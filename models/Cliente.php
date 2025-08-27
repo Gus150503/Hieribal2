@@ -70,7 +70,7 @@ final class Cliente {
         ':pass'    => password_hash(bin2hex(random_bytes(8)), PASSWORD_DEFAULT)
       ]);
       return (int)$this->pdo->lastInsertId();
-  }
+    }
 
     // ---------------- NUEVOS PARA VERIFICACIÓN POR EMAIL ---------------- //
     public function crearConVerificacion(array $d, string $token): int {
@@ -131,5 +131,21 @@ final class Cliente {
           ':pwd'=>$hash,
           ':t'=>$token,
         ]);
+    }
+
+    // ---------------- KPIs PARA EL DASHBOARD ---------------- //
+
+    /** Total de clientes (sin filtros) */
+    public function total(): int {
+        return (int)$this->pdo->query("SELECT COUNT(*) FROM clientes")->fetchColumn();
+    }
+
+    /**
+     * Total de clientes activos.
+     * Usa 'verificado = 1' porque esa columna sí existe en tu esquema.
+     * Si usas otra convención (p. ej. 'estado'), ajusta el WHERE.
+     */
+    public function totalActivos(): int {
+        return (int)$this->pdo->query("SELECT COUNT(*) FROM clientes WHERE verificado = 1")->fetchColumn();
     }
 }

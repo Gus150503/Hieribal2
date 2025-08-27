@@ -23,34 +23,37 @@ final class AdminDashboardController extends Controller
         $this->ventas    = new Venta($config);
     }
 
-    public function index(): void
-    {
-        if (empty($_SESSION['admin'])) {
-            $_SESSION['admin_error'] = 'Inicia sesión para continuar.';
-            $this->redirect('/?r=admin_login');
-        }
+// controllers/AdminDashboardController.php
+public function index(): void
+{
+    if (empty($_SESSION['admin'])) {
+        $_SESSION['admin_error'] = 'Inicia sesión para continuar.';
+        $this->redirect('/?r=admin_login');
+    }
 
-        // Series para gráficos
-        [$lowLabels, $lowValues]   = $this->productos->porAcabarse(10);
-        [$needLabels, $needValues] = $this->productos->porPedir(10);
-        [$tcLabels, $tcValues]     = $this->ventas->clientesQueMasCompran(10);
+    [$lowLabels,  $lowValues]  = $this->productos->porAcabarse(10);
+    [$needLabels, $needValues] = $this->productos->porPedir(10);
+    [$tcLabels,   $tcValues]   = $this->ventas->topClientes(10, 'compras');
 
-        $this->render('admin/dashboard', [
-            'admin'            => $_SESSION['admin'],
+    $this->render(
+        'admin/dashboard',
+        [
+            'esAdmin'         => true, // <—— IMPORTANTE
 
             // KPIs
-            'totalEmpleados'   => (int)$this->usuarios->totalPorRol('Empleado'), // si tienes este método
-            'totalClientes'    => (int)$this->clientes->totalActivos(),
-            'totalProductos'   => (int)$this->productos->totalActivos(),
-            'totalVentasMes'   => (int)$this->ventas->totalDelMes(),
+            'admin'           => $_SESSION['admin'],
+            'totalEmpleados'  => (int) $this->usuarios->totalPorRol('Empleado'),
+            'totalClientes'   => (int) $this->clientes->totalActivos(), // o ->total()
+            'totalProductos'  => (int) $this->productos->totalActivos(),
+            'totalVentasMes'  => (int) $this->ventas->totalDelMes(),
 
-            // Carruseles (si no tienes datos aún, deja arrays vacíos)
-            'invDestacados'    => [],
-            'topVendidos'      => [],
-            'agotados'         => [],
-            'aniversario1Año'  => [],
+            // Carruseles
+            'invDestacados'   => [],
+            'topVendidos'     => [],
+            'agotados'        => [],
+            'aniversario1Año' => [],
 
-            // Gráficos -> la vista los inyecta en window.__charts
+            // Gráficos
             'lowStockLabels'   => $lowLabels,
             'lowStockValues'   => $lowValues,
             'toOrderLabels'    => $needLabels,
@@ -58,11 +61,13 @@ final class AdminDashboardController extends Controller
             'topClientsLabels' => $tcLabels,
             'topClientsValues' => $tcValues,
 
-            // JS
+            // JS extra
             'extra_js' => [
                 'https://cdn.jsdelivr.net/npm/chart.js',
                 $this->config['app']['base_url'] . '/assets/js/admin-dashboard.js',
             ],
-        ], 'Dashboard');
-    }
+        ],
+        'Dashboard'
+    );
+}
 }

@@ -12,6 +12,7 @@
     <a href="<?= $base ?>/?r=admin_productos"><i class="bi bi-basket3"></i> Productos</a>
     <a href="<?= $base ?>/?r=admin_usuarios"><i class="bi bi-people"></i> Usuarios</a>
     <a href="<?= $base ?>/?r=admin_configuracion"><i class="bi bi-gear"></i> Configuración</a>
+    
   </nav>
 
   <!-- Backdrop para cerrar tocando fuera (solo móvil) -->
