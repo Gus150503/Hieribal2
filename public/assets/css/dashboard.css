@@ -1,32 +1,46 @@
-/* ======== Tema admin (solo aplica cuando el <body> tiene .admin-layout) ======== */
-.admin-layout {
-  --bg: #f6f8fb;
-  --card: #ffffff;
-  --muted: #6b7280;
-  --text: #1f2937;
-  --border: #e5e7eb;
-  --shadow: 0 8px 20px rgba(18,38,63,.06);
-  background: var(--bg);
-  color: var(--text);
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+/* ===========================
+   THEME & BASE
+   =========================== */
+
+html, body { height: 100%; overflow-y: auto; }
+
+.admin-layout{
+  --bg:#f6f8fb;
+  --card:#ffffff;
+  --muted:#6b7280;
+  --text:#1f2937;
+  --border:#e5e7eb;
+  --shadow:0 8px 20px rgba(18,38,63,.06);
+  background:var(--bg);
+  color:var(--text);
+  font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
-/* Oculta header/hero del sitio público si algo se cuela */
+/* Oculta cabeceras públicas dentro del admin */
 .admin-layout .site-header,
 .admin-layout .hero,
-.admin-layout .home-hero { display: none !important; }
+.admin-layout .home-hero{ display:none !important; }
 
-/* ======== Layout ======== */
-.dashboard-layout { display:flex; min-height:100vh; }
+/* ===========================
+   LAYOUT
+   =========================== */
+
+/* contenedor principal: sidebar + contenido */
+.dashboard-layout{
+  display:flex;
+  min-height:100vh;
+  gap: clamp(12px, 2vw, 24px);
+}
 
 /* Sidebar */
 .sidebar{
-  width: 240px;
-  background: #679d48;
+  width:240px;
+  background:#679d48;
   color:#fff;
-  position: sticky;
-  top:0; height:100vh; flex-shrink:0;
-  display:flex; flex-direction:column; gap:.25rem; padding:1rem .75rem;
+  position:sticky; top:0;
+  flex-shrink:0;
+  display:flex; flex-direction:column; gap:.25rem;
+  padding:1rem .75rem;
   box-shadow: inset -1px 0 0 rgba(255,255,255,.08);
 }
 .sidebar .logo{ text-align:center; padding:.25rem 0 .5rem; }
@@ -37,58 +51,247 @@
   transition: background .15s ease, opacity .15s ease, transform .15s ease;
 }
 .sidebar a:hover{ background: rgba(255,255,255,.12); opacity:1; transform: translateX(2px); }
-.sidebar i{ font-size:1rem; opacity:.95; }
 
-/* Main */
-.main-content{ flex:1; padding:22px; }
-
-/* Topbar */
-.topbar{
-  background: var(--card)!important; border:1px solid var(--border);
-  border-radius:16px; padding:12px 16px; box-shadow: var(--shadow);
-  margin-bottom:18px;
+/* Contenido: ocupa todo el ancho, con gutter responsivo */
+.dashboard-layout > .p-4,
+.dashboard-layout > .main-content{
+  flex:1; width:100%; max-width:none; margin:0;
+  box-sizing:border-box;
+  padding-inline: clamp(24px, 3vw, 56px);
+  padding-block: 18px 32px;
 }
-.topbar strong{ font-weight:700; color:#374151; }
-.topbar .dropdown-toggle{ color:#374151; text-decoration:none; font-weight:600; }
-.topbar .dropdown-menu{ border-radius:12px; box-shadow: var(--shadow); }
 
-/* ======== Tarjetas ======== */
-.cards{
+/* Títulos/auxiliares */
+.p-4 h4{ margin:6px 0 4px; }
+.p-4 .text-muted{ margin:0 0 10px; color:var(--muted); }
+
+/* ===========================
+   GRID SUPERIOR (KPIs + PANELS)
+   =========================== */
+
+/* Dos columnas: KPIs angostos + contenido */
+.dash-grid{
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-  gap:16px; margin-top:10px;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap:16px;
+  margin-top:8px;
 }
-.card-stat{
-  background: var(--card); border:1px solid var(--border); border-radius:18px;
-  padding:16px; text-align:center; box-shadow: var(--shadow);
-  transition: transform .18s ease, box-shadow .18s ease;
-}
-.card-stat:hover{ transform: translateY(-2px); box-shadow: 0 12px 26px rgba(18,38,63,.09); }
-.card-stat h6{
-  margin:0 0 6px; font-size:.8rem; letter-spacing:.35px; text-transform:uppercase; color:var(--muted);
-}
-.card-stat .num{ font-size:2.1rem; font-weight:800; line-height:1; margin:0; }
 
-/* toques de color suaves */
-.card-blue { background: linear-gradient(180deg,#e8f1ff 0%, #fff 50%); }
-.card-green{ background: linear-gradient(180deg,#e8fff3 0%, #fff 50%); }
-.card-amber{ background: linear-gradient(180deg,#fff6e3 0%, #fff 50%); }
-.card-cyan { background: linear-gradient(180deg,#e6fbff 0%, #fff 50%); }
+/* KPIs compactos a la izquierda */
+.kpi-stack{ display:flex; flex-direction:column; gap:10px; }
+.kpi-card{
+  border-radius:12px; padding:10px 12px; color:#fff; box-shadow:var(--shadow);
+}
+.kpi-title{ font-weight:600; opacity:.95; font-size:.9rem; }
+.kpi-value{ font-size:1.7rem; line-height:1; font-weight:800; margin-top:6px; }
+.kpi-red{ background:#e44755; }
+.kpi-orange{ background:#f59e0b; }
+.kpi-green{ background:#10b981; }
+.kpi-cyan{ background:#22c3d6; }
 
-/* Panel (contenedor del gráfico) */
+/* Paneles de la derecha (2 x fila) */
+.carousel-grid{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap:16px;
+}
+
+/* ===========================
+   PANELS & CARDS
+   =========================== */
+
 .panel{
-  background: var(--card); border:1px solid var(--border); border-radius:18px;
-  padding:18px; box-shadow: var(--shadow); margin-top:18px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px;
+  box-shadow:var(--shadow);
 }
-.panel h5{ margin:0 0 10px; font-weight:700; }
+.panel h5{
+  margin:0 0 8px;
+  font-weight:700; letter-spacing:.2px; color:#111827;
+}
 
-/* Chart */
-.chart-container{ display:flex; align-items:center; justify-content:center; min-height:320px; }
+/* Slider simple dentro de panel */
+.slider{ position:relative; padding:0 2px; }
+.slider-track{
+  display:flex; gap:10px;
+  overflow-x:auto; scroll-behavior:smooth;
+  padding:6px 28px 6px 28px;
+}
+.slider-track::-webkit-scrollbar{ height:7px; }
+.slider-track::-webkit-scrollbar-thumb{ background:#e5e7eb; border-radius:8px; }
 
-/* Responsive: sidebar colapsable en pantallas pequeñas */
-@media (max-width: 1024px){
-  .main-content{ padding:16px; }
-  .sidebar{ position: fixed; left:-260px; z-index:1000; transition:left .25s ease; }
+.slider-btn{
+  position:absolute; top:50%; transform:translateY(-50%);
+  border:0; background:#fff; box-shadow:var(--shadow);
+  width:28px; height:28px; border-radius:999px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+}
+.slider-btn.prev{ left:4px; } .slider-btn.next{ right:4px; }
+.slider-btn[disabled]{ opacity:.35; pointer-events:none; }
+
+/* Tarjeta de item del carrusel */
+.slide-card{
+  min-width:130px; max-width:130px;
+  background:#fff; border:1px solid var(--border);
+  border-radius:10px; padding:8px;
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  box-shadow:var(--shadow);
+}
+.slide-card img{ width:48px; height:48px; object-fit:cover; border-radius:8px; background:#f5f7fa; }
+.slide-title{ font-weight:700; text-align:center; font-size:.86rem; }
+.slide-sub{ font-size:.78rem; color:var(--muted); }
+.slide-empty{
+  min-width:100%; text-align:center; color:var(--muted);
+  padding:18px 0; background:#fafafa; border:1px dashed var(--border); border-radius:10px;
+}
+
+/* ===========================
+   GRÁFICOS (parte de abajo)
+   =========================== */
+
+.charts-grid{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));  /* 3 columnas que llenan el ancho */
+  gap:16px;
+  margin-top:16px;
+  align-items:stretch;
+}
+
+.charts-grid > .panel{ padding:12px; border-radius:12px; }
+.charts-grid > .panel h5{ margin:0 0 8px; }
+
+/* Tarjeta del gráfico + overlay centrado */
+.chart-card{
+  position: relative;              /* <- necesario para overlay */
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  width:100%;
+  height: 240px;                   /* 210–260 según prefieras */
+  display:flex; align-items:center; justify-content:center;
+}
+.chart-card canvas{
+  width:100% !important;
+  height:100% !important;
+  display:block;
+}
+
+/* Overlay “Sin datos” centrado y por encima del canvas */
+.chart-card .chart-empty{
+  position:absolute;
+  inset:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#fafafa;
+  border:1px dashed var(--border);
+  border-radius:12px;
+  color:var(--muted);
+  font-weight:600;
+  z-index:2;
+  pointer-events:none;
+}
+
+/* ===========================
+   RESPONSIVE
+   =========================== */
+
+@media (max-width:1280px){
+  .charts-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width:1024px){
+  .dash-grid{ grid-template-columns: 1fr; }
+  .carousel-grid{ grid-template-columns: 1fr; }
+  .charts-grid{ grid-template-columns: 1fr; }
+
+  .sidebar{
+    position:fixed; left:-260px; top:0; bottom:0; z-index:1000; transition:left .25s ease;
+  }
   .sidebar.active{ left:0; }
   .menu-toggle{ display:inline-flex; }
+
+  .dashboard-layout > .p-4,
+  .dashboard-layout > .main-content{
+    padding-inline:16px;
+    padding-block:16px 28px;
+    height:100vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  }
+}
+
+/* ===== Mejoras para pantallas GRANDES sin mover las tarjetas de abajo ===== */
+@media (min-width: 1440px){
+  .dashboard-layout > .p-4{
+    padding-inline: clamp(20px, 2vw, 40px);
+  }
+  .dash-grid{
+    grid-template-columns: 240px 1fr;
+    gap: 22px;
+  }
+  .kpi-card{ padding: 14px 16px; }
+  .kpi-title{ font-size: 1.05rem; }
+  .kpi-value{ font-size: 2.3rem; }
+
+  .panel{ padding: 18px; }
+
+  .slide-card{ min-width: 160px; max-width: 160px; }
+  .slide-title{ font-size: .95rem; }
+  .slide-sub{ font-size: .85rem; }
+
+  .charts-grid{
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 20px;
+  }
+  .chart-card{ height: 240px; }
+}
+@media (min-width: 1680px){
+  .dashboard-layout > .p-4{ padding-inline: clamp(22px, 2.2vw, 42px); }
+  .dash-grid{ grid-template-columns: 260px 1fr; gap: 24px; }
+  .kpi-value{ font-size: 2.45rem; }
+  .slide-card{ min-width: 170px; max-width: 170px; }
+
+  .charts-grid{ grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .chart-card{ height: 240px; }
+}
+
+/* ===========================
+   Móvil: barra + backdrop + off-canvas
+   =========================== */
+
+.mobile-bar{
+  display:none; align-items:center; gap:10px;
+  margin-bottom:12px;
+}
+.menu-toggle{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:40px; height:40px; border:0; border-radius:10px;
+  background:#fff; box-shadow:0 8px 20px rgba(18,38,63,.06);
+}
+
+.sidebar-backdrop{
+  display:none;
+  position:fixed; inset:0; background:rgba(0,0,0,.35);
+  z-index: 999; /* debajo de la sidebar */
+}
+
+@media (max-width:1024px){
+  .mobile-bar{ display:flex; }
+
+  .sidebar{
+    position:fixed;
+    top:0; left:0; bottom:0;
+    z-index: 1000;
+    width: 260px;
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+  }
+
+  body.sidebar-open #adminSidebar{
+    transform: translateX(0);
+  }
+  body.sidebar-open .sidebar-backdrop{
+    display:block;
+  }
 }
