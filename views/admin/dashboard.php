@@ -19,19 +19,10 @@ $normFoto = function(array $row): string {
 
 <div class="dashboard-layout">
   <!-- Sidebar -->
-  <nav class="sidebar" id="adminSidebar">
-    <div class="logo">
-      <img src="<?= $base ?>/assets/img/logo.png" alt="Logo Hieribal">
-    </div>
-    <a href="<?= $base ?>/?r=admin_dashboard"><i class="bi bi-house-door"></i> Inicio</a>
-    <a href="<?= $base ?>/?r=admin_inventario"><i class="bi bi-box-seam"></i> Inventario</a>
-    <a href="<?= $base ?>/?r=admin_productos"><i class="bi bi-basket3"></i> Productos</a>
-    <a href="<?= $base ?>/?r=admin_usuarios"><i class="bi bi-people"></i> Usuarios</a>
-    <a href="<?= $base ?>/?r=admin_configuracion"><i class="bi bi-gear"></i> Configuración</a>
-    <a href="<?= $base ?>/?r=admin_logout" class="btn btn-danger mt-3">
-      <i class="bi bi-box-arrow-right"></i> Salir
-    </a>
-  </nav>
+<nav class="sidebar" id="adminSidebar">
+  <?php include __DIR__ . '/sidebar.php'; ?>
+</nav>
+
 
   <!-- Backdrop para cerrar tocando fuera (solo móvil) -->
   <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
