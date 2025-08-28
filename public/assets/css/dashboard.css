@@ -59,8 +59,8 @@ html, body { height: 100%; overflow-y: auto; }
   padding-block: 18px 32px;
 }
 
-.p-4 h4{ margin:6px 0 4px; }
-.p-4 .text-muted{ margin:0 0 10px; color:var(--muted); }
+.p-4 h4{ margin:6px 0 4px; margin-left: 210px;}
+.p-4 .text-muted{ margin:0 0 10px; color:var(--muted); margin-left: 210px}
 
 /* ===========================
    GRID SUPERIOR (KPIs + PANELS)
@@ -71,6 +71,7 @@ html, body { height: 100%; overflow-y: auto; }
   grid-template-columns: 200px minmax(0, 1fr);
   gap:16px;
   margin-top:8px;
+  margin-left: 209px;
 }
 
 .kpi-stack{ display:flex; flex-direction:column; gap:10px; }
@@ -185,6 +186,7 @@ html, body { height: 100%; overflow-y: auto; }
   display:grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap:16px; margin-top:16px; align-items:stretch;
+  margin-left: 200px;
 }
 .charts-grid > .panel{ padding:12px; border-radius:12px; }
 .charts-grid > .panel h5{ margin:0 0 8px; }
@@ -265,3 +267,69 @@ html, body { height: 100%; overflow-y: auto; }
   body.sidebar-open .sidebar-backdrop{ display:block; }
 }
 
+/* que el viewport esté “a tamaño completo” */
+html, body { height: 100%; margin: 0; }
+
+/* contenedor general del admin */
+.admin-wrap { min-height: 100vh; }
+
+/* === SIDEBAR === */
+.sidebar{
+  position: fixed;      /* fija al lado izquierdo */
+  top: 0;
+  left: 0;
+  width: 220px;
+  height: 100vh;        /* ocupa TODO el alto de la ventana */
+  background: #4CAF50;  /* tu verde */
+  color: #fff;
+  padding: 20px 0;
+  overflow-y: auto;     /* scroll si el menú crece */
+  z-index: 1000;
+}
+
+/* menú del sidebar (quita las viñetas) */
+.sidebar nav, .sidebar .sidebar-nav { display:block; }
+.sidebar .menu{ list-style: none; margin: 0; padding: 0; }
+.sidebar .menu li a{
+  display: block;
+  padding: 12px 20px;
+  color: #fff;
+  text-decoration: none;
+}
+.sidebar .menu li a:hover,
+.sidebar .menu li a.active{
+  background: rgba(0,0,0,.15);
+  border-left: 4px solid #fff;
+}
+
+/* === CONTENIDO A LA DERECHA === */
+.content{
+  margin-left: 220px;   /* deja espacio para la barra */
+  padding: 24px;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* tamaño sidebar (ajusta si cambias el ancho) */
+:root { --sidebar-w: 220px; }
+
+/* barra fija */
+.sidebar{
+  position: fixed;
+  top: 0; left: 0;
+  width: var(--sidebar-w);
+  height: 100vh;
+  background: #4CAF50;
+  color: #fff;
+  padding: 20px 0;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+/* contenido a la derecha */
+.content{
+  margin-left: var(--sidebar-w);
+  padding: 24px;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
