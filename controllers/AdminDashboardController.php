@@ -31,6 +31,8 @@ final class AdminDashboardController extends Controller
         $this->redirect('/?r=admin_login');
     }
 
+
+    
     // ===== Charts =====
     [$lowLabels,  $lowValues]  = $this->productos->porAcabarse(10);
     [$needLabels, $needValues] = $this->productos->porPedir(10);
@@ -73,5 +75,24 @@ final class AdminDashboardController extends Controller
         ],
     ]);
 }
+
+public function inventario(): void {
+    if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+    if (empty($_SESSION['admin'])) { $_SESSION['admin_error'] = 'Inicia sesión para continuar.'; $this->redirect('/?r=admin_login'); }
+    $this->render('admin/inventario/index', ['titulo' => 'Inventario', 'esAdmin' => true]);
+}
+
+public function productos(): void {
+    if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+    if (empty($_SESSION['admin'])) { $_SESSION['admin_error'] = 'Inicia sesión para continuar.'; $this->redirect('/?r=admin_login'); }
+    $this->render('admin/productos/index', ['titulo' => 'Productos', 'esAdmin' => true]);
+}
+
+public function configuracion(): void {
+    if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+    if (empty($_SESSION['admin'])) { $_SESSION['admin_error'] = 'Inicia sesión para continuar.'; $this->redirect('/?r=admin_login'); }
+    $this->render('admin/configuracion/index', ['titulo' => 'Configuración', 'esAdmin' => true]);
+}
+
 
 }

@@ -2,7 +2,7 @@
 <?php if (!$partial) include __DIR__ . '/../_shell_start.php'; ?>
 
 <section class="card">
-  <h1><?= htmlspecialchars($titulo ?? 'Usuarios') ?></h1>
+  <h1><?= htmlspecialchars($titulo ?? 'Inventario') ?></h1>
   <p>En construcción.</p>
 </section>
 
