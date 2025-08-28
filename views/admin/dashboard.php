@@ -1,19 +1,28 @@
 <?php /* views/admin/dashboard.php */ ?>
-<?php $base = htmlspecialchars($this->config['app']['base_url'] ?? ''); ?>
+<?php
+$base = htmlspecialchars($this->config['app']['base_url'] ?? '');
+
+/**
+ * Normaliza el nombre de imagen que venga del query.
+ * - Acepta claves 'imagen' o 'img'
+ * - Quita prefijos como 'assets/img/' o 'img/'
+ * - Devuelve 'placeholder.png' si está vacío
+ */
+$normFoto = function(array $row): string {
+  $f = $row['imagen'] ?? ($row['img'] ?? '');
+  $f = ltrim((string)$f, '/');
+  if (stripos($f, 'assets/img/') === 0) { $f = substr($f, strlen('assets/img/')); }
+  if (stripos($f, 'img/') === 0)        { $f = substr($f, strlen('img/')); }
+  return $f !== '' ? $f : 'placeholder.png';
+};
+?>
 
 <div class="dashboard-layout">
   <!-- Sidebar -->
-  <nav class="sidebar" id="adminSidebar">
-    <div class="logo">
-      <img src="<?= $base ?>/assets/img/logo.png" alt="Logo Hieribal">
-    </div>
-    <a href="<?= $base ?>/?r=admin_dashboard"><i class="bi bi-house-door"></i> Inicio</a>
-    <a href="<?= $base ?>/?r=admin_inventario"><i class="bi bi-box-seam"></i> Inventario</a>
-    <a href="<?= $base ?>/?r=admin_productos"><i class="bi bi-basket3"></i> Productos</a>
-    <a href="<?= $base ?>/?r=admin_usuarios"><i class="bi bi-people"></i> Usuarios</a>
-    <a href="<?= $base ?>/?r=admin_configuracion"><i class="bi bi-gear"></i> Configuración</a>
-    
-  </nav>
+<nav class="sidebar" id="adminSidebar">
+  <?php include __DIR__ . '/sidebar.php'; ?>
+</nav>
+
 
   <!-- Backdrop para cerrar tocando fuera (solo móvil) -->
   <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
@@ -62,12 +71,15 @@
         <!-- Inventario destacados -->
         <article class="panel">
           <h5 class="mb-2">🌟 Inventario destacado</h5>
-          <div class="slider" data-slider>
+          <div class="slider slider--single" data-slider>
             <button class="slider-btn prev" data-prev>&lsaquo;</button>
             <div class="slider-track" data-track>
               <?php foreach (($invDestacados ?? []) as $p): ?>
+                <?php $foto = $normFoto($p); ?>
                 <div class="slide-card">
-                  <img src="<?= $base ?>/assets/img/products/<?= htmlspecialchars($p['img'] ?? 'placeholder.png') ?>" alt="">
+                  <img
+                    src="<?= $base ?>/assets/img/<?= htmlspecialchars($foto) ?>"
+                    alt="<?= htmlspecialchars($p['nombre'] ?? 'Producto') ?>">
                   <div class="slide-title"><?= htmlspecialchars($p['nombre'] ?? 'Producto') ?></div>
                   <div class="slide-sub">Stock: <?= (int)($p['stock'] ?? 0) ?></div>
                 </div>
@@ -83,12 +95,15 @@
         <!-- Más vendidos -->
         <article class="panel">
           <h5 class="mb-2">🏆 Más vendidos</h5>
-          <div class="slider" data-slider>
+          <div class="slider slider--single" data-slider>
             <button class="slider-btn prev" data-prev>&lsaquo;</button>
             <div class="slider-track" data-track>
               <?php foreach (($topVendidos ?? []) as $p): ?>
+                <?php $foto = $normFoto($p); ?>
                 <div class="slide-card">
-                  <img src="<?= $base ?>/assets/img/products/<?= htmlspecialchars($p['img'] ?? 'placeholder.png') ?>" alt="">
+                  <img
+                    src="<?= $base ?>/assets/img/<?= htmlspecialchars($foto) ?>"
+                    alt="<?= htmlspecialchars($p['nombre'] ?? 'Producto') ?>">
                   <div class="slide-title"><?= htmlspecialchars($p['nombre'] ?? 'Producto') ?></div>
                   <div class="slide-sub">Unid: <?= (int)($p['unidades'] ?? 0) ?></div>
                 </div>
@@ -104,12 +119,15 @@
         <!-- Agotados -->
         <article class="panel">
           <h5 class="mb-2">🚨 Productos agotados</h5>
-          <div class="slider" data-slider>
+          <div class="slider slider--single" data-slider>
             <button class="slider-btn prev" data-prev>&lsaquo;</button>
             <div class="slider-track" data-track>
               <?php foreach (($agotados ?? []) as $p): ?>
+                <?php $foto = $normFoto($p); ?>
                 <div class="slide-card">
-                  <img src="<?= $base ?>/assets/img/products/<?= htmlspecialchars($p['img'] ?? 'placeholder.png') ?>" alt="">
+                  <img
+                    src="<?= $base ?>/assets/img/<?= htmlspecialchars($foto) ?>"
+                    alt="<?= htmlspecialchars($p['nombre'] ?? 'Producto') ?>">
                   <div class="slide-title"><?= htmlspecialchars($p['nombre'] ?? 'Producto') ?></div>
                   <div class="slide-sub text-danger">Agotado</div>
                 </div>
@@ -125,12 +143,14 @@
         <!-- Empleados con 1 año -->
         <article class="panel">
           <h5 class="mb-2">🎉 1 año en la empresa</h5>
-          <div class="slider" data-slider>
+          <div class="slider slider--single" data-slider>
             <button class="slider-btn prev" data-prev>&lsaquo;</button>
             <div class="slider-track" data-track>
               <?php foreach (($aniversario1Año ?? []) as $e): ?>
                 <div class="slide-card">
-                  <img src="<?= $base ?>/assets/img/avatars/<?= htmlspecialchars($e['img'] ?? 'avatar.png') ?>" alt="">
+                  <img
+                    src="<?= $base ?>/assets/img/avatars/<?= htmlspecialchars($e['img'] ?? 'avatar.png') ?>"
+                    alt="<?= htmlspecialchars($e['nombre'] ?? 'Empleado') ?>">
                   <div class="slide-title"><?= htmlspecialchars($e['nombre'] ?? 'Empleado') ?></div>
                   <div class="slide-sub">Desde: <?= htmlspecialchars($e['desde'] ?? '') ?></div>
                 </div>

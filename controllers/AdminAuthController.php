@@ -79,9 +79,23 @@ final class AdminAuthController extends Controller {
     }
 
     /** Cierra sesión admin */
-    public function logout(): void {
-        unset($_SESSION['admin']);
-        session_regenerate_id(true);
-        $this->redirect('/?r=admin_login');
+public function logout(): void
+{
+    if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+
+    // Limpiar sesión
+    $_SESSION = [];
+    if (ini_get('session.use_cookies')) {
+        $p = session_get_cookie_params();
+        setcookie(session_name(), '', time()-42000, $p['path'], $p['domain'], $p['secure'], $p['httponly']);
     }
+    session_destroy();
+
+    // Redirigir usando el router (?r=home), NO a /home/index.php
+    $base = rtrim($this->config['app']['base_url'] ?? '', '/'); // p.ej. /Hieribal2/public
+    header('Location: ' . $base . '/?r=home');
+    exit;
+}
+
+
 }

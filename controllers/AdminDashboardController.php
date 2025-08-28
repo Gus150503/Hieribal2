@@ -23,51 +23,76 @@ final class AdminDashboardController extends Controller
         $this->ventas    = new Venta($config);
     }
 
-// controllers/AdminDashboardController.php
-public function index(): void
-{
-    if (empty($_SESSION['admin'])) {
-        $_SESSION['admin_error'] = 'Inicia sesión para continuar.';
-        $this->redirect('/?r=admin_login');
-    }
+    public function index(): void
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+        if (empty($_SESSION['admin'])) {
+            $_SESSION['admin_error'] = 'Inicia sesión para continuar.';
+            $this->redirect('/?r=admin_login');
+        }
 
-    [$lowLabels,  $lowValues]  = $this->productos->porAcabarse(10);
-    [$needLabels, $needValues] = $this->productos->porPedir(10);
-    [$tcLabels,   $tcValues]   = $this->ventas->topClientes(10, 'compras');
+        // ===== Charts =====
+        [$lowLabels,  $lowValues]  = $this->productos->porAcabarse(10);           // [labels, values]
+        [$needLabels, $needValues] = $this->productos->porPedir(10);              // [labels, values]
+        [$tcLabels,   $tcValues]   = $this->ventas->topClientes(10, 'compras');   // [labels, values]
 
-    $this->render(
-        'admin/dashboard',
-        [
-            'esAdmin'         => true, // <—— IMPORTANTE
+        // ===== Carruseles =====
+        $invDestacados     = $this->productos->destacados(10);
+        $topVendidos       = $this->ventas->topProductos(10);
+        $agotados          = $this->productos->agotados(10);
+        $aniversario1Anio  = $this->usuarios->conAnioAntiguedad(10); // usa fecha_creacion
 
-            // KPIs
-            'admin'           => $_SESSION['admin'],
-            'totalEmpleados'  => (int) $this->usuarios->totalPorRol('Empleado'),
-            'totalClientes'   => (int) $this->clientes->totalActivos(), // o ->total()
-            'totalProductos'  => (int) $this->productos->totalActivos(),
-            'totalVentasMes'  => (int) $this->ventas->totalDelMes(),
+        // Render (vista = contenido puro; layout aporta sidebar/estructura)
+        $this->render(
+            'admin/dashboard',
+            [
+                'esAdmin'            => true,
 
-            // Carruseles
-            'invDestacados'   => [],
-            'topVendidos'     => [],
-            'agotados'        => [],
-            'aniversario1Año' => [],
+                // === NUEVO: variables que espera el layout ===
+                'bodyClass'   => 'admin-layout',                    // activa tema del panel
+                'pageStyles'  => [
+                    '/assets/css/dashboard.css', 
+                    '/assets/css/sidebar.css'                      // <-- agregado aquí
+                ],     
+                'pageScripts' => [                                 // scripts que debe inyectar el layout
+                    'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js',
+                    $this->config['app']['base_url'] . '/assets/js/admin.js',
+                ],
 
-            // Gráficos
-            'lowStockLabels'   => $lowLabels,
-            'lowStockValues'   => $lowValues,
-            'toOrderLabels'    => $needLabels,
-            'toOrderValues'    => $needValues,
-            'topClientsLabels' => $tcLabels,
-            'topClientsValues' => $tcValues,
+                // === Mantengo lo tuyo tal cual ===
+                'admin'              => $_SESSION['admin'],
 
-            // JS extra
-            'extra_js' => [
-                'https://cdn.jsdelivr.net/npm/chart.js',
-                $this->config['app']['base_url'] . '/assets/js/admin-dashboard.js',
+                // KPIs
+                'totalEmpleados'     => (int) $this->usuarios->totalPorRol('Empleado'),
+                'totalClientes'      => (int) $this->clientes->totalActivos(),
+                'totalProductos'     => (int) $this->productos->totalActivos(),
+                'totalVentasMes'     => (int) $this->ventas->totalDelMes(),
+
+                // Carruseles
+                'invDestacados'      => $invDestacados,
+                'topVendidos'        => $topVendidos,
+                'agotados'           => $agotados,
+                'aniversario1Anio'   => $aniversario1Anio,
+
+                // 👉 Alias por si tu vista usa la variable con "ñ"
+                'aniversario1Año'    => $aniversario1Anio,
+
+                // Charts
+                'lowStockLabels'     => $lowLabels,
+                'lowStockValues'     => $lowValues,
+                'toOrderLabels'      => $needLabels,
+                'toOrderValues'      => $needValues,
+                'topClientsLabels'   => $tcLabels,
+                'topClientsValues'   => $tcValues,
+
+                // === Mantengo tu clave original (por compatibilidad) ===
+                // Si tu layout nuevo ya usa pageScripts, evita duplicar carga en la plantilla.
+                'extra_js' => [
+                    'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js',
+                    $this->config['app']['base_url'] . '/assets/js/admin.js',
+                ],
             ],
-        ],
-        'Dashboard'
-    );
-}
+            'Dashboard'
+        );
+    }
 }
