@@ -32,43 +32,61 @@ final class AdminDashboardController extends Controller
         }
 
         // ===== Charts =====
-        [$lowLabels,  $lowValues]  = $this->productos->porAcabarse(10);  // [labels, values]
-        [$needLabels, $needValues] = $this->productos->porPedir(10);     // [labels, values]
-        [$tcLabels,   $tcValues]   = $this->ventas->topClientes(10, 'compras'); // [labels, values]
+        [$lowLabels,  $lowValues]  = $this->productos->porAcabarse(10);           // [labels, values]
+        [$needLabels, $needValues] = $this->productos->porPedir(10);              // [labels, values]
+        [$tcLabels,   $tcValues]   = $this->ventas->topClientes(10, 'compras');   // [labels, values]
 
         // ===== Carruseles =====
-        $invDestacados   = $this->productos->destacados(10);
-        $topVendidos     = $this->ventas->topProductos(10);
-        $agotados        = $this->productos->agotados(10);
-        $aniversario1Anio = $this->usuarios->conAnioAntiguedad(10); // usa fecha_creacion
+        $invDestacados     = $this->productos->destacados(10);
+        $topVendidos       = $this->ventas->topProductos(10);
+        $agotados          = $this->productos->agotados(10);
+        $aniversario1Anio  = $this->usuarios->conAnioAntiguedad(10); // usa fecha_creacion
 
+        // Render (vista = contenido puro; layout aporta sidebar/estructura)
         $this->render(
             'admin/dashboard',
             [
-                'esAdmin'         => true,
+                'esAdmin'            => true,
+
+                // === NUEVO: variables que espera el layout ===
+                'bodyClass'   => 'admin-layout',                    // activa tema del panel
+                'pageStyles'  => [
+                    '/assets/css/dashboard.css', 
+                    '/assets/css/sidebar.css'                      // <-- agregado aquí
+                ],     
+                'pageScripts' => [                                 // scripts que debe inyectar el layout
+                    'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js',
+                    $this->config['app']['base_url'] . '/assets/js/admin.js',
+                ],
+
+                // === Mantengo lo tuyo tal cual ===
+                'admin'              => $_SESSION['admin'],
 
                 // KPIs
-                'admin'           => $_SESSION['admin'],
-                'totalEmpleados'  => (int) $this->usuarios->totalPorRol('Empleado'),
-                'totalClientes'   => (int) $this->clientes->totalActivos(),
-                'totalProductos'  => (int) $this->productos->totalActivos(),
-                'totalVentasMes'  => (int) $this->ventas->totalDelMes(),
+                'totalEmpleados'     => (int) $this->usuarios->totalPorRol('Empleado'),
+                'totalClientes'      => (int) $this->clientes->totalActivos(),
+                'totalProductos'     => (int) $this->productos->totalActivos(),
+                'totalVentasMes'     => (int) $this->ventas->totalDelMes(),
 
                 // Carruseles
-                'invDestacados'   => $invDestacados,
-                'topVendidos'     => $topVendidos,
-                'agotados'        => $agotados,
-                'aniversario1Anio'=> $aniversario1Anio,
+                'invDestacados'      => $invDestacados,
+                'topVendidos'        => $topVendidos,
+                'agotados'           => $agotados,
+                'aniversario1Anio'   => $aniversario1Anio,
+
+                // 👉 Alias por si tu vista usa la variable con "ñ"
+                'aniversario1Año'    => $aniversario1Anio,
 
                 // Charts
-                'lowStockLabels'   => $lowLabels,
-                'lowStockValues'   => $lowValues,
-                'toOrderLabels'    => $needLabels,
-                'toOrderValues'    => $needValues,
-                'topClientsLabels' => $tcLabels,
-                'topClientsValues' => $tcValues,
+                'lowStockLabels'     => $lowLabels,
+                'lowStockValues'     => $lowValues,
+                'toOrderLabels'      => $needLabels,
+                'toOrderValues'      => $needValues,
+                'topClientsLabels'   => $tcLabels,
+                'topClientsValues'   => $tcValues,
 
-                // JS extra (tu plantilla debe imprimirlos al final del body en ese orden)
+                // === Mantengo tu clave original (por compatibilidad) ===
+                // Si tu layout nuevo ya usa pageScripts, evita duplicar carga en la plantilla.
                 'extra_js' => [
                     'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js',
                     $this->config['app']['base_url'] . '/assets/js/admin.js',

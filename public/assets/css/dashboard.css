@@ -264,3 +264,4 @@ html, body { height: 100%; overflow-y: auto; }
   body.sidebar-open #adminSidebar{ transform: translateX(0); }
   body.sidebar-open .sidebar-backdrop{ display:block; }
 }
+
