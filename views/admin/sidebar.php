@@ -16,6 +16,7 @@ $act = fn($r) => $route === $r ? 'active' : '';
   <li><a href="?r=admin/productos">Productos</a></li>
   <li><a href="?r=admin/usuarios">Usuarios</a></li>
   <li><a href="?r=admin/configuracion">Configuración</a></li>
-  <li><a href="?r=auth/logout">Salir</a></li>
+  <li><a href="?r=admin_logout" data-no-spa>Salir</a></li>
+
 </ul>
 
