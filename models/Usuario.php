@@ -92,11 +92,26 @@ public function totalPorEstado(string $estado): int {
 }
 
 public function totalPorRol(string $rol): int {
-    // En tu tabla los enums son 'Admin','Empleado','Cajero'
     $st = $this->pdo->prepare("SELECT COUNT(*) FROM usuarios WHERE rol = :r");
     $st->execute([':r' => $rol]);
     return (int)$st->fetchColumn();
 }
+
+/** Empleados con ≥1 año (usa usuarios.fecha_creacion como fecha de ingreso) */
+public function conAnioAntiguedad(int $limit = 10): array {
+    $sql = "SELECT CONCAT(nombres,' ',apellidos) AS nombre,
+                   NULL AS img,          /* ajusta si tienes columna foto */
+                   DATE_FORMAT(fecha_creacion, '%Y-%m-%d') AS desde
+              FROM usuarios
+             WHERE DATEDIFF(CURDATE(), fecha_creacion) >= 365
+          ORDER BY fecha_creacion DESC
+             LIMIT :lim";
+    $st = $this->pdo->prepare($sql);
+    $st->bindValue(':lim', $limit, \PDO::PARAM_INT);
+    $st->execute();
+    return $st->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+}
+
 
 public function ultimos(int $limit = 5): array {
     $st = $this->pdo->prepare(

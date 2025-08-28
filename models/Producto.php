@@ -1,32 +1,70 @@
 <?php
 namespace Models;
 
-use Core\Database;
 use PDO;
+use Core\Database;
 
 final class Producto {
-    private PDO $db;
+    private PDO $pdo;
+    public function __construct(array $config) { $this->pdo = Database::get($config['db']); }
 
-    public function __construct(array $config) {
-        $this->db = Database::get($config['db']);
-    }
-
-    /** Total de productos “activos”. Si no usas un flag real, cuenta todos. */
+    // KPI: total activos (si usas estado='activo')
     public function totalActivos(): int {
-        // Ajusta esta condición a tu esquema real de “activo”
-        $sql = "SELECT COUNT(*) FROM productos
-                WHERE estado IS NULL OR estado = 1 OR estado = 'Activo'";
-        return (int)$this->db->query($sql)->fetchColumn();
+        $st = $this->pdo->query("SELECT COUNT(*) FROM productos WHERE estado='activo'");
+        return (int)$st->fetchColumn();
     }
 
-    /** Serie para “Productos por acabarse”. Tu tabla no tiene stock ⇒ vacío. */
+    /** Carrusel: destacados (no tienes columna 'destacado', así que usamos mayor stock/unidad) */
+    public function destacados(int $limit = 10): array {
+        $sql = "SELECT nombre, imagen AS img, unidad 
+                  FROM productos 
+                 WHERE estado='activo'
+              ORDER BY unidad DESC
+                 LIMIT :lim";
+        $st = $this->pdo->prepare($sql);
+        $st->bindValue(':lim', $limit, PDO::PARAM_INT);
+        $st->execute();
+        return $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
+    /** Carrusel: agotados (unidad <= 0) */
+    public function agotados(int $limit = 10): array {
+        $sql = "SELECT nombre, imagen AS img 
+                  FROM productos 
+                 WHERE unidad <= 0
+              ORDER BY nombre
+                 LIMIT :lim";
+        $st = $this->pdo->prepare($sql);
+        $st->bindValue(':lim', $limit, PDO::PARAM_INT);
+        $st->execute();
+        return $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
+    /** Chart: por acabarse (unidad > 0 y <= 5) -> [labels, values] */
     public function porAcabarse(int $limit = 10): array {
-        // Cuando agregues columnas de inventario, cambia este método.
-        return [[], []];
+        $sql = "SELECT nombre, unidad 
+                  FROM productos 
+                 WHERE unidad > 0 AND unidad <= 5
+              ORDER BY unidad ASC
+                 LIMIT :lim";
+        $st = $this->pdo->prepare($sql);
+        $st->bindValue(':lim', $limit, PDO::PARAM_INT);
+        $st->execute();
+        $rows = $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        return [array_column($rows, 'nombre'), array_map('intval', array_column($rows, 'unidad'))];
     }
 
-    /** Serie para “Productos por pedir”. Tu tabla no tiene min/max ⇒ vacío. */
+    /** Chart: por pedir (min_stock - unidad) -> [labels, values] */
     public function porPedir(int $limit = 10): array {
-        return [[], []];
+        $sql = "SELECT nombre, (min_stock - unidad) AS faltante
+                  FROM productos
+                 WHERE min_stock IS NOT NULL AND unidad < min_stock
+              ORDER BY faltante DESC
+                 LIMIT :lim";
+        $st = $this->pdo->prepare($sql);
+        $st->bindValue(':lim', $limit, PDO::PARAM_INT);
+        $st->execute();
+        $rows = $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        return [array_column($rows, 'nombre'), array_map('intval', array_column($rows, 'faltante'))];
     }
 }
