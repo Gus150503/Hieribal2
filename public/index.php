@@ -53,11 +53,20 @@ switch ($r) {
   case 'google_callback': $auth->googleCallback(); break;
   case 'verify':          $auth->verify();       break;
 
-  /* ====== Admin ====== */
-  case 'admin_login':      $adminA->loginForm();   break;
-  case 'admin_do_login':   $adminA->login();       break;
-  case 'admin_logout':     $adminA->logout();      break;
-  case 'admin_dashboard':  $adminD->index();       break;
+/* ====== Admin ====== */
+case 'admin_login':        $adminA->loginForm();        break;
+case 'admin_do_login':     $adminA->login();            break;
+case 'admin_logout':       $adminA->logout();           break;
+case 'admin_dashboard':    $adminD->index();            break;
+
+case 'admin_inventario':   $adminD->inventario();       break;
+case 'admin_productos':    $adminD->productos();        break;
+case 'admin_configuracion':$adminD->configuracion();    break;
+
+/* ====== Módulo Usuarios (Admin) ====== */
+case 'admin_usuarios':     (new AdminUsuariosController($config))->index(); break;
+case 'admin_usuarios_api': (new AdminUsuariosController($config))->api();   break;
+
 
   /* ====== Módulo Usuarios (Admin) ====== */
   case 'admin_usuarios':
