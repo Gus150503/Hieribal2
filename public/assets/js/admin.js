@@ -78,4 +78,37 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('mousedown', globalHandler, true);
   document.addEventListener('mouseup', globalHandler, true);
   document.addEventListener('auxclick', globalHandler, true);
+
+  // === Forzar que TODOS los links del sidebar abran en la MISMA pestaña ===
+document.addEventListener('DOMContentLoaded', () => {
+  const side = document.getElementById('adminSidebar');
+  if (!side) return;
+
+  // quita target y handlers inline molestos
+  const scrub = () => {
+    side.querySelectorAll('a[href]').forEach(a => {
+      a.removeAttribute('target');
+      // por si algún builder mete onClick inline
+      [...a.attributes].forEach(att => { if (/^on/i.test(att.name)) a.removeAttribute(att.name); });
+    });
+  };
+  scrub();
+
+  // captura el click ANTES de que otro JS actúe
+  const handler = (e) => {
+    const a = e.target.closest('a[href]');
+    if (!a || !side.contains(a)) return;
+    e.preventDefault();
+    a.removeAttribute('target');
+    // navegación normal en la MISMA pestaña
+    try { window.location.assign(a.href); } catch { window.location.href = a.href; }
+  };
+  side.addEventListener('click', handler, true);
+  side.addEventListener('mousedown', handler, true);
+  side.addEventListener('auxclick', handler, true); // click rueda
+
+  // por si otro script vuelve a poner target/_blank
+  new MutationObserver(scrub).observe(side, { subtree:true, attributes:true, childList:true });
+});
+
 });

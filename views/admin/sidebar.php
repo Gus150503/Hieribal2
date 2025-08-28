@@ -10,11 +10,13 @@ $act = fn($r) => $route === $r ? 'active' : '';
   <img src="<?= $base ?>/assets/img/logo.png" alt="Logo Hieribal">
 </div>
 
-<nav class="sidebar-nav">
-  <a class="<?= $act('admin_dashboard') ?>" href="?r=admin_dashboard">Inicio</a>
-  <a class="<?= $act('inventario') ?>"      href="?r=inventario">Inventario</a>
-  <a class="<?= $act('productos') ?>"       href="?r=productos">Productos</a>
-  <a class="<?= $act('usuarios') ?>"        href="?r=usuarios">Usuarios</a>
-  <a class="<?= $act('configuracion') ?>"   href="?r=configuracion">Configuración</a>
-  <a class="<?= $act('logout') ?>"          href="?r=logout">Salir</a>
-</nav>
+<ul class="menu">
+  <li><a href="?r=admin/dashboard">Inicio</a></li>
+  <li><a href="?r=admin/inventario">Inventario</a></li>
+  <li><a href="?r=admin/productos">Productos</a></li>
+  <li><a href="?r=admin/usuarios">Usuarios</a></li>
+  <li><a href="?r=admin/configuracion">Configuración</a></li>
+  <li><a href="?r=admin_logout" data-no-spa>Salir</a></li>
+
+</ul>
+
