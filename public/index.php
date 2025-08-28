@@ -30,11 +30,13 @@ $adminD = new AdminDashboardController($config);
 
 /* ========= Router ========= */
 $r = $_GET['r'] ?? 'home';
+$r = trim(str_replace('/', '_', $r), '_');
 
 switch ($r) {
   /* ====== Público / Home ====== */
   case 'home':        $home->index();      break;
   case 'dashboard':   $home->dashboard();  break; // dashboard público/cliente
+  
 
   /* ====== Auth de clientes ====== */
   case 'login':           $auth->loginForm();    break;
