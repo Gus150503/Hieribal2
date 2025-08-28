@@ -19,10 +19,15 @@ $bodyClassAttr = implode(' ', $bodyClasses);
 
   <!-- CSS global del sitio público -->
   <link rel="stylesheet" href="<?= $base ?>/assets/css/app.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
 
   <?php if ($isAdmin): ?>
     <!-- CSS del panel admin -->
-    <link rel="stylesheet" href="<?= $base ?>/assets/css/dashboard.css">
+<link rel="stylesheet" href="<?= $base ?>/assets/vendor/bootstrap/bootstrap.min.css">
+<link rel="stylesheet" href="<?= $base ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css">
+<link rel="stylesheet" href="<?= $base ?>/assets/css/dashboard.css">
+
   <?php endif; ?>
 
   <!-- CSS extra por página -->
@@ -92,5 +97,9 @@ $bodyClassAttr = implode(' ', $bodyClasses);
       <script src="<?= htmlspecialchars($src) ?>"></script>
     <?php endforeach; ?>
   <?php endif; ?>
+<script src="<?= $base ?>/assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
+<script src="<?= $base ?>/assets/vendor/chartjs/chart.umd.min.js" defer></script>
+<script src="<?= $base ?>/assets/js/admin-dashboard.js" defer></script>
+
 </body>
 </html>
