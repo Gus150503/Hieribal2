@@ -23,51 +23,58 @@ final class AdminDashboardController extends Controller
         $this->ventas    = new Venta($config);
     }
 
-// controllers/AdminDashboardController.php
-public function index(): void
-{
-    if (empty($_SESSION['admin'])) {
-        $_SESSION['admin_error'] = 'Inicia sesión para continuar.';
-        $this->redirect('/?r=admin_login');
-    }
+    public function index(): void
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+        if (empty($_SESSION['admin'])) {
+            $_SESSION['admin_error'] = 'Inicia sesión para continuar.';
+            $this->redirect('/?r=admin_login');
+        }
 
-    [$lowLabels,  $lowValues]  = $this->productos->porAcabarse(10);
-    [$needLabels, $needValues] = $this->productos->porPedir(10);
-    [$tcLabels,   $tcValues]   = $this->ventas->topClientes(10, 'compras');
+        // ===== Charts =====
+        [$lowLabels,  $lowValues]  = $this->productos->porAcabarse(10);  // [labels, values]
+        [$needLabels, $needValues] = $this->productos->porPedir(10);     // [labels, values]
+        [$tcLabels,   $tcValues]   = $this->ventas->topClientes(10, 'compras'); // [labels, values]
 
-    $this->render(
-        'admin/dashboard',
-        [
-            'esAdmin'         => true, // <—— IMPORTANTE
+        // ===== Carruseles =====
+        $invDestacados   = $this->productos->destacados(10);
+        $topVendidos     = $this->ventas->topProductos(10);
+        $agotados        = $this->productos->agotados(10);
+        $aniversario1Anio = $this->usuarios->conAnioAntiguedad(10); // usa fecha_creacion
 
-            // KPIs
-            'admin'           => $_SESSION['admin'],
-            'totalEmpleados'  => (int) $this->usuarios->totalPorRol('Empleado'),
-            'totalClientes'   => (int) $this->clientes->totalActivos(), // o ->total()
-            'totalProductos'  => (int) $this->productos->totalActivos(),
-            'totalVentasMes'  => (int) $this->ventas->totalDelMes(),
+        $this->render(
+            'admin/dashboard',
+            [
+                'esAdmin'         => true,
 
-            // Carruseles
-            'invDestacados'   => [],
-            'topVendidos'     => [],
-            'agotados'        => [],
-            'aniversario1Año' => [],
+                // KPIs
+                'admin'           => $_SESSION['admin'],
+                'totalEmpleados'  => (int) $this->usuarios->totalPorRol('Empleado'),
+                'totalClientes'   => (int) $this->clientes->totalActivos(),
+                'totalProductos'  => (int) $this->productos->totalActivos(),
+                'totalVentasMes'  => (int) $this->ventas->totalDelMes(),
 
-            // Gráficos
-            'lowStockLabels'   => $lowLabels,
-            'lowStockValues'   => $lowValues,
-            'toOrderLabels'    => $needLabels,
-            'toOrderValues'    => $needValues,
-            'topClientsLabels' => $tcLabels,
-            'topClientsValues' => $tcValues,
+                // Carruseles
+                'invDestacados'   => $invDestacados,
+                'topVendidos'     => $topVendidos,
+                'agotados'        => $agotados,
+                'aniversario1Anio'=> $aniversario1Anio,
 
-            // JS extra
-            'extra_js' => [
-                'https://cdn.jsdelivr.net/npm/chart.js',
-                $this->config['app']['base_url'] . '/assets/js/admin-dashboard.js',
+                // Charts
+                'lowStockLabels'   => $lowLabels,
+                'lowStockValues'   => $lowValues,
+                'toOrderLabels'    => $needLabels,
+                'toOrderValues'    => $needValues,
+                'topClientsLabels' => $tcLabels,
+                'topClientsValues' => $tcValues,
+
+                // JS extra (tu plantilla debe imprimirlos al final del body en ese orden)
+                'extra_js' => [
+                    'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js',
+                    $this->config['app']['base_url'] . '/assets/js/admin.js',
+                ],
             ],
-        ],
-        'Dashboard'
-    );
-}
+            'Dashboard'
+        );
+    }
 }
