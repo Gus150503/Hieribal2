@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 29-08-2025 a las 03:04:29
+-- Tiempo de generación: 29-08-2025 a las 22:53:54
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -72,8 +72,7 @@ CREATE TABLE `clientes` (
 --
 
 INSERT INTO `clientes` (`id_cliente`, `cedula`, `nombres`, `apellidos`, `telefono`, `correo`, `contraseña`, `fecha_registro`, `verificado`, `token_verificacion`, `token_recuperacion`, `recuperacion_expira`) VALUES
-(1, NULL, 'María Pérez', '', NULL, '', '', '2025-08-28 09:25:01', 0, NULL, NULL, NULL),
-(20, NULL, 'gustavo cuevas', '', '', 'gustavoalexiscuevas@gmail.com', '$2y$10$QJRvvfRtqSRPeBUXMfW.MewOZ8DmTIPdzvl6OhyI0kVwBpIQ/dhOS', '2025-08-28 08:59:27', 1, NULL, NULL, NULL);
+(1, NULL, 'María Pérez', '', NULL, '', '', '2025-08-28 09:25:01', 0, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -98,7 +97,7 @@ CREATE TABLE `historial_pedido` (
 
 CREATE TABLE `inventario` (
   `id` int(11) NOT NULL,
-  `producto_id` int(11) NOT NULL,
+  `id_producto` int(11) NOT NULL,
   `codigo_interno` varchar(40) DEFAULT NULL,
   `stock` int(11) DEFAULT 0,
   `stock_minimo` int(11) DEFAULT 0,
@@ -107,6 +106,17 @@ CREATE TABLE `inventario` (
   `ubicacion` varchar(100) DEFAULT NULL,
   `estado` enum('disponible','agotado','pendiente') DEFAULT 'disponible'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `inventario`
+--
+
+INSERT INTO `inventario` (`id`, `id_producto`, `codigo_interno`, `stock`, `stock_minimo`, `stock_maximo`, `punto_reorden`, `ubicacion`, `estado`) VALUES
+(16, 2, NULL, 40, 0, 0, 0, NULL, 'disponible'),
+(17, 3, NULL, 12, 0, 0, 0, NULL, 'disponible'),
+(18, 4, NULL, 15, 0, 0, 0, NULL, 'disponible'),
+(19, 5, NULL, 10, 0, 0, 0, NULL, 'disponible'),
+(20, 6, NULL, 10, 0, 0, 0, NULL, 'disponible');
 
 -- --------------------------------------------------------
 
@@ -120,8 +130,8 @@ CREATE TABLE `productos` (
   `categoria` varchar(60) DEFAULT NULL,
   `marca` varchar(60) DEFAULT NULL,
   `presentacion` varchar(60) DEFAULT NULL,
-  `unidad` varchar(20) DEFAULT NULL,
-  `min_stock` int(10) UNSIGNED DEFAULT NULL,
+  `stock_actual` varchar(20) DEFAULT NULL,
+  `stock_minimo` int(10) UNSIGNED DEFAULT NULL,
   `descripcion` text DEFAULT NULL,
   `lote` varchar(40) DEFAULT NULL,
   `f_vencimiento` date DEFAULT NULL,
@@ -139,12 +149,22 @@ CREATE TABLE `productos` (
 -- Volcado de datos para la tabla `productos`
 --
 
-INSERT INTO `productos` (`id`, `nombre`, `categoria`, `marca`, `presentacion`, `unidad`, `min_stock`, `descripcion`, `lote`, `f_vencimiento`, `precio_compra`, `precio_venta`, `iva`, `codigo_sku`, `ubicacion`, `estado`, `imagen`, `creado`) VALUES
-(2, 'Eucalipto', 'ramas', 'no se', 'fisica', '50', 40, 'eucalipto', '2', '2025-08-31', 1000.00, 2000.00, 0.00, '5342', 'ni idea', 'activo', 'gym1.png\n', '2025-08-27 23:37:31'),
-(3, 'Menta', NULL, NULL, NULL, '3', 12, NULL, NULL, NULL, NULL, 1200.00, 0.00, NULL, NULL, 'activo', 'gym1.png\n', '2025-08-28 14:14:42'),
-(4, 'Toronjil', NULL, NULL, NULL, '4', 15, NULL, NULL, NULL, NULL, 1100.00, 0.00, NULL, NULL, 'activo', NULL, '2025-08-28 14:15:14'),
-(5, 'Manzanilla', NULL, NULL, NULL, '0', 10, NULL, NULL, NULL, NULL, 1500.00, 0.00, NULL, NULL, 'activo', NULL, '2025-08-28 14:15:56'),
-(6, 'Manzanillaa', NULL, NULL, NULL, '0', 10, NULL, NULL, NULL, NULL, 1500.00, 0.00, NULL, NULL, 'activo', NULL, '2025-08-28 14:15:56');
+INSERT INTO `productos` (`id`, `nombre`, `categoria`, `marca`, `presentacion`, `stock_actual`, `stock_minimo`, `descripcion`, `lote`, `f_vencimiento`, `precio_compra`, `precio_venta`, `iva`, `codigo_sku`, `ubicacion`, `estado`, `imagen`, `creado`) VALUES
+(2, 'Eucalipto', 'ramas', 'no se', 'fisica', '50', 40, 'eucalipto', '2', '2025-08-31', 1000.00, 2000.00, 0.00, '5342', 'ni idea', 'activo', 'eucalipto.png\n', '2025-08-27 23:37:31'),
+(3, 'Menta', NULL, NULL, NULL, '3', 12, NULL, NULL, NULL, NULL, 1200.00, 0.00, NULL, NULL, 'activo', 'menta.png\n', '2025-08-28 14:14:42'),
+(4, 'Toronjil', NULL, NULL, NULL, '4', 15, NULL, NULL, NULL, NULL, 1100.00, 0.00, NULL, NULL, 'activo', 'toronjil.png\n', '2025-08-28 14:15:14'),
+(5, 'Manzanilla', NULL, NULL, NULL, '0', 5, NULL, NULL, NULL, NULL, 1500.00, 0.00, NULL, NULL, 'activo', 'manzanilla.png\n', '2025-08-28 14:15:56'),
+(6, 'Diente de leon', NULL, NULL, NULL, '0', 5, NULL, NULL, NULL, NULL, 1500.00, 0.00, NULL, NULL, 'activo', 'leon.png', '2025-08-28 14:15:56');
+
+--
+-- Disparadores `productos`
+--
+DELIMITER $$
+CREATE TRIGGER `productos_ai` AFTER INSERT ON `productos` FOR EACH ROW BEGIN
+  INSERT INTO inventario (id_producto, stock) VALUES (NEW.id, 0);
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -176,10 +196,10 @@ CREATE TABLE `usuarios` (
   `id_usuario` int(11) NOT NULL,
   `usuario` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `rol` enum('Admin','Empleado','Cajero') DEFAULT NULL,
+  `rol` enum('Admin','Empleado','Cajero') NOT NULL DEFAULT 'Empleado',
   `nombres` varchar(100) NOT NULL,
   `apellidos` varchar(100) NOT NULL,
-  `correo` varchar(100) DEFAULT NULL,
+  `correo` varchar(255) NOT NULL,
   `correo_verificado` tinyint(1) NOT NULL DEFAULT 0,
   `correo_verificacion_token` varchar(64) DEFAULT NULL,
   `correo_verificacion_expira` datetime DEFAULT NULL,
@@ -193,8 +213,8 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id_usuario`, `usuario`, `password`, `rol`, `nombres`, `apellidos`, `correo`, `correo_verificado`, `correo_verificacion_token`, `correo_verificacion_expira`, `fecha_creacion`, `estado`, `token_recuperacion`) VALUES
-(3, 'admin', '$2y$10$RGDjjslCZYaj2O.GX.WNr.mgLybwAYhbe.YUA4JB1OGWv9l7vh1au', 'Empleado', 'gustavo', 'cuevas', 'gustavo@gmail.com', 0, NULL, NULL, '2024-07-24 00:00:00', 'Activo', NULL),
-(6, 'admin1', '$2y$10$VSXPt6oeKYEDEFUhAOaw3./uaTDPIYg.vdXuMXGFZDqamHmwcvxxG', 'Admin', 'gustavo', 'cuevas', 'gustavoalexiscuevas@gmail.com', 1, NULL, NULL, '2025-07-10 16:37:09', 'Activo', NULL);
+(10, 'admin2', '$2y$10$LvpQy0.ZqiOtntxjhFJL9u2bKMvixaoszhKn8frc2/ODEF5po9EKy', 'Admin', 'gustavo', 'cuevas', 'gustavoalexiscuevas@gmail.com', 1, NULL, NULL, '2024-07-16 10:42:01', 'Activo', NULL),
+(22, 'admin', '$2y$10$E1z8SbfDBxWp5GsZ0zhAaOh6HzahiaIsZd/MNVEcsZGzsu.Fsf.FC', 'Cajero', 'gustavo', 'cuevas', 'usty49@gmail.com', 0, 'e2ca375f3a6da07af3725cb6287292c0', '2025-08-30 19:57:30', '2025-08-29 12:57:30', 'Activo', NULL);
 
 -- --------------------------------------------------------
 
@@ -247,7 +267,8 @@ ALTER TABLE `historial_pedido`
 --
 ALTER TABLE `inventario`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `producto_id` (`producto_id`);
+  ADD UNIQUE KEY `uq_inv_producto` (`id_producto`),
+  ADD KEY `producto_id` (`id_producto`);
 
 --
 -- Indices de la tabla `productos`
@@ -266,7 +287,9 @@ ALTER TABLE `proveedores`
 --
 ALTER TABLE `usuarios`
   ADD PRIMARY KEY (`id_usuario`),
-  ADD UNIQUE KEY `usuario` (`usuario`);
+  ADD UNIQUE KEY `uq_usuarios_usuario` (`usuario`),
+  ADD UNIQUE KEY `uq_usuarios_correo` (`correo`),
+  ADD UNIQUE KEY `uq_correo` (`correo`);
 
 --
 -- Indices de la tabla `ventas`
@@ -289,7 +312,7 @@ ALTER TABLE `carrito`
 -- AUTO_INCREMENT de la tabla `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT de la tabla `historial_pedido`
@@ -301,7 +324,7 @@ ALTER TABLE `historial_pedido`
 -- AUTO_INCREMENT de la tabla `inventario`
 --
 ALTER TABLE `inventario`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT de la tabla `productos`
@@ -319,7 +342,7 @@ ALTER TABLE `proveedores`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT de la tabla `ventas`
@@ -341,7 +364,8 @@ ALTER TABLE `historial_pedido`
 -- Filtros para la tabla `inventario`
 --
 ALTER TABLE `inventario`
-  ADD CONSTRAINT `inventario_ibfk_1` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_inv_producto` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `inventario_ibfk_1` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `ventas`
