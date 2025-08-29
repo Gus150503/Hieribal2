@@ -133,7 +133,7 @@ html, body { height: 100%; overflow-y: auto; }
   display:flex; flex-direction:column; align-items:center; gap:6px;
   box-shadow:var(--shadow);
 }
-.slide-card img{ width:80px; height:80px; object-fit:cover; border-radius:8px; background:#f5f7fa; }
+.slide-card img{ width:80px; height:80px; object-fit:cover; border-radius:8px; }
 .slide-title{ font-weight:700; text-align:center; font-size:.86rem; }
 .slide-sub{ font-size:.78rem; color:var(--muted); }
 .slide-empty{

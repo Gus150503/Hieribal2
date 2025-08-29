@@ -5,50 +5,60 @@ use PDO;
 
 final class RepoInventario {
   private PDO $pdo;
-  public function __construct(PDO $pdo){ $this->pdo = $pdo; }
 
-  /** Tarjetas: inventario destacado (o por mayor stock si no tienes flag) */
-  public function destacados(int $limit = 10): array {
-    $sql = "SELECT id, nombre, img, stock
-              FROM productos
-             WHERE destacado = 1
-             ORDER BY id DESC
-             LIMIT :lim";
-    $st = $this->pdo->prepare($sql);
-    $st->bindValue(':lim', $limit, PDO::PARAM_INT);
-    $st->execute();
-    $rows = $st->fetchAll(PDO::FETCH_ASSOC);
-    if (!$rows) { // fallback si no usas 'destacado'
-      $sql2 = "SELECT id, nombre, img, stock FROM productos ORDER BY stock DESC LIMIT :lim";
-      $st2 = $this->pdo->prepare($sql2);
-      $st2->bindValue(':lim', $limit, PDO::PARAM_INT);
-      $st2->execute();
-      return $st2->fetchAll(PDO::FETCH_ASSOC) ?: [];
-    }
-    return $rows;
+  public function __construct(PDO $pdo){
+    $this->pdo = $pdo;
   }
 
-  /** Tarjeta: agotados */
-  public function agotados(int $limit = 10): array {
-    $st = $this->pdo->prepare("SELECT id, nombre, img FROM productos WHERE stock <= 0 ORDER BY nombre LIMIT :lim");
+  /** Tarjetas: inventario destacado (o por mayor stock si no hay flag) */
+  public function destacados(int $limit = 10): array {
+    // Si en el futuro tienes un flag "destacado", úsalo aquí. Por ahora: mayor stock_actual.
+    $sql = "SELECT id, nombre, imagen AS img, stock_actual AS stock
+              FROM productos
+             WHERE LOWER(estado)='activo'
+             ORDER BY stock_actual DESC
+             LIMIT :lim";
+    $st = $this->pdo->prepare($sql);
     $st->bindValue(':lim', $limit, PDO::PARAM_INT);
     $st->execute();
     return $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
   }
 
-  /** Chart: productos por acabarse (stock <= umbral) */
+  /** Tarjetas: agotados (stock_actual <= 0) */
+  public function agotados(int $limit = 10): array {
+    $sql = "SELECT id, nombre, imagen AS img
+              FROM productos
+             WHERE stock_actual <= 0
+             ORDER BY nombre
+             LIMIT :lim";
+    $st = $this->pdo->prepare($sql);
+    $st->bindValue(':lim', $limit, PDO::PARAM_INT);
+    $st->execute();
+    return $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
+  }
+
+  /** Chart: productos por acabarse (0 < stock_actual <= umbral) */
   public function bajoStock(int $umbral = 5, int $limit = 10): array {
-    $st = $this->pdo->prepare("SELECT nombre, stock FROM productos WHERE stock <= :u AND stock > 0 ORDER BY stock ASC LIMIT :lim");
+    $sql = "SELECT nombre, stock_actual AS stock
+              FROM productos
+             WHERE stock_actual > 0 AND stock_actual <= :u
+             ORDER BY stock_actual ASC
+             LIMIT :lim";
+    $st = $this->pdo->prepare($sql);
     $st->bindValue(':u', $umbral, PDO::PARAM_INT);
     $st->bindValue(':lim', $limit, PDO::PARAM_INT);
     $st->execute();
     return $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
   }
 
-  /** Chart: productos por pedir (stock < min_stock) */
+  /** Chart: productos por pedir (stock_actual < stock_minimo) */
   public function porPedir(int $limit = 10): array {
-    // requiere columna min_stock en productos
-    $st = $this->pdo->prepare("SELECT nombre, (min_stock - stock) AS faltante FROM productos WHERE min_stock IS NOT NULL AND stock < min_stock ORDER BY faltante DESC LIMIT :lim");
+    $sql = "SELECT nombre, (stock_minimo - stock_actual) AS faltante
+              FROM productos
+             WHERE stock_minimo IS NOT NULL AND stock_actual < stock_minimo
+             ORDER BY faltante DESC
+             LIMIT :lim";
+    $st = $this->pdo->prepare($sql);
     $st->bindValue(':lim', $limit, PDO::PARAM_INT);
     $st->execute();
     return $st->fetchAll(PDO::FETCH_ASSOC) ?: [];

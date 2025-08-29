@@ -82,6 +82,8 @@ $normFoto = function(array $row): string {
                     alt="<?= htmlspecialchars($p['nombre'] ?? 'Producto') ?>">
                   <div class="slide-title"><?= htmlspecialchars($p['nombre'] ?? 'Producto') ?></div>
                   <div class="slide-sub">Stock: <?= (int)($p['stock'] ?? 0) ?></div>
+
+
                 </div>
               <?php endforeach; ?>
               <?php if (empty($invDestacados)): ?>

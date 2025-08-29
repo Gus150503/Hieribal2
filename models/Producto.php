@@ -6,20 +6,23 @@ use Core\Database;
 
 final class Producto {
     private PDO $pdo;
-    public function __construct(array $config) { $this->pdo = Database::get($config['db']); }
 
-    // KPI: total activos (si usas estado='activo')
+    public function __construct(array $config) {
+        $this->pdo = Database::get($config['db']);
+    }
+
+    /** KPI: total activos (case-insensitive por si guardas 'Activo' o 'activo') */
     public function totalActivos(): int {
-        $st = $this->pdo->query("SELECT COUNT(*) FROM productos WHERE estado='activo'");
+        $st = $this->pdo->query("SELECT COUNT(*) FROM productos WHERE LOWER(estado)='activo'");
         return (int)$st->fetchColumn();
     }
 
-    /** Carrusel: destacados (no tienes columna 'destacado', así que usamos mayor stock/unidad) */
+    /** Carrusel: destacados (ordenados por mayor stock_actual) */
     public function destacados(int $limit = 10): array {
-        $sql = "SELECT nombre, imagen AS img, unidad 
-                  FROM productos 
-                 WHERE estado='activo'
-              ORDER BY unidad DESC
+        $sql = "SELECT nombre, imagen AS img, stock_actual AS stock
+                  FROM productos
+                 WHERE LOWER(estado)='activo'
+              ORDER BY stock_actual DESC
                  LIMIT :lim";
         $st = $this->pdo->prepare($sql);
         $st->bindValue(':lim', $limit, PDO::PARAM_INT);
@@ -27,11 +30,11 @@ final class Producto {
         return $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
-    /** Carrusel: agotados (unidad <= 0) */
+    /** Carrusel: agotados (stock_actual <= 0) */
     public function agotados(int $limit = 10): array {
-        $sql = "SELECT nombre, imagen AS img 
-                  FROM productos 
-                 WHERE unidad <= 0
+        $sql = "SELECT nombre, imagen AS img
+                  FROM productos
+                 WHERE stock_actual <= 0
               ORDER BY nombre
                  LIMIT :lim";
         $st = $this->pdo->prepare($sql);
@@ -40,31 +43,37 @@ final class Producto {
         return $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
-    /** Chart: por acabarse (unidad > 0 y <= 5) -> [labels, values] */
+    /** Chart: por acabarse (0 < stock_actual <= 5) -> [labels, values] */
     public function porAcabarse(int $limit = 10): array {
-        $sql = "SELECT nombre, unidad 
-                  FROM productos 
-                 WHERE unidad > 0 AND unidad <= 5
-              ORDER BY unidad ASC
+        $sql = "SELECT nombre, stock_actual
+                  FROM productos
+                 WHERE stock_actual > 0 AND stock_actual <= 5
+              ORDER BY stock_actual ASC
                  LIMIT :lim";
         $st = $this->pdo->prepare($sql);
         $st->bindValue(':lim', $limit, PDO::PARAM_INT);
         $st->execute();
         $rows = $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
-        return [array_column($rows, 'nombre'), array_map('intval', array_column($rows, 'unidad'))];
+        return [
+            array_column($rows, 'nombre'),
+            array_map('intval', array_column($rows, 'stock_actual')),
+        ];
     }
 
-    /** Chart: por pedir (min_stock - unidad) -> [labels, values] */
+    /** Chart: por pedir (stock_actual < stock_minimo) -> [labels, values] */
     public function porPedir(int $limit = 10): array {
-        $sql = "SELECT nombre, (min_stock - unidad) AS faltante
+        $sql = "SELECT nombre, (stock_minimo - stock_actual) AS faltante
                   FROM productos
-                 WHERE min_stock IS NOT NULL AND unidad < min_stock
+                 WHERE stock_minimo IS NOT NULL AND stock_actual < stock_minimo
               ORDER BY faltante DESC
                  LIMIT :lim";
         $st = $this->pdo->prepare($sql);
         $st->bindValue(':lim', $limit, PDO::PARAM_INT);
         $st->execute();
         $rows = $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
-        return [array_column($rows, 'nombre'), array_map('intval', array_column($rows, 'faltante'))];
+        return [
+            array_column($rows, 'nombre'),
+            array_map('intval', array_column($rows, 'faltante')),
+        ];
     }
 }
