@@ -69,7 +69,7 @@ case 'admin_usuarios_api': (new AdminUsuariosController($config))->api();   brea
 
 
   /* ====== Módulo Usuarios (Admin) ====== */
-  case 'admin_usuarios':
+case 'admin_usuarios':
       (new AdminUsuariosController($config))->index();
       break;
 
@@ -77,13 +77,22 @@ case 'admin_usuarios_api': (new AdminUsuariosController($config))->api();   brea
       (new AdminUsuariosController($config))->api();
       break;
 
-  /* (Opcional) compat: redirige la ruta antigua a la nueva */
+      case 'admin_usuarios_verify_email':
+    (new AdminUsuariosController($config))->verifyEmail();
+    break;
+
+case 'admin_usuarios_resend_verif':
+    (new AdminUsuariosController($config))->resendVerification();
+    break;
+
+
+  /* (Compat) ruta vieja -> nueva */
   case 'usuarioadmin':
       header('Location: ' . (($config['app']['base_url'] ?? '') . '/?r=admin_usuarios'), true, 302);
       exit;
 
   /* ====== 404 ====== */
   default:
-    http_response_code(404);
-    echo '404 Página no encontrada';
+      http_response_code(404);
+      echo '404 Página no encontrada';
 }

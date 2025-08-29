@@ -1,116 +1,139 @@
 (() => {
-  const API = (window.APP && window.APP.api && window.APP.api.usuarios) || '?r=admin_usuarios_api';
+  const base = location.pathname.replace(/\/public\/?$/, '') + '/public';
+  const api  = (params) => `${base}/?r=admin_usuarios_api&${params}`;
 
-  const $  = (s, c=document) => c.querySelector(s);
-  const tbl = $('#tblUsuarios');
-  const pag = $('#paginacion');
-  const lblTotal = $('#lblTotal');
-  const frm = $('#frmUsuario');
-  const modalEl = $('#modalUsuario');
-  const modal = modalEl ? new bootstrap.Modal(modalEl) : null;
-  const ttl = $('#ttlModal');
+  const nameRe = /^[A-Za-zÁÉÍÓÚÑáéíóúñ ]{2,60}$/u;
+  const userRe = /^[A-Za-z0-9._-]{3,30}$/;
 
-  let page = 1, per = 10, q = '';
+  const $ = s => document.querySelector(s);
+  const $$ = s => document.querySelectorAll(s);
 
-  const escapeHtml = s => (s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const modal = $('#modalUsuario');
+  const frm   = $('#frmUsuario');
+  const tbl   = $('#tblUsuarios tbody');
 
-  async function fetchJSON(url, opts) {
-    const r = await fetch(url, opts);
-    if (!r.ok) throw new Error(await r.text() || ('HTTP ' + r.status));
-    return r.json();
-  }
+  let editId = 0;
 
-  async function cargar(){
-    const data = await fetchJSON(`${API}&action=list&q=${encodeURIComponent(q)}&page=${page}&per=${per}`);
-    const rows = data.data || [];
-    tbl.innerHTML = rows.map(r => `
-      <tr>
-        <td>${r.id_usuario}</td>
-        <td>${escapeHtml(r.usuario)}</td>
-        <td>${escapeHtml(r.rol)}</td>
-        <td>${escapeHtml(r.nombres)} ${escapeHtml(r.apellidos)}</td>
-        <td>${escapeHtml(r.correo)}</td>
-        <td><span class="badge bg-${r.estado==='activo'?'success':'secondary'}">${escapeHtml(r.estado)}</span></td>
-        <td>${escapeHtml(r.fecha_creacion ?? '')}</td>
-        <td class="d-flex gap-1">
-          <button class="btn btn-sm btn-outline-primary" data-editar="${r.id_usuario}"><i class="bi bi-pencil"></i></button>
-          <button class="btn btn-sm btn-outline-warning" data-toggle="${r.id_usuario}"><i class="bi bi-power"></i></button>
-          <button class="btn btn-sm btn-outline-danger" data-eliminar="${r.id_usuario}"><i class="bi bi-trash"></i></button>
-        </td>
-      </tr>
-    `).join('');
+  function openModal(title, data={}) {
+    $('#modalTitle').textContent = title;
+    modal.style.display = 'block';
+    editId = data.id_usuario || 0;
 
-    const total = data.total ?? 0;
-    const pages = Math.max(1, Math.ceil(total / per));
-    lblTotal.textContent = `${total} usuario(s) • pág ${page}/${pages}`;
-    pag.innerHTML = '';
-    for (let i=1;i<=pages;i++){
-      const li = document.createElement('li');
-      li.className = `page-item ${i===page?'active':''}`;
-      li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-      li.addEventListener('click', e => { e.preventDefault(); page=i; cargar(); });
-      pag.appendChild(li);
-    }
-  }
-
-  $('#btnBuscar')?.addEventListener('click', () => { q = $('#txtBuscar').value.trim(); page=1; cargar(); });
-  $('#txtBuscar')?.addEventListener('keydown', e => { if (e.key==='Enter'){ e.preventDefault(); $('#btnBuscar').click(); } });
-
-  $('#btnNuevo')?.addEventListener('click', () => {
+    // reset
     frm.reset();
-    $('#id_usuario').value = '';
+    $('#id_usuario').value = editId;
+    $('#usuario').value = data.usuario || '';
+    $('#rol').value     = data.rol || 'empleado';
+    $('#nombres').value = data.nombres || '';
+    $('#apellidos').value = data.apellidos || '';
+    $('#correo').value  = data.correo || '';
+    $('#estado').value  = data.estado || 'activo';
     $('#password').value = '';
-    ttl.textContent = 'Nuevo usuario';
-    frm.classList.remove('was-validated');
-    modal?.show();
-  });
+  }
 
-  tbl?.addEventListener('click', async (e)=>{
-    const idE = e.target.closest('[data-editar]')?.dataset.editar;
-    const idT = e.target.closest('[data-toggle]')?.dataset.toggle;
-    const idD = e.target.closest('[data-eliminar]')?.dataset.eliminar;
+  function closeModal(){ modal.style.display='none'; }
 
-    if (idE){
-      const r = await fetchJSON(`${API}&action=get&id=${idE}`);
-      const u = r.data;
-      if (!u) return;
-      $('#id_usuario').value = u.id_usuario;
-      $('#usuario').value = u.usuario ?? '';
-      $('#correo').value = u.correo ?? '';
-      $('#nombres').value = u.nombres ?? '';
-      $('#apellidos').value = u.apellidos ?? '';
-      $('#rol').value = u.rol ?? 'empleado';
-      $('#estado').value = u.estado ?? 'activo';
-      $('#password').value = '';
-      ttl.textContent = 'Editar usuario';
-      frm.classList.remove('was-validated');
-      modal?.show();
+  $('#btnNuevo')?.addEventListener('click', () => openModal('Nuevo usuario'));
+  $('#btnCerrar')?.addEventListener('click', closeModal);
+
+  // Buscar/listar
+// Buscar/listar
+async function listar() {
+  const q = encodeURIComponent($('#q').value || '');
+  try {
+    const res  = await fetch(api(`action=list&q=${q}&page=1&per=20`));
+    const txt  = await res.text();          // leemos texto primero
+    let json;
+    try {
+      json = JSON.parse(txt);               // intentamos parsear JSON
+    } catch (e) {
+      console.error('Respuesta no JSON del API:', txt);
+      throw e;
     }
+    if (!res.ok) throw new Error(json.msg || 'Error API');
+    renderTabla(json.items || []);
+  } catch (err) {
+    console.error('Error listar:', err);
+    alert('Error al listar: ' + err.message);
+  }
+}
 
-    if (idT){
-      if (!confirm('¿Cambiar estado?')) return;
-      await fetchJSON(API + '&action=toggle', { method:'POST', body: toForm({ id_usuario:idT }) });
-      cargar();
+ function renderTabla(items) {
+  tbl.innerHTML = '';
+  for (const u of items) {
+    const isActive = String(u.estado || '').toLowerCase().startsWith('activo');
+    const verifIcon = u.correo_verificado ? '✔' : '✖';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${u.id_usuario}</td>
+      <td>${u.usuario}</td>
+      <td>${u.nombres} ${u.apellidos}</td>
+      <td>${u.correo}</td>
+      <td>${u.rol}</td>
+      <td>${u.estado}</td>
+      <td>${verifIcon}</td>
+      <td>
+        <button data-editar="${u.id_usuario}">Editar</button>
+        <button data-eliminar="${u.id_usuario}">Eliminar</button>
+        <button data-toggle="${u.id_usuario}">${isActive ? 'Desactivar' : 'Activar'}</button>
+        ${u.correo_verificado ? '' : `<button data-reenviar="${u.id_usuario}">Reenviar verificación</button>`}
+      </td>
+    `;
+    tbl.appendChild(tr);
+  }
+}
+
+
+  $('#btnBuscar')?.addEventListener('click', listar);
+  $('#q')?.addEventListener('keydown', e => { if (e.key==='Enter') { e.preventDefault(); listar(); }});
+
+  // Delegación de acciones
+  tbl.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button'); if (!btn) return;
+    const id = +btn.dataset.editar || +btn.dataset.eliminar || +btn.dataset.toggle || +btn.dataset.reenviar;
+
+    if (btn.dataset.editar) {
+      const r = await fetch(api(`action=get&id=${id}`)); const j = await r.json();
+      openModal('Editar usuario', j.data || {});
     }
-
-    if (idD){
+    if (btn.dataset.eliminar) {
       if (!confirm('¿Eliminar usuario?')) return;
-      await fetchJSON(API + '&action=delete', { method:'POST', body: toForm({ id_usuario:idD }) });
-      cargar();
+      await fetch(api('action=delete'), { method:'POST', body: formData({id_usuario:id}) });
+      listar();
+    }
+    if (btn.dataset.toggle) {
+      await fetch(api('action=toggle'), { method:'POST', body: formData({id_usuario:id}) });
+      listar();
+    }
+    if (btn.dataset.reenviar) {
+      location.href = `${base}/?r=admin_usuarios_resend_verif&id=${id}`;
     }
   });
 
-  frm?.addEventListener('submit', async (e)=>{
+  // Validación del formulario
+  frm?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!frm.checkValidity()){ frm.classList.add('was-validated'); return; }
-    const id = $('#id_usuario').value;
-    const action = id ? 'update' : 'create';
-    const body = new FormData(frm);
-    const r = await fetchJSON(API + '&action=' + action, { method:'POST', body });
-    if (r.ok){ modal?.hide(); cargar(); } else { alert(r.msg || 'Error'); }
+    const d = Object.fromEntries(new FormData(frm).entries());
+
+    if (!userRe.test(d.usuario))            return alert('Usuario inválido (3-30, solo letras/números . _ -)');
+    if (!nameRe.test(d.nombres))            return alert('Nombres: solo letras y espacios (2-60).');
+    if (!nameRe.test(d.apellidos))          return alert('Apellidos: solo letras y espacios (2-60).');
+    if (!/.+@.+\..+/.test(d.correo))        return alert('Correo inválido.');
+    if (!editId && (!d.password || d.password.length < 6)) return alert('Password mínimo 6.');
+
+    const action = editId ? 'update' : 'create';
+    const fd = new FormData(frm);
+    fd.append('action', action);
+    const res = await fetch(api(`action=${action}`), { method:'POST', body: fd });
+    const j = await res.json();
+    if (!j.ok) return alert(j.msg || 'Error');
+
+    closeModal(); listar();
   });
 
-  function toForm(obj){ const fd=new FormData(); Object.entries(obj).forEach(([k,v])=>fd.append(k,v)); return fd; }
+  function formData(obj) { const fd = new FormData(); Object.entries(obj).forEach(([k,v])=>fd.append(k,v)); return fd; }
 
-  document.addEventListener('DOMContentLoaded', cargar);
+  // init
+  listar();
 })();
