@@ -142,3 +142,7 @@ img{max-width:100%; display:block}
 
 .modal-footer{padding:.75rem 1.1rem; border-top:1px solid #e9eef5; gap:.5rem}
 .modal-footer .btn{min-width:110px}
+
+/* Hotfix temporal para que la sidebar no se desconfigure */
+.sidebar .nav { list-style: none; padding-left: .75rem; }
+.sidebar .nav-link { padding: .75rem 1rem; line-height: 1.5; font-size: .95rem; }

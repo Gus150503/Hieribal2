@@ -194,46 +194,44 @@ final class AdminUsuariosController extends Controller
     }
 
     /** ==== Sanitización y validación de entrada ==== */
-    private function sanitize(array $in, bool $creating): array
-    {
-        $nameRe = '/^[A-Za-zÁÉÍÓÚÑáéíóúñ ]{2,60}$/u';
-        $userRe = '/^[A-Za-z0-9._-]{3,30}$/';
+    private function sanitize(array $in, bool $creating): array {
+    $nameRe = '/^[A-Za-zÁÉÍÓÚÑáéíóúñ ]{2,60}$/u';
+    $userRe = '/^[A-Za-z0-9._-]{3,30}$/';
 
-        $rolIn    = strtolower(trim($in['rol'] ?? 'empleado'));
-        $estadoIn = strtolower(trim($in['estado'] ?? 'activo'));
+    $rolIn    = strtolower(trim($in['rol'] ?? 'empleado'));
+    $estadoIn = strtolower(trim($in['estado'] ?? 'activo'));
 
-        // Normaliza valores a la forma que usas en BD (Title Case)
-        $rolOk    = in_array($rolIn, ['admin','empleado'], true) ? $rolIn : 'empleado';
-        $estadoOk = in_array($estadoIn, ['activo','inactivo'], true) ? $estadoIn : 'activo';
+    // <-- Acepta cajero también
+    $rolOk    = in_array($rolIn, ['admin','empleado','cajero'], true) ? $rolIn : 'empleado';
+    $estadoOk = in_array($estadoIn, ['activo','inactivo'], true) ? $estadoIn : 'activo';
 
-        $nombres   = trim($in['nombres']   ?? '');
-        $apellidos = trim($in['apellidos'] ?? '');
-        $usuario   = trim($in['usuario']   ?? '');
-        $correo    = trim($in['correo']    ?? '');
-        $password  = trim($in['password']  ?? '');
+    $rolLabel    = ['admin'=>'Admin','empleado'=>'Empleado','cajero'=>'Cajero'][$rolOk];
+    $estadoLabel = ($estadoOk === 'inactivo') ? 'Inactivo' : 'Activo';
 
-        if (!preg_match($nameRe, $nombres))    throw new \Exception('Nombres inválidos.');
-        if (!preg_match($nameRe, $apellidos))  throw new \Exception('Apellidos inválidos.');
-        if (!preg_match($userRe, $usuario))    throw new \Exception('Usuario inválido (3-30, letras/números . _ -).');
-        if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) throw new \Exception('Correo inválido.');
+    $nombres   = trim($in['nombres'] ?? '');
+    $apellidos = trim($in['apellidos'] ?? '');
+    $usuario   = trim($in['usuario'] ?? '');
+    $correo    = trim($in['correo'] ?? '');
+    $password  = trim($in['password'] ?? '');
 
-        // Password mínimo 8 en creación; en update sólo si viene (no obligatorio)
-        if ($creating) {
-            if (strlen($password) < 8) throw new \Exception('La contraseña debe tener al menos 8 caracteres.');
-        } elseif ($password !== '' && strlen($password) < 8) {
-            throw new \Exception('La contraseña debe tener al menos 8 caracteres.');
-        }
+    if (!preg_match($nameRe, $nombres))   throw new \Exception('Nombres inválidos');
+    if (!preg_match($nameRe, $apellidos)) throw new \Exception('Apellidos inválidos');
+    if (!preg_match($userRe, $usuario))   throw new \Exception('Usuario inválido');
+    if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) throw new \Exception('Correo inválido');
+    if ($creating && strlen($password) < 8) throw new \Exception('Password muy corto (mín. 8)');
 
-        return [
-            'usuario'   => $usuario,
-            'password'  => $password, // en update, si viene vacío el modelo lo ignora
-            'rol'       => ($rolOk === 'admin') ? 'Admin' : 'Empleado',
-            'nombres'   => $nombres,
-            'apellidos' => $apellidos,
-            'correo'    => $correo,
-            'estado'    => ($estadoOk === 'inactivo') ? 'Inactivo' : 'Activo',
-        ];
-    }
+    return [
+        'usuario'   => $usuario,
+        'password'  => $password,        // vacío en update = no cambia
+        'rol'       => $rolLabel,        // Admin | Empleado | Cajero
+        'nombres'   => $nombres,
+        'apellidos' => $apellidos,
+        'correo'    => $correo,
+        'estado'    => $estadoLabel,     // Activo | Inactivo
+    ];
+}
+
+
 
     /** ==== Mapea errores de BD a mensajes amigables ==== */
     private function friendlyDbError(\Throwable $e): string

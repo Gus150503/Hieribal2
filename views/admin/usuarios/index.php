@@ -102,6 +102,7 @@
               <select class="form-select" name="rol" id="rol" required>
                 <option value="empleado">Empleado</option>
                 <option value="admin">Admin</option>
+                <option value="cajero">Cajero</option>
               </select>
               <div class="invalid-feedback">Selecciona un rol.</div>
             </div>
