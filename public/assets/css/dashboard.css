@@ -295,6 +295,7 @@ html, body { height: 100%; margin: 0; }
   padding: 12px 20px;
   color: #fff;
   text-decoration: none;
+  
 }
 .sidebar .menu li a:hover,
 .sidebar .menu li a.active{
