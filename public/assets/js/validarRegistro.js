@@ -11,9 +11,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const password  = form.querySelector("[name='password']");
 
   // Expresiones regulares
-  const regexNombre = /^[a-zA-ZÀ-ÿ\s]+$/;            // Solo letras y espacios
-  const regexNumero = /^[0-9]+$/;                    // Solo números
-  const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;  // Email básico
+  const regexNombre    = /^[a-zA-ZÀ-ÿ\s]+$/;      // Solo letras y espacios
+  const regexNumero    = /^[0-9]+$/;              // Solo números
+  const regexCorreo    = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Email básico
+  const regexTelefono  = /^\d{10}$/;              // Exactamente 10 dígitos
 
   // --- utilidades ---
   const createOrGetErrorBox = () => {
@@ -39,17 +40,25 @@ document.addEventListener("DOMContentLoaded", () => {
   if (cedula) {
     cedula.setAttribute("inputmode", "numeric");
     cedula.setAttribute("autocomplete", "off");
+    cedula.setAttribute("maxlength", "10");
     cedula.addEventListener("input", () => {
-      // solo números y máximo 10
       cedula.value = cedula.value.replace(/\D/g, "");
       if (cedula.value.length > 10) cedula.value = cedula.value.slice(0, 10);
     });
   }
 
   if (telefono) {
-    telefono.setAttribute("inputmode", "tel");
+    // Reforzamos atributos del input
+    telefono.setAttribute("inputmode", "numeric"); // teclado numérico en móviles
+    telefono.setAttribute("maxlength", "10");
+    telefono.setAttribute("pattern", "\\d{10}");
+    telefono.setAttribute("autocomplete", "tel");
+    telefono.setAttribute("required", ""); // <-- Obligatorio
+
+    // Normaliza en vivo: solo números y tope 10
     telefono.addEventListener("input", () => {
       telefono.value = telefono.value.replace(/\D/g, "");
+      if (telefono.value.length > 10) telefono.value = telefono.value.slice(0, 10);
     });
   }
 
@@ -61,8 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!res.ok) return { exists: false };
       return await res.json(); // { exists: boolean }
     } catch {
-      // si falla la red, no bloqueamos — validará el backend
-      return { exists: false };
+      return { exists: false }; // el backend revalidará
     }
   }
 
@@ -89,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
     clearErrors();
     const mensajes = [];
 
-    // Cedula
+    // Cédula
     const c = (cedula?.value || "").trim();
     if (!regexNumero.test(c)) {
       mensajes.push("La cédula debe contener solo números.");
@@ -110,10 +118,10 @@ document.addEventListener("DOMContentLoaded", () => {
       mensajes.push("El apellido solo debe contener letras y espacios.");
     }
 
-    // Teléfono (opcional)
+    // Teléfono (obligatorio y 10 dígitos exactos)
     const t = (telefono?.value || "").trim();
-    if (t !== "" && !regexNumero.test(t)) {
-      mensajes.push("El teléfono debe contener solo números.");
+    if (!regexTelefono.test(t)) {
+      mensajes.push("El teléfono debe tener exactamente 10 dígitos.");
     }
 
     // Correo
@@ -127,24 +135,24 @@ document.addEventListener("DOMContentLoaded", () => {
       mensajes.push("La contraseña debe tener mínimo 8 caracteres.");
     }
 
-    // Consultas al servidor (si no hay errores de formato)
+    // Consultas al servidor si no hay errores de formato
     if (mensajes.length === 0) {
-      const [cedulaRes, correoRes] = await Promise.all([
-        checkField("cedula", c),
-        checkField("correo", mail),
-      ]);
+      const checks = [];
+      if (cedula) checks.push(checkField("cedula", c)); else checks.push(Promise.resolve({exists:false}));
+      if (correo)  checks.push(checkField("correo", mail)); else checks.push(Promise.resolve({exists:false}));
+      const [cedulaRes, correoRes] = await Promise.all(checks);
       if (cedulaRes.exists) mensajes.push("⚠️ La cédula ya está registrada.");
-      if (correoRes.exists) mensajes.push("⚠️ El correo ya está registrado.");
+      if (correoRes.exists)  mensajes.push("⚠️ El correo ya está registrado.");
     }
 
     if (mensajes.length > 0) {
       e.preventDefault();
       showErrors(mensajes);
-      // opcional: focus al primer campo con problema
+      // focus al primero con problema
       if (!regexNumero.test(c) || c.length !== 10) { cedula?.focus(); return; }
       if (!regexNombre.test(n)) { nombres?.focus(); return; }
       if (a !== "" && !regexNombre.test(a)) { apellidos?.focus(); return; }
-      if (t !== "" && !regexNumero.test(t)) { telefono?.focus(); return; }
+      if (!regexTelefono.test(t)) { telefono?.focus(); return; }
       if (!regexCorreo.test(mail)) { correo?.focus(); return; }
       if (!password || password.value.length < 8) { password?.focus(); return; }
     }

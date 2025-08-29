@@ -21,7 +21,19 @@
 
           <!-- Fila 2: 2 columnas -->
           <div class="form-row form-2">
-            <input type="tel"    name="telefono"  placeholder="Teléfono" inputmode="tel">
+            <input
+            id="telefono"
+            name="telefono"
+            type="text"
+            placeholder="Teléfono"
+            inputmode="numeric"
+            pattern="\d{10}"
+            maxlength="10"
+            autocomplete="tel"
+            required
+          >
+
+            
             <input type="email"  name="correo"    placeholder="Correo"   required autocomplete="email">
           </div>
 
