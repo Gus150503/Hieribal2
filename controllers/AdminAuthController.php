@@ -11,8 +11,6 @@ final class AdminAuthController extends Controller {
     public function __construct(array $config) {
         parent::__construct($config);
         $this->usuarios = new Usuario($config);
-
-        // Base URL normalizada (solo para assets/vistas)
         $this->base = rtrim((string)($this->config['app']['base_url'] ?? ''), '/');
     }
 
@@ -25,8 +23,6 @@ final class AdminAuthController extends Controller {
             'error'     => $error,
             'msg'       => $msg,
             'full'      => true,
-
-            // CSS/JS específicos del login admin
             'extra_css' => [
                 $this->base . '/assets/css/admin.css',
                 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css',
@@ -51,16 +47,22 @@ final class AdminAuthController extends Controller {
             $this->redirect('/?r=admin_login');
         }
 
-        // Verifica credenciales (el modelo usa password_verify y estado Activo)
+        // Verifica credenciales (el modelo debe validar estado Activo)
         $u = $this->usuarios->verificarPassword($user, $pass);
         if ($u === false) {
             $_SESSION['admin_error'] = 'Credenciales inválidas o usuario inactivo.';
             $this->redirect('/?r=admin_login');
         }
 
-        // Normaliza rol y limita acceso
-        $rol = strtolower(trim((string)($u['rol'] ?? '')));
-        if (!in_array($rol, ['admin','manager'], true)) {
+        // Normaliza rol de BD: Admin, Cajero, Empleado -> admin|cajero|empleado
+        $rolRaw = (string)($u['rol'] ?? '');
+        $rol = strtolower(trim($rolRaw));
+        // (opcional: mapea sinónimos)
+        if ($rol === 'administrador') $rol = 'admin';
+
+        // Permitir panel a admin, cajero y empleado
+        $permitidos = ['admin','cajero','empleado'];
+        if (!in_array($rol, $permitidos, true)) {
             $_SESSION['admin_error'] = 'No tienes permisos para acceder al panel.';
             $this->redirect('/?r=admin_login');
         }
@@ -70,32 +72,29 @@ final class AdminAuthController extends Controller {
         $_SESSION['admin'] = [
             'id'      => (int)($u['id_usuario'] ?? 0),
             'usuario' => (string)($u['usuario'] ?? ''),
-            'nombre'  => trim((string)($u['nombres'] ?? '') . ' ' . (string)($u['apellidos'] ?? '')),
-            'rol'     => $rol,
+            'nombre'  => trim(((string)($u['nombres'] ?? '')) . ' ' . ((string)($u['apellidos'] ?? ''))),
+            'rol'     => $rol, // <-- en minúsculas: admin|cajero|empleado
             'correo'  => (string)($u['correo'] ?? ''),
         ];
 
-        $this->redirect('/?r=admin_dashboard');
+        // Redirección consistente con tus rutas (sidebar usa admin/dashboard)
+        $this->redirect('/?r=admin/dashboard');
     }
 
     /** Cierra sesión admin */
-public function logout(): void
-{
-    if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+    public function logout(): void {
+        if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
 
-    // Limpiar sesión
-    $_SESSION = [];
-    if (ini_get('session.use_cookies')) {
-        $p = session_get_cookie_params();
-        setcookie(session_name(), '', time()-42000, $p['path'], $p['domain'], $p['secure'], $p['httponly']);
+        $_SESSION = [];
+        if (ini_get('session.use_cookies')) {
+            $p = session_get_cookie_params();
+            setcookie(session_name(), '', time()-42000, $p['path'], $p['domain'], $p['secure'], $p['httponly']);
+        }
+        session_destroy();
+
+        // Usa router (?r=home)
+        $base = rtrim($this->config['app']['base_url'] ?? '', '/');
+        header('Location: ' . $base . '/?r=home');
+        exit;
     }
-    session_destroy();
-
-    // Redirigir usando el router (?r=home), NO a /home/index.php
-    $base = rtrim($this->config['app']['base_url'] ?? '', '/'); // p.ej. /Hieribal2/public
-    header('Location: ' . $base . '/?r=home');
-    exit;
-}
-
-
 }
