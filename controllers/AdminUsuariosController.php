@@ -15,11 +15,24 @@ final class AdminUsuariosController extends Controller {
         $this->mailer  = new Mailer($config);
     }
 
-    public function index(): void {
-        if (session_status() !== PHP_SESSION_ACTIVE) session_start();
-        if (empty($_SESSION['admin'])) { $_SESSION['admin_error']='Inicia sesión para continuar.'; $this->redirect('/?r=admin_login'); }
-        $this->render('admin/usuarios/index', ['titulo'=>'Usuarios','esAdmin'=>true]);
+   public function index(): void {
+    if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+    if (empty($_SESSION['admin'])) {
+        $_SESSION['admin_error'] = 'Inicia sesión para continuar.';
+        header('Location: /?r=admin_login'); exit;
     }
+
+    $base = $this->config['app']['base_url'];
+
+  $this->render('admin/usuarios/index', [
+  'titulo'    => 'Usuarios',
+  'esAdmin'   => true,
+  'extra_css' => [$this->config['app']['base_url'] . '/assets/css/admin_usuarios.css?v=5'],
+  'extra_js'  => [$this->config['app']['base_url'] . '/assets/js/admin_usuarios.js?v=5'],
+]);
+
+}
+
 
     /** API CRUD */
     public function api(): void {

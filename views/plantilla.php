@@ -1,8 +1,8 @@
 <?php
 /** Layout principal */
-$full = $full ?? false;                    // Vistas full-bleed (login/registro)
-$base = $this->config['app']['base_url'];  // Atajo para rutas
-$isAdmin = !empty($esAdmin);               // Flag para panel admin
+$full  = $full  ?? false;                   // Vistas full-bleed (login/registro)
+$base  = $this->config['app']['base_url'];  // Atajo para rutas absolutas
+$isAdmin = !empty($esAdmin);                // Flag para panel admin
 
 // Clases para <body>
 $bodyClasses = [];
@@ -17,17 +17,15 @@ $bodyClassAttr = implode(' ', $bodyClasses);
   <title><?= htmlspecialchars($titulo ?? 'App') ?></title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- CSS global del sitio público -->
+  <!-- CSS global público -->
   <link rel="stylesheet" href="<?= $base ?>/assets/css/app.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
   <?php if ($isAdmin): ?>
     <!-- CSS del panel admin -->
-<link rel="stylesheet" href="<?= $base ?>/assets/vendor/bootstrap/bootstrap.min.css">
-<link rel="stylesheet" href="<?= $base ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css">
-<link rel="stylesheet" href="<?= $base ?>/assets/css/dashboard.css">
-
+    <link rel="stylesheet" href="<?= $base ?>/assets/vendor/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="<?= $base ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="<?= $base ?>/assets/css/dashboard.css">
   <?php endif; ?>
 
   <!-- CSS extra por página -->
@@ -41,7 +39,7 @@ $bodyClassAttr = implode(' ', $bodyClasses);
 <body class="<?= htmlspecialchars($bodyClassAttr) ?>">
 
   <?php if (!$full && !$isAdmin): ?>
-    <!-- ===== Header / navegación pública (NO en admin ni en full) ===== -->
+    <!-- ===== Header público (NO en admin ni en vistas full) ===== -->
     <header class="site-header header">
       <div class="container header-wrap" style="display:flex;align-items:center;justify-content:space-between;">
         <a class="logo" href="<?= $base ?>/?r=home" aria-label="Ir al inicio">
@@ -70,7 +68,7 @@ $bodyClassAttr = implode(' ', $bodyClasses);
   <!-- ===== Contenido ===== -->
   <main class="site-main <?= $full ? 'site-main--full' : '' ?>">
     <?php if ($full || $isAdmin): ?>
-      <!-- Sin .container en login ni en admin (las vistas ya traen su layout) -->
+      <!-- Sin .container en login ni en admin (las vistas de admin traen su propio layout interno) -->
       <?= $contenido ?? '' ?>
     <?php else: ?>
       <div class="container">
@@ -80,7 +78,7 @@ $bodyClassAttr = implode(' ', $bodyClasses);
   </main>
 
   <?php if (!$full && !$isAdmin): ?>
-    <!-- ===== Footer público (no en admin ni full) ===== -->
+    <!-- ===== Footer público (no en admin ni en full) ===== -->
     <footer class="site-footer">
       <div class="container">
         <p style="margin:0;">© <?= date('Y') ?> MI HIERBAL • Bienestar natural</p>
@@ -88,18 +86,50 @@ $bodyClassAttr = implode(' ', $bodyClasses);
     </footer>
   <?php endif; ?>
 
-  <!-- JS global -->
-  <script src="<?= $base ?>/assets/js/app.js"></script>
+  <!-- ===== Scripts ===== -->
 
-  <!-- JS extra por página -->
+  <?php if ($isAdmin): ?>
+    <!-- Vendor admin primero (Bootstrap para modales, tooltips, etc.) -->
+    <script src="<?= $base ?>/assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
+  <?php endif; ?>
+
+  <!-- JS global de la app -->
+  <script src="<?= $base ?>/assets/js/app.js" defer></script>
+
+  <!-- JS extra por página (después de Bootstrap) -->
   <?php if (!empty($extra_js) && is_array($extra_js)): ?>
     <?php foreach ($extra_js as $src): ?>
-      <script src="<?= htmlspecialchars($src) ?>"></script>
+      <script src="<?= htmlspecialchars($src) ?>" defer></script>
     <?php endforeach; ?>
   <?php endif; ?>
-<script src="<?= $base ?>/assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
-<script src="<?= $base ?>/assets/vendor/chartjs/chart.umd.min.js" defer></script>
-<script src="<?= $base ?>/assets/js/admin-dashboard.js" defer></script>
+
+  <!-- Scripts opcionales sólo si la página lo pide (p.ej. Dashboard) -->
+  <?php if (!empty($carga_chartjs)): ?>
+    <script src="<?= $base ?>/assets/vendor/chartjs/chart.umd.min.js" defer></script>
+    <script src="<?= $base ?>/assets/js/admin-dashboard.js" defer></script>
+  <?php endif; ?>
+
+    <?php if ($isAdmin): ?>
+    <!-- Bootstrap primero: necesario para modales/tooltip -->
+    <script src="<?= $base ?>/assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
+  <?php endif; ?>
+
+  <!-- JS global de la app -->
+  <script src="<?= $base ?>/assets/js/app.js" defer></script>
+
+  <!-- JS extra por página (inyectado por el controlador) -->
+  <?php if (!empty($extra_js) && is_array($extra_js)): ?>
+    <?php foreach ($extra_js as $src): ?>
+      <script src="<?= htmlspecialchars($src) ?>" defer></script>
+    <?php endforeach; ?>
+  <?php endif; ?>
+
+  <!-- SOLO si la página lo pide -->
+  <?php if (!empty($carga_chartjs)): ?>
+    <script src="<?= $base ?>/assets/vendor/chartjs/chart.umd.min.js" defer></script>
+    <script src="<?= $base ?>/assets/js/admin-dashboard.js" defer></script>
+  <?php endif; ?>
+
 
 </body>
 </html>
