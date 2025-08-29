@@ -1,0 +1,121 @@
+/* ============== Variables de tono ============== */
+:root{
+  --brand: #198754;           /* verde bootstrap */
+  --brand-50: #e6f4ea;
+  --muted: #6c757d;
+  --border: #e8eef3;
+  --bg-soft: #f7f9fb;
+  --danger-50: #fdeaea;
+  --secondary-50:#eef1f4;
+}
+
+/* ============== Card contenedor ============== */
+.card{
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgba(16, 24, 40, .06);
+}
+.card .card-body{ padding: 1.25rem 1.25rem; }
+
+/* ============== Toolbar ============== */
+#btnNuevo{
+  border-radius: 10px;
+  padding: .45rem .9rem;
+}
+.input-group > .form-control{
+  border-color: var(--border);
+  border-radius: .75rem 0 0 .75rem;
+}
+.input-group-text{
+  border-color: var(--border);
+  border-radius: .75rem 0 0 .75rem;
+}
+.input-group .btn{
+  border-radius: 0 .75rem .75rem 0;
+}
+
+/* ============== Tabla ============== */
+.table{
+  --bs-table-bg: #fff;
+  --bs-table-hover-bg: #f8fbf8;
+  border-color: var(--border);
+}
+.table thead th{
+  background: var(--bg-soft);
+  border-bottom: 1px solid var(--border);
+  color: #16272e;
+  font-weight: 600;
+}
+.table td, .table th{ vertical-align: middle; }
+
+/* filas más cómodas */
+.table tbody tr{ --space: .5rem; }
+.table tbody td{ padding-top: var(--space); padding-bottom: var(--space); }
+
+/* ============== Badges suaves ============== */
+.badge.border{ border-color: var(--border)!important; }
+.bg-success-subtle{ background: var(--brand-50)!important; color: var(--brand)!important; }
+.bg-danger-subtle{  background: var(--danger-50)!important; color: #c03a2b!important; }
+.bg-secondary-subtle{ background: var(--secondary-50)!important; color: #495057!important; }
+
+/* ============== Botones de acción ============== */
+.btn-group .btn{
+  border-radius: 10px!important;
+  padding: .35rem .5rem;
+  line-height: 1;
+  display: inline-flex; align-items:center; justify-content:center;
+  width: 34px; height: 34px;
+}
+.btn-outline-primary{ --bs-btn-color:#0d6efd; --bs-btn-border-color:var(--border); }
+.btn-outline-danger{  --bs-btn-border-color:var(--border); }
+.btn-outline-secondary{--bs-btn-border-color:var(--border); }
+.btn-outline-success{ --bs-btn-border-color:var(--border); }
+
+/* ============== Paginación bonita (y sin viñetas) ============== */
+#paginador{ display:flex; gap:.35rem; list-style:none; padding:0; margin:0; }
+#paginador .page-item{ list-style:none; }
+#paginador .page-link{
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  color: #0f172a;
+  padding: .35rem .65rem;
+  box-shadow: 0 1px 0 rgba(16,24,40,.04);
+}
+#paginador .page-item.active .page-link{
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+#paginador .page-item.disabled .page-link{
+  background: #fafafa; color: var(--muted);
+}
+
+/* Selector “per page” y contador */
+#perPage{ border-radius: 8px; }
+#totalUsuarios{ color: var(--muted); }
+
+/* ============== Modal (si usas modal para crear/editar) ============== */
+.modal-content{
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 28px rgba(16, 24, 40, 0.12);
+}
+.modal-header{ border-bottom-color: var(--border); }
+.modal-footer{ border-top-color: var(--border); }
+.modal .form-control, .modal .form-select{
+  border-color: var(--border);
+  border-radius: .7rem;
+}
+
+/* ============== Formularios inline (si aparecieran) ============== */
+#frmUsuario:not(.modal form){
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 2px 12px rgba(16,24,40,.06);
+}
+
+/* Reseteos suaves */
+.table-responsive{ scrollbar-width: thin; }

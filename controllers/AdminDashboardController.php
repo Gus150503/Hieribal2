@@ -47,6 +47,7 @@ final class AdminDashboardController extends Controller
     $this->render('admin/dashboard', [
         'titulo'            => 'Dashboard',   // 👈 IMPORTANTE (va dentro de $data)
         'esAdmin'           => true,
+        'carga_chartjs'  => true,
 
         // Tus variables (se mantienen tal cual)
         'admin'             => $_SESSION['admin'],

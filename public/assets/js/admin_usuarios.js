@@ -1,139 +1,260 @@
 (() => {
+  // ===== Base y endpoints =====
   const base = location.pathname.replace(/\/public\/?$/, '') + '/public';
   const api  = (params) => `${base}/?r=admin_usuarios_api&${params}`;
 
-  const nameRe = /^[A-Za-zÁÉÍÓÚÑáéíóúñ ]{2,60}$/u;
-  const userRe = /^[A-Za-z0-9._-]{3,30}$/;
+  // ===== Estado =====
+  const state = { page: 1, per: 10, total: 0, q: '' };
 
-  const $ = s => document.querySelector(s);
-  const $$ = s => document.querySelectorAll(s);
+  // ===== Selectores =====
+  const $  = (s) => document.querySelector(s);
+  const $$ = (s) => document.querySelectorAll(s);
+  const tbl = $('#tblUsuarios tbody');
 
-  const modal = $('#modalUsuario');
-  const frm   = $('#frmUsuario');
-  const tbl   = $('#tblUsuarios tbody');
-
-  let editId = 0;
-
-  function openModal(title, data={}) {
-    $('#modalTitle').textContent = title;
-    modal.style.display = 'block';
-    editId = data.id_usuario || 0;
-
-    // reset
-    frm.reset();
-    $('#id_usuario').value = editId;
-    $('#usuario').value = data.usuario || '';
-    $('#rol').value     = data.rol || 'empleado';
-    $('#nombres').value = data.nombres || '';
-    $('#apellidos').value = data.apellidos || '';
-    $('#correo').value  = data.correo || '';
-    $('#estado').value  = data.estado || 'activo';
-    $('#password').value = '';
-  }
-
-  function closeModal(){ modal.style.display='none'; }
-
-  $('#btnNuevo')?.addEventListener('click', () => openModal('Nuevo usuario'));
-  $('#btnCerrar')?.addEventListener('click', closeModal);
-
-  // Buscar/listar
-// Buscar/listar
-async function listar() {
-  const q = encodeURIComponent($('#q').value || '');
-  try {
-    const res  = await fetch(api(`action=list&q=${q}&page=1&per=20`));
-    const txt  = await res.text();          // leemos texto primero
-    let json;
-    try {
-      json = JSON.parse(txt);               // intentamos parsear JSON
-    } catch (e) {
-      console.error('Respuesta no JSON del API:', txt);
-      throw e;
+  // ===== Util UI =====
+  function setLoading(on) {
+    if (on) {
+      tbl.innerHTML = `<tr><td colspan="8" class="py-4 text-center">
+        <div class="spinner-border spinner-border-sm me-2"></div> Cargando…
+      </td></tr>`;
     }
-    if (!res.ok) throw new Error(json.msg || 'Error API');
-    renderTabla(json.items || []);
-  } catch (err) {
-    console.error('Error listar:', err);
-    alert('Error al listar: ' + err.message);
   }
-}
-
- function renderTabla(items) {
-  tbl.innerHTML = '';
-  for (const u of items) {
-    const isActive = String(u.estado || '').toLowerCase().startsWith('activo');
-    const verifIcon = u.correo_verificado ? '✔' : '✖';
-
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${u.id_usuario}</td>
-      <td>${u.usuario}</td>
-      <td>${u.nombres} ${u.apellidos}</td>
-      <td>${u.correo}</td>
-      <td>${u.rol}</td>
-      <td>${u.estado}</td>
-      <td>${verifIcon}</td>
-      <td>
-        <button data-editar="${u.id_usuario}">Editar</button>
-        <button data-eliminar="${u.id_usuario}">Eliminar</button>
-        <button data-toggle="${u.id_usuario}">${isActive ? 'Desactivar' : 'Activar'}</button>
-        ${u.correo_verificado ? '' : `<button data-reenviar="${u.id_usuario}">Reenviar verificación</button>`}
-      </td>
-    `;
-    tbl.appendChild(tr);
+  function emptyState() {
+    tbl.innerHTML = `<tr><td colspan="8" class="py-4 text-center text-muted">Sin resultados</td></tr>`;
   }
-}
+  function updateTotal() {
+    const el = $('#totalUsuarios');
+    if (el) el.textContent = `${state.total} registro(s)`;
+  }
 
+  // ===== Listado con paginación =====
+  async function listar(page = state.page) {
+    state.page = page;
+    const q = encodeURIComponent(state.q || '');
+    setLoading(true);
+    try {
+      const res = await fetch(api(`action=list&q=${q}&page=${state.page}&per=${state.per}`));
+      const j = await res.json();
 
-  $('#btnBuscar')?.addEventListener('click', listar);
-  $('#q')?.addEventListener('keydown', e => { if (e.key==='Enter') { e.preventDefault(); listar(); }});
+      const items = j.items || [];
+      state.total = parseInt(j.total ?? items.length, 10);
+      state.page  = parseInt(j.page  ?? state.page, 10);
+      state.per   = parseInt(j.per   ?? state.per, 10);
 
-  // Delegación de acciones
+      renderTabla(items);
+      renderPager();
+      updateTotal();
+    } catch (err) {
+      console.error('Error listar:', err);
+      emptyState();
+    }
+  }
+
+  // ===== Render de tabla =====
+  function renderTabla(items) {
+    if (!items.length) return emptyState();
+    tbl.innerHTML = '';
+    for (const u of items) {
+      const isActive = String(u.estado || '').toLowerCase().startsWith('activo');
+      const estadoBadge = isActive
+        ? '<span class="badge bg-success-subtle text-success border">Activo</span>'
+        : '<span class="badge bg-secondary-subtle text-secondary border">Inactivo</span>';
+
+      const verifBadge = u.correo_verificado
+        ? '<span class="badge bg-success-subtle text-success border">Verificado</span>'
+        : '<span class="badge bg-danger-subtle text-danger border">Pendiente</span>';
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${u.id_usuario}</td>
+        <td class="fw-semibold">${u.usuario}</td>
+        <td>${u.nombres} ${u.apellidos}</td>
+        <td>${u.correo}</td>
+        <td><span class="badge bg-light text-dark border">${u.rol}</span></td>
+        <td>${estadoBadge}</td>
+        <td>${verifBadge}</td>
+        <td class="text-end">
+          <div class="btn-group btn-group-sm" role="group">
+            <button class="btn btn-outline-primary" title="Editar" data-editar="${u.id_usuario}">
+              <i class="bi bi-pencil-square"></i>
+            </button>
+            <button class="btn btn-outline-danger" title="Eliminar" data-eliminar="${u.id_usuario}">
+              <i class="bi bi-trash"></i>
+            </button>
+            <button class="btn btn-outline-secondary" title="${isActive?'Desactivar':'Activar'}" data-toggle="${u.id_usuario}">
+              <i class="bi ${isActive?'bi-toggle-on':'bi-toggle-off'}"></i>
+            </button>
+            ${u.correo_verificado ? '' : `
+              <button class="btn btn-outline-success" title="Reenviar verificación" data-reenviar="${u.id_usuario}">
+                <i class="bi bi-envelope-arrow-up"></i>
+              </button>`}
+          </div>
+        </td>
+      `;
+      tbl.appendChild(tr);
+    }
+  }
+
+  // ===== Paginación =====
+  function renderPager() {
+    const ul = $('#paginador'); if (!ul) return;
+    const pages = Math.max(1, Math.ceil(state.total / state.per));
+    let html = '';
+
+    const prevDisabled = state.page <= 1 ? ' disabled' : '';
+    html += `<li class="page-item${prevDisabled}">
+      <button class="page-link" data-page="${state.page - 1}" aria-label="Anterior">&laquo;</button>
+    </li>`;
+
+    const win = 2;
+    let start = Math.max(1, state.page - win);
+    let end   = Math.min(pages, state.page + win);
+
+    if (start > 1) {
+      html += `<li class="page-item"><button class="page-link" data-page="1">1</button></li>`;
+      if (start > 2) html += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
+    }
+    for (let p = start; p <= end; p++) {
+      html += `<li class="page-item ${p === state.page ? 'active' : ''}">
+        <button class="page-link" data-page="${p}">${p}</button>
+      </li>`;
+    }
+    if (end < pages) {
+      if (end < pages - 1) html += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
+      html += `<li class="page-item"><button class="page-link" data-page="${pages}">${pages}</button></li>`;
+    }
+
+    const nextDisabled = state.page >= pages ? ' disabled' : '';
+    html += `<li class="page-item${nextDisabled}">
+      <button class="page-link" data-page="${state.page + 1}" aria-label="Siguiente">&raquo;</button>
+    </li>`;
+
+    ul.innerHTML = html;
+  }
+
+  $('#paginador')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-page]'); if (!btn) return;
+    const to = parseInt(btn.dataset.page, 10);
+    const pages = Math.max(1, Math.ceil(state.total / state.per));
+    if (to >= 1 && to <= pages && to !== state.page) listar(to);
+  });
+
+  $('#perPage')?.addEventListener('change', (e) => {
+    state.per = parseInt(e.target.value, 10) || 10;
+    listar(1);
+  });
+
+  // ===== Buscar =====
+  $('#btnBuscar')?.addEventListener('click', () => { state.q = $('#q').value.trim(); listar(1); });
+  $('#q')?.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); state.q = $('#q').value.trim(); listar(1); }});
+
+  // ===== Modal =====
+  const modalEl = document.getElementById('modalUsuario');
+  const frm     = document.getElementById('frmUsuario');
+  const btnNuevo = document.getElementById('btnNuevo');
+  const modalTitle = document.getElementById('modalTitle');
+  let bsModal = null;
+  if (modalEl && window.bootstrap) bsModal = new bootstrap.Modal(modalEl, { backdrop: 'static' });
+
+  function fillForm(data = {}) {
+    const d = {
+      id_usuario: 0, usuario: '', rol: 'empleado', estado: 'activo',
+      nombres: '', apellidos: '', correo: '', ...data
+    };
+    d.estado = String(d.estado || '').toLowerCase().startsWith('inac') ? 'inactivo' : 'activo';
+    frm.querySelector('#id_usuario').value = d.id_usuario || 0;
+    frm.querySelector('#usuario').value    = d.usuario || '';
+    frm.querySelector('#rol').value        = d.rol || 'empleado';
+    frm.querySelector('#estado').value     = d.estado;
+    frm.querySelector('#nombres').value    = d.nombres || '';
+    frm.querySelector('#apellidos').value  = d.apellidos || '';
+    frm.querySelector('#correo').value     = d.correo || '';
+    frm.querySelector('#password').value   = '';
+  }
+  function openEditor(data, title) {
+    fillForm(data);
+    if (modalTitle) modalTitle.textContent = title || 'Nuevo usuario';
+    bsModal ? bsModal.show() : (modalEl.style.display = 'block');
+  }
+  function closeEditor() {
+    bsModal ? bsModal.hide() : (modalEl.style.display = 'none');
+  }
+
+  btnNuevo?.addEventListener('click', () => openEditor({}, 'Nuevo usuario'));
+
+  // ===== Acciones tabla =====
   tbl.addEventListener('click', async (e) => {
     const btn = e.target.closest('button'); if (!btn) return;
     const id = +btn.dataset.editar || +btn.dataset.eliminar || +btn.dataset.toggle || +btn.dataset.reenviar;
 
     if (btn.dataset.editar) {
-      const r = await fetch(api(`action=get&id=${id}`)); const j = await r.json();
-      openModal('Editar usuario', j.data || {});
+      const r = await fetch(api(`action=get&id=${id}`));
+      const j = await r.json();
+      if (!j || !j.data) return alert('No se pudo cargar el usuario.');
+      openEditor(j.data, 'Editar usuario');
+      return;
     }
     if (btn.dataset.eliminar) {
       if (!confirm('¿Eliminar usuario?')) return;
       await fetch(api('action=delete'), { method:'POST', body: formData({id_usuario:id}) });
-      listar();
+      listar(); return;
     }
     if (btn.dataset.toggle) {
       await fetch(api('action=toggle'), { method:'POST', body: formData({id_usuario:id}) });
-      listar();
+      listar(); return;
     }
     if (btn.dataset.reenviar) {
       location.href = `${base}/?r=admin_usuarios_resend_verif&id=${id}`;
     }
   });
 
-  // Validación del formulario
+  // ===== Validación y submit =====
+  const nameRe = /^[A-Za-zÁÉÍÓÚÑáéíóúñ ]{2,60}$/u;
+  const userRe = /^[A-Za-z0-9._-]{3,30}$/;
+
+  function validate(data, isUpdate) {
+    if (!userRe.test(data.usuario || '')) return 'Usuario inválido (3-30, letras/números . _ -)';
+    if (!nameRe.test(data.nombres || '')) return 'Nombres inválidos (sólo letras/espacios, 2-60).';
+    if (!nameRe.test(data.apellidos || '')) return 'Apellidos inválidos (sólo letras/espacios, 2-60).';
+    if (!/.+@.+\..+/.test(data.correo || '')) return 'Correo inválido.';
+    if (!isUpdate && (!data.password || data.password.length < 6)) return 'Password mínimo 6 caracteres.';
+    return '';
+  }
+
   frm?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const d = Object.fromEntries(new FormData(frm).entries());
-
-    if (!userRe.test(d.usuario))            return alert('Usuario inválido (3-30, solo letras/números . _ -)');
-    if (!nameRe.test(d.nombres))            return alert('Nombres: solo letras y espacios (2-60).');
-    if (!nameRe.test(d.apellidos))          return alert('Apellidos: solo letras y espacios (2-60).');
-    if (!/.+@.+\..+/.test(d.correo))        return alert('Correo inválido.');
-    if (!editId && (!d.password || d.password.length < 6)) return alert('Password mínimo 6.');
-
-    const action = editId ? 'update' : 'create';
     const fd = new FormData(frm);
-    fd.append('action', action);
-    const res = await fetch(api(`action=${action}`), { method:'POST', body: fd });
-    const j = await res.json();
-    if (!j.ok) return alert(j.msg || 'Error');
+    const id = +fd.get('id_usuario');
+    const isUpdate = id > 0;
 
-    closeModal(); listar();
+    const plain = Object.fromEntries(fd.entries());
+    const err = validate(plain, isUpdate);
+    if (err) return alert(err);
+
+    const btnSubmit = frm.querySelector('button[type="submit"]');
+    const prevHtml = btnSubmit.innerHTML;
+    btnSubmit.disabled = true;
+    btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando…';
+
+    try {
+      const action = isUpdate ? 'update' : 'create';
+      const res = await fetch(api(`action=${action}`), { method:'POST', body: fd });
+      const j = await res.json();
+      if (!j.ok) throw new Error(j.msg || 'Error al guardar');
+      closeEditor();
+      listar(); // refrescar
+    } catch (er) {
+      alert(er.message || 'Error al guardar');
+    } finally {
+      btnSubmit.disabled = false;
+      btnSubmit.innerHTML = prevHtml;
+    }
   });
 
-  function formData(obj) { const fd = new FormData(); Object.entries(obj).forEach(([k,v])=>fd.append(k,v)); return fd; }
+  // ===== Init =====
+  function boot(){ listar(1); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+  window.addEventListener('pageshow', (e) => { if (e.persisted) boot(); });
 
-  // init
-  listar();
+  function formData(obj){ const fd=new FormData(); Object.entries(obj).forEach(([k,v])=>fd.append(k,v)); return fd; }
 })();
