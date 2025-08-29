@@ -96,12 +96,27 @@ final class AdminUsuariosController extends Controller {
         $this->render('admin/usuarios/verify_result', ['titulo'=>'Verificación de correo','esAdmin'=>true,'msg'=>$msg]);
     }
 
-    public function resendVerification(): void {
-        $id = (int)($_GET['id'] ?? 0);
-        $u = $this->Usuario->getById($id);
-        if ($u) $this->sendVerificationEmail($u);
-        $this->redirect('/?r=admin_usuarios');
+  public function resendVerification(): void {
+    if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+    if (empty($_SESSION['admin'])) { $_SESSION['admin_error']='Inicia sesión para continuar.'; $this->redirect('/?r=admin_login'); }
+
+    $id = (int)($_GET['id'] ?? 0);
+    if ($id <= 0) { $_SESSION['flash'] = ['type'=>'danger','msg'=>'ID inválido']; $this->redirect('/?r=admin_usuarios'); }
+
+    $u = $this->Usuario->getById($id);
+    if (!$u) { $_SESSION['flash'] = ['type'=>'danger','msg'=>'Usuario no encontrado']; $this->redirect('/?r=admin_usuarios'); }
+
+    // si no tiene token o está vencido, generarlo
+    if (empty($u['correo_verificacion_token']) || !empty($u['correo_verificacion_expira']) && strtotime($u['correo_verificacion_expira']) <= time()) {
+        $u = $this->Usuario->resetVerificationToken($id); // <-- lo añadimos abajo
     }
+
+    // enviar correo (blindado; si falla no rompe)
+    $this->sendVerificationEmail($u);
+
+    $_SESSION['flash'] = ['type'=>'success','msg'=>'Correo de verificación reenviado (si el SMTP está configurado).'];
+    $this->redirect('/?r=admin_usuarios');
+}
 
     private function sendVerificationEmail(array $u): void {
         if (empty($u['correo']) || empty($u['correo_verificacion_token'])) return;

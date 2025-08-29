@@ -4,6 +4,14 @@
 <section class="card">
   <div style="display:flex; align-items:center; justify-content:space-between;">
     <h1><?= htmlspecialchars($titulo ?? 'Usuarios') ?></h1>
+    <?php if (session_status() !== PHP_SESSION_ACTIVE) session_start(); ?>
+<?php if (!empty($_SESSION['flash'])):
+      $f = $_SESSION['flash']; unset($_SESSION['flash']); ?>
+  <div class="alert alert-<?= htmlspecialchars($f['type'] ?? 'info') ?>" role="alert">
+    <?= htmlspecialchars($f['msg'] ?? '') ?>
+  </div>
+<?php endif; ?>
+
     <button id="btnNuevo" class="btn btn-primary">Nuevo</button>
   </div>
 

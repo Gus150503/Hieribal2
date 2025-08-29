@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 28-08-2025 a las 02:06:22
+-- Tiempo de generación: 29-08-2025 a las 03:04:29
 -- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.0.30
+-- Versión de PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -34,8 +34,17 @@ CREATE TABLE `carrito` (
   `cantidad` int(11) NOT NULL DEFAULT 1,
   `precio` decimal(10,2) NOT NULL,
   `subtotal` decimal(10,2) GENERATED ALWAYS AS (`cantidad` * `precio`) STORED,
-  `fecha_agregado` timestamp NOT NULL DEFAULT current_timestamp()
+  `fecha_agregado` timestamp NOT NULL DEFAULT current_timestamp(),
+  `id_cliente` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `carrito`
+--
+
+INSERT INTO `carrito` (`id_carrito`, `id_producto`, `nombre_producto`, `cantidad`, `precio`, `fecha_agregado`, `id_cliente`) VALUES
+(1002, 3, 'Menta', 2, 1200.00, '2025-08-28 14:16:55', NULL),
+(3001, 2, 'Eucalipto', 4, 2000.00, '2025-08-28 14:27:37', 1);
 
 -- --------------------------------------------------------
 
@@ -45,7 +54,7 @@ CREATE TABLE `carrito` (
 
 CREATE TABLE `clientes` (
   `id_cliente` int(11) NOT NULL,
-  `cedula` varchar(20) NOT NULL,
+  `cedula` varchar(20) DEFAULT NULL,
   `nombres` varchar(100) NOT NULL,
   `apellidos` varchar(100) NOT NULL,
   `telefono` varchar(20) DEFAULT NULL,
@@ -63,8 +72,8 @@ CREATE TABLE `clientes` (
 --
 
 INSERT INTO `clientes` (`id_cliente`, `cedula`, `nombres`, `apellidos`, `telefono`, `correo`, `contraseña`, `fecha_registro`, `verificado`, `token_verificacion`, `token_recuperacion`, `recuperacion_expira`) VALUES
-(14, '', 'gustavo cuevas', '', '', 'gustavoalexiscuevas@gmail.com', '$2y$10$pVv7yuGWuXjlR6YLPnCK3OFSWi9k3ubCJevEW0FChAIoHS.366quG', '2025-08-25 18:45:07', 1, NULL, '1d0335c78d989ba2c0ddc681be2e26be8aab9791731ed6071eaa956b74f134c7', '2025-08-26 04:23:18'),
-(16, '1232423423', 'ggg', 'gggg', '32141343242', 'p3a3pel@gmail.com', '$2y$10$E8V8uvglYZEfsL1Bc.tgSO4dWFJ71ycqg/1LxNmrqYEmo1pYNO7I6', '2025-08-25 19:45:47', 0, '16cec96add11af01eae82e09c0719e47a259bce8ac8d05406ba3edfc67c909a4', NULL, NULL);
+(1, NULL, 'María Pérez', '', NULL, '', '', '2025-08-28 09:25:01', 0, NULL, NULL, NULL),
+(20, NULL, 'gustavo cuevas', '', '', 'gustavoalexiscuevas@gmail.com', '$2y$10$QJRvvfRtqSRPeBUXMfW.MewOZ8DmTIPdzvl6OhyI0kVwBpIQ/dhOS', '2025-08-28 08:59:27', 1, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -131,7 +140,11 @@ CREATE TABLE `productos` (
 --
 
 INSERT INTO `productos` (`id`, `nombre`, `categoria`, `marca`, `presentacion`, `unidad`, `min_stock`, `descripcion`, `lote`, `f_vencimiento`, `precio_compra`, `precio_venta`, `iva`, `codigo_sku`, `ubicacion`, `estado`, `imagen`, `creado`) VALUES
-(2, 'Eucalipto', 'ramas', 'no se', 'fisica', '50', 40, 'eucalipto', '2', '2025-08-31', 1000.00, 2000.00, 0.00, '5342', 'ni idea', 'activo', NULL, '2025-08-27 23:37:31');
+(2, 'Eucalipto', 'ramas', 'no se', 'fisica', '50', 40, 'eucalipto', '2', '2025-08-31', 1000.00, 2000.00, 0.00, '5342', 'ni idea', 'activo', 'gym1.png\n', '2025-08-27 23:37:31'),
+(3, 'Menta', NULL, NULL, NULL, '3', 12, NULL, NULL, NULL, NULL, 1200.00, 0.00, NULL, NULL, 'activo', 'gym1.png\n', '2025-08-28 14:14:42'),
+(4, 'Toronjil', NULL, NULL, NULL, '4', 15, NULL, NULL, NULL, NULL, 1100.00, 0.00, NULL, NULL, 'activo', NULL, '2025-08-28 14:15:14'),
+(5, 'Manzanilla', NULL, NULL, NULL, '0', 10, NULL, NULL, NULL, NULL, 1500.00, 0.00, NULL, NULL, 'activo', NULL, '2025-08-28 14:15:56'),
+(6, 'Manzanillaa', NULL, NULL, NULL, '0', 10, NULL, NULL, NULL, NULL, 1500.00, 0.00, NULL, NULL, 'activo', NULL, '2025-08-28 14:15:56');
 
 -- --------------------------------------------------------
 
@@ -167,6 +180,9 @@ CREATE TABLE `usuarios` (
   `nombres` varchar(100) NOT NULL,
   `apellidos` varchar(100) NOT NULL,
   `correo` varchar(100) DEFAULT NULL,
+  `correo_verificado` tinyint(1) NOT NULL DEFAULT 0,
+  `correo_verificacion_token` varchar(64) DEFAULT NULL,
+  `correo_verificacion_expira` datetime DEFAULT NULL,
   `fecha_creacion` datetime DEFAULT current_timestamp(),
   `estado` enum('Activo','Inactivo') NOT NULL,
   `token_recuperacion` varchar(255) DEFAULT NULL
@@ -176,10 +192,9 @@ CREATE TABLE `usuarios` (
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`id_usuario`, `usuario`, `password`, `rol`, `nombres`, `apellidos`, `correo`, `fecha_creacion`, `estado`, `token_recuperacion`) VALUES
-(3, 'admin', '$2y$10$RGDjjslCZYaj2O.GX.WNr.mgLybwAYhbe.YUA4JB1OGWv9l7vh1au', 'Admin', 'gustavo', 'cuevas', 'gustavo@gmail.com', '2025-07-10 16:37:09', 'Activo', NULL),
-(6, 'admin1', '$2y$10$VSXPt6oeKYEDEFUhAOaw3./uaTDPIYg.vdXuMXGFZDqamHmwcvxxG', 'Admin', 'gustavo', 'cuevas', 'gustavo@gmail.com', '2025-07-10 16:37:09', 'Activo', NULL),
-(9, 'admin2', '$2y$10$VSXPt6oeKYEDEFUhAOaw3./uaTDPIYg.vdXuMXGFZDqamHmwcvxxG', 'Empleado', 'gustavo', 'cuevas', 'gustavo@gmail.com', '2025-07-10 16:37:09', 'Activo', NULL);
+INSERT INTO `usuarios` (`id_usuario`, `usuario`, `password`, `rol`, `nombres`, `apellidos`, `correo`, `correo_verificado`, `correo_verificacion_token`, `correo_verificacion_expira`, `fecha_creacion`, `estado`, `token_recuperacion`) VALUES
+(3, 'admin', '$2y$10$RGDjjslCZYaj2O.GX.WNr.mgLybwAYhbe.YUA4JB1OGWv9l7vh1au', 'Empleado', 'gustavo', 'cuevas', 'gustavo@gmail.com', 0, NULL, NULL, '2024-07-24 00:00:00', 'Activo', NULL),
+(6, 'admin1', '$2y$10$VSXPt6oeKYEDEFUhAOaw3./uaTDPIYg.vdXuMXGFZDqamHmwcvxxG', 'Admin', 'gustavo', 'cuevas', 'gustavoalexiscuevas@gmail.com', 1, NULL, NULL, '2025-07-10 16:37:09', 'Activo', NULL);
 
 -- --------------------------------------------------------
 
@@ -194,6 +209,13 @@ CREATE TABLE `ventas` (
   `fecha_venta` timestamp NOT NULL DEFAULT current_timestamp(),
   `metodo_pago` varchar(50) DEFAULT 'Efectivo'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `ventas`
+--
+
+INSERT INTO `ventas` (`id_venta`, `id_carrito`, `total`, `fecha_venta`, `metodo_pago`) VALUES
+(5002, 3001, 8000.00, '2025-08-28 14:27:37', 'efectivo');
 
 --
 -- Índices para tablas volcadas
@@ -261,13 +283,13 @@ ALTER TABLE `ventas`
 -- AUTO_INCREMENT de la tabla `carrito`
 --
 ALTER TABLE `carrito`
-  MODIFY `id_carrito` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_carrito` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3002;
 
 --
 -- AUTO_INCREMENT de la tabla `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT de la tabla `historial_pedido`
@@ -285,7 +307,7 @@ ALTER TABLE `inventario`
 -- AUTO_INCREMENT de la tabla `productos`
 --
 ALTER TABLE `productos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `proveedores`
@@ -303,7 +325,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `ventas`
 --
 ALTER TABLE `ventas`
-  MODIFY `id_venta` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_venta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5003;
 
 --
 -- Restricciones para tablas volcadas

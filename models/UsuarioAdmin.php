@@ -175,6 +175,21 @@ class UsuarioAdmin
         $st->execute([':t' => $token]);
         return $st->rowCount() > 0;
     }
+    public function resetVerificationToken(int $id): array {
+    list($tok, $exp) = $this->genToken();
+    $st = $this->db->prepare(
+        "UPDATE usuarios
+         SET correo_verificado=0,
+             correo_verificacion_token=:tok,
+             correo_verificacion_expira=:exp
+         WHERE id_usuario=:id"
+    );
+    $st->execute([':tok'=>$tok, ':exp'=>$exp, ':id'=>$id]);
+
+    // devolver fila actualizada
+    return $this->obtener($id) ?? [];
+}
+
 
     public function getById(int $id): ?array
     {
