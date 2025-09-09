@@ -1,7 +1,5 @@
 </main>
 </div>
-
-<!-- Shim modal vanilla (sustituye a bootstrap.bundle.min.js) -->
 <script>
 window.bootstrap = window.bootstrap || {};
 if (!window.bootstrap.Modal) {
