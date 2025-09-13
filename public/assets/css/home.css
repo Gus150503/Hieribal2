@@ -7,7 +7,7 @@
       color: #333;
       background-color: #fff;
       scroll-behavior: smooth;
-      overflow: scroll;
+      overflow-y: scroll;
     }
 
     h1, h2, h3 {
@@ -28,7 +28,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
       position: sticky;
       top: 0;
-      z-index: 101;
+      z-index: 100;
     }
 
     .logo img {

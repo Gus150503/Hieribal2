@@ -2,3 +2,73 @@
 Trace:
 #0 {main}
 
+[2025-09-12 19:36:11] [2025-09-12 19:36:11] Uncaught: require(C:\xampp\htdocs\Hieribal2\public/../vendor/autoload.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\Hieribal2\public\index.php:101
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\public\index.php(101): {closure}(2, 'require(C:\\xamp...', 'C:\\xampp\\htdocs...', 101)
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(101): require()
+#2 {main}
+
+[2025-09-12 20:01:39] [2025-09-12 20:01:39] Uncaught: SQLSTATE[HY000] [2002] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión in C:\xampp\htdocs\Hieribal2\core\Database.php:21
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\core\Database.php(21): PDO->__construct('mysql:host=127....', 'root', '', Array)
+#1 C:\xampp\htdocs\Hieribal2\models\Cliente.php(11): Core\Database::get(Array)
+#2 C:\xampp\htdocs\Hieribal2\controllers\AuthController.php(18): Models\Cliente->__construct(Array)
+#3 C:\xampp\htdocs\Hieribal2\public\index.php(122): Controllers\AuthController->__construct(Array)
+#4 {main}
+
+[2025-09-12 20:01:54] [2025-09-12 20:01:54] Uncaught: SQLSTATE[HY000] [2002] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión in C:\xampp\htdocs\Hieribal2\core\Database.php:21
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\core\Database.php(21): PDO->__construct('mysql:host=127....', 'root', '', Array)
+#1 C:\xampp\htdocs\Hieribal2\models\Cliente.php(11): Core\Database::get(Array)
+#2 C:\xampp\htdocs\Hieribal2\controllers\AuthController.php(18): Models\Cliente->__construct(Array)
+#3 C:\xampp\htdocs\Hieribal2\public\index.php(122): Controllers\AuthController->__construct(Array)
+#4 {main}
+
+[2025-09-12 20:01:59] [2025-09-12 20:01:59] Uncaught: SQLSTATE[HY000] [2002] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión in C:\xampp\htdocs\Hieribal2\core\Database.php:21
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\core\Database.php(21): PDO->__construct('mysql:host=127....', 'root', '', Array)
+#1 C:\xampp\htdocs\Hieribal2\models\Cliente.php(11): Core\Database::get(Array)
+#2 C:\xampp\htdocs\Hieribal2\controllers\AuthController.php(18): Models\Cliente->__construct(Array)
+#3 C:\xampp\htdocs\Hieribal2\public\index.php(122): Controllers\AuthController->__construct(Array)
+#4 {main}
+
+[2025-09-12 20:02:13] [2025-09-12 20:02:13] Uncaught: SQLSTATE[HY000] [2002] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión in C:\xampp\htdocs\Hieribal2\core\Database.php:21
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\core\Database.php(21): PDO->__construct('mysql:host=127....', 'root', '', Array)
+#1 C:\xampp\htdocs\Hieribal2\models\Cliente.php(11): Core\Database::get(Array)
+#2 C:\xampp\htdocs\Hieribal2\controllers\AuthController.php(18): Models\Cliente->__construct(Array)
+#3 C:\xampp\htdocs\Hieribal2\public\index.php(122): Controllers\AuthController->__construct(Array)
+#4 {main}
+
+[2025-09-12 20:03:33] [2025-09-12 20:03:33] Uncaught: SQLSTATE[HY000] [2002] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión in C:\xampp\htdocs\Hieribal2\core\Database.php:21
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\core\Database.php(21): PDO->__construct('mysql:host=127....', 'root', '', Array)
+#1 C:\xampp\htdocs\Hieribal2\models\Cliente.php(11): Core\Database::get(Array)
+#2 C:\xampp\htdocs\Hieribal2\controllers\AuthController.php(18): Models\Cliente->__construct(Array)
+#3 C:\xampp\htdocs\Hieribal2\public\index.php(122): Controllers\AuthController->__construct(Array)
+#4 {main}
+
+[2025-09-12 20:04:47] [2025-09-12 20:04:47] Uncaught: SQLSTATE[HY000] [2002] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión in C:\xampp\htdocs\Hieribal2\core\Database.php:21
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\core\Database.php(21): PDO->__construct('mysql:host=127....', 'root', '', Array)
+#1 C:\xampp\htdocs\Hieribal2\models\Cliente.php(11): Core\Database::get(Array)
+#2 C:\xampp\htdocs\Hieribal2\controllers\AuthController.php(18): Models\Cliente->__construct(Array)
+#3 C:\xampp\htdocs\Hieribal2\public\index.php(122): Controllers\AuthController->__construct(Array)
+#4 {main}
+
+[2025-09-12 20:04:55] [2025-09-12 20:04:55] Uncaught: SQLSTATE[HY000] [2002] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión in C:\xampp\htdocs\Hieribal2\core\Database.php:21
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\core\Database.php(21): PDO->__construct('mysql:host=127....', 'root', '', Array)
+#1 C:\xampp\htdocs\Hieribal2\models\Cliente.php(11): Core\Database::get(Array)
+#2 C:\xampp\htdocs\Hieribal2\controllers\AuthController.php(18): Models\Cliente->__construct(Array)
+#3 C:\xampp\htdocs\Hieribal2\public\index.php(122): Controllers\AuthController->__construct(Array)
+#4 {main}
+
+[2025-09-12 20:05:26] [2025-09-12 20:05:26] Uncaught: SQLSTATE[HY000] [2002] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión in C:\xampp\htdocs\Hieribal2\core\Database.php:21
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\core\Database.php(21): PDO->__construct('mysql:host=127....', 'root', '', Array)
+#1 C:\xampp\htdocs\Hieribal2\models\Cliente.php(11): Core\Database::get(Array)
+#2 C:\xampp\htdocs\Hieribal2\controllers\AuthController.php(18): Models\Cliente->__construct(Array)
+#3 C:\xampp\htdocs\Hieribal2\public\index.php(122): Controllers\AuthController->__construct(Array)
+#4 {main}
+
