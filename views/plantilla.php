@@ -81,7 +81,7 @@ $bodyClassAttr = implode(' ', $bodyClasses);
     <!-- ===== Footer público (no en admin ni en full) ===== -->
     <footer class="site-footer">
       <div class="container">
-        <p style="margin:0;">© <?= date('Y') ?> MI HIERBAL • Bienestar natural</p>
+      
       </div>
     </footer>
   <?php endif; ?>
