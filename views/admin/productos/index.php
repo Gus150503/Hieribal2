@@ -37,12 +37,21 @@
         <thead class="table-light position-sticky" style="top:0; z-index:1;">
           <tr>
             <th>ID</th>
-            <th>Usuario</th>
             <th>Nombre</th>
-            <th>Correo</th>
-            <th>Rol</th>
-            <th>Estado</th>
-            <th>Verif.</th>
+            <th>Categoria</th>
+            <th>Marca</th>
+            <th>Presentacion</th>
+            <th>Unidad</th>
+            <th>Descripcion.</th>
+            <th>Lote</th>
+            <th>Fecha Vencimiento.</th>
+            <th>Precio Compra</th>
+            <th>Precio Venta</th>
+            <th>Iva.</th>
+            <th>Codigo Barras.</th>
+            <th>Ubicacion</th>
+            <th>Imagen</th>
+             <th>Creado</th>
             <th class="text-end">Acciones</th>
           </tr>
         </thead>
@@ -73,7 +82,7 @@
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content border-0 rounded-4 shadow">
       <div class="modal-header border-0 pb-0">
-        <h5 class="modal-title fw-semibold" id="modalTitle">Nuevo usuario</h5>
+        <h5 class="modal-title fw-semibold" id="modalTitle">Nuevo Producto</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
 
