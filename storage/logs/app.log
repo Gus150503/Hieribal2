@@ -2,7 +2,11 @@
 Trace:
 #0 {main}
 
+
 [2025-09-12 19:36:11] [2025-09-12 19:36:11] Uncaught: require(C:\xampp\htdocs\Hieribal2\public/../vendor/autoload.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\Hieribal2\public\index.php:101
+
+[2025-09-12 19:21:24] [2025-09-12 19:21:24] Uncaught: require(C:\xampp\htdocs\Hieribal2\public/../vendor/autoload.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\Hieribal2\public\index.php:101
+
 Trace:
 #0 C:\xampp\htdocs\Hieribal2\public\index.php(101): {closure}(2, 'require(C:\\xamp...', 'C:\\xampp\\htdocs...', 101)
 #1 C:\xampp\htdocs\Hieribal2\public\index.php(101): require()
@@ -71,4 +75,11 @@ Trace:
 #2 C:\xampp\htdocs\Hieribal2\controllers\AuthController.php(18): Models\Cliente->__construct(Array)
 #3 C:\xampp\htdocs\Hieribal2\public\index.php(122): Controllers\AuthController->__construct(Array)
 #4 {main}
+
+[2025-09-12 19:36:04] [2025-09-12 19:36:04] Uncaught: require(C:\xampp\htdocs\Hieribal2\public/../vendor/autoload.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\Hieribal2\public\index.php:101
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\public\index.php(101): {closure}(2, 'require(C:\\xamp...', 'C:\\xampp\\htdocs...', 101)
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(101): require()
+#2 {main}
+
 
