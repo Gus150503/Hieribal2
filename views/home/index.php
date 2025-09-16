@@ -51,7 +51,7 @@
       </p>
       <div class="text-section-buttons">
         <a href="https://wa.me/573212322978?text=Hola%2C%20me%20gustaría%20más%20información%20sobre%20sus%20productos"
-           class="btn btn-contactanos">Contáctanos</a>
+          class="btn btn-contactanos">Contáctanos</a>
         <button class="btn btn-mas-nosotros"
                 onclick="document.getElementById('nosotros').scrollIntoView({ behavior: 'smooth' })">
           Más sobre nosotros

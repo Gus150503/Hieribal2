@@ -66,7 +66,7 @@ final class Producto {
                   FROM productos
                  WHERE stock_minimo IS NOT NULL AND stock_actual < stock_minimo
               ORDER BY faltante DESC
-                 LIMIT :lim";
+ LIMIT :lim";
         $st = $this->pdo->prepare($sql);
         $st->bindValue(':lim', $limit, PDO::PARAM_INT);
         $st->execute();
