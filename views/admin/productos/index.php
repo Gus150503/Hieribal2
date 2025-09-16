@@ -42,16 +42,16 @@
             <th>Marca</th>
             <th>Presentacion</th>
             <th>Unidad</th>
-            <th>Descripcion.</th>
+            <th>Descripcion</th>
             <th>Lote</th>
-            <th>Fecha Vencimiento.</th>
+            <th>Fecha Vencimiento</th>
             <th>Precio Compra</th>
             <th>Precio Venta</th>
-            <th>Iva.</th>
-            <th>Codigo Barras.</th>
+            <th>Iva</th>
+            <th>Codigo Barras</th>
             <th>Ubicacion</th>
             <th>Imagen</th>
-             <th>Creado</th>
+            <th>Creado</th>
             <th class="text-end">Acciones</th>
           </tr>
         </thead>
