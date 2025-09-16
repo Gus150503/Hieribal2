@@ -187,4 +187,26 @@
   </div>
 </div>
 
+
+<!-- Contenedor para toasts (avisos bonitos) -->
+<div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Modal de confirmación (Bootstrap) -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 rounded-4 shadow">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-semibold" id="confirmTitle">Confirmar acción</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body pt-3" id="confirmBody">¿Seguro?</div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success" id="btnOkConfirm">Sí, continuar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <?php if (!$partial) include __DIR__ . '/../_shell_end.php'; ?>
