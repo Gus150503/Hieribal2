@@ -146,3 +146,47 @@ img{max-width:100%; display:block}
 /* Hotfix temporal para que la sidebar no se desconfigure */
 .sidebar .nav { list-style: none; padding-left: .75rem; }
 .sidebar .nav-link { padding: .75rem 1rem; line-height: 1.5; font-size: .95rem; }
+
+
+/* ===== Toasts (ligeros, usando tus tokens) ===== */
+.toast-host{
+  position: fixed; top: 1rem; right: 1rem; z-index: 1080;
+  display: flex; flex-direction: column; gap: .5rem;
+}
+.toast{
+  min-width: 280px; max-width: 380px;
+  background: #fff; border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: var(--shadow); padding: .7rem .9rem;
+  display: flex; align-items: flex-start; gap: .6rem;
+  animation: toastSlideIn .18s ease-out;
+}
+.toast .toast-msg{flex:1}
+.toast .btn-close{margin-left:.25rem}
+
+.toast-success{border-color: rgba(25,135,84,.25)}
+.toast-danger{border-color: rgba(192,58,43,.25)}
+.toast-warning{border-color: rgba(245,158,11,.3)}
+.toast-info{border-color: rgba(2,132,199,.25)}
+
+.toast .dot{
+  width:.6rem; height:.6rem; border-radius:999px; margin-top:.2rem; flex:0 0 .6rem;
+}
+.toast-success .dot{background: var(--brand)}
+.toast-danger  .dot{background: var(--danger)}
+.toast-warning .dot{background: #f59e0b}
+.toast-info    .dot{background: #0284c7}
+
+@keyframes toastSlideIn{
+  from{ transform: translateY(-8px); opacity: 0; }
+  to{ transform: translateY(0); opacity: 1; }
+}
+
+/* ===== Flash para filas actualizadas ===== */
+.flash-success{ animation: flashSuccess 1.2s ease-out 1; }
+@keyframes flashSuccess{
+  0%{ background: var(--brand-50); } 100%{ background: transparent; }
+}
+.flash-danger{ animation: flashDanger 1.2s ease-out 1; }
+@keyframes flashDanger{
+  0%{ background: #fdeaea; } 100%{ background: transparent; }
+}

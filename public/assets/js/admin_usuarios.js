@@ -17,12 +17,81 @@
 
   // ===== Estado =====
   const state = { page: 1, per: 10, total: 0, q: '' };
+  // Secuencia para evitar condiciones de carrera (última respuesta gana)
+  let __LIST_REQ_SEQ__ = 0;
 
   // ===== Selectores =====
   const $  = (s) => document.querySelector(s);
   const tbl = $('#tblUsuarios tbody');
 
-  // ===== Util UI =====
+  // ===== Helpers UI: Toasts + Confirm =====
+  function ensureToastHost(){
+    let host = document.getElementById('toastHost');
+    if(!host){
+      host = document.createElement('div');
+      host.id = 'toastHost';
+      host.className = 'toast-host';
+      document.body.appendChild(host);
+    }
+    return host;
+  }
+  /** uiToast('mensaje', 'success'|'danger'|'warning'|'info', ms=3500) */
+  function uiToast(msg, variant='info', ms=3500){
+    const host = ensureToastHost();
+    const t = document.createElement('div');
+    t.className = `toast toast-${variant}`;
+    t.innerHTML = `
+      <div class="dot"></div>
+      <div class="toast-msg">${escapeHtml(String(msg))}</div>
+      <button class="btn-close" aria-label="Cerrar"></button>
+    `;
+    host.appendChild(t);
+    const close = () => t.remove();
+    t.querySelector('.btn-close')?.addEventListener('click', close);
+    const timer = setTimeout(close, ms);
+    // si pasas el mouse, se queda
+    t.addEventListener('mouseenter', () => clearTimeout(timer), { once:true });
+  }
+
+  /** uiConfirm({title, body, confirmText, variant}) -> Promise<boolean> (Bootstrap modal) */
+  function uiConfirm(opts = {}){
+    const modalEl = document.getElementById('confirmModal');
+    if(!modalEl || !window.bootstrap){
+      return Promise.resolve(confirm(opts.body || '¿Seguro?')); // fallback
+    }
+    const title = modalEl.querySelector('#confirmTitle');
+    const body  = modalEl.querySelector('#confirmBody');
+    const btnOk = modalEl.querySelector('#btnOkConfirm');
+
+    title.textContent = opts.title || 'Confirmar acción';
+    body.innerHTML = escapeHtml(String(opts.body || '¿Seguro?')).replace(/\n/g,'<br>');
+    btnOk.textContent = opts.confirmText || 'Sí, continuar';
+
+    // color del botón ok según variante
+    btnOk.className = 'btn ' + (
+      opts.variant === 'danger'  ? 'btn-outline-danger' :
+      opts.variant === 'warning' ? 'btn-outline-secondary' :
+      opts.variant === 'success' ? 'btn-success' :
+                                   'btn-success'
+    );
+
+    return new Promise(resolve => {
+      const bs = new bootstrap.Modal(modalEl, { backdrop: 'static' });
+
+      const onOk = () => { cleanup(); bs.hide(); resolve(true); };
+      const onHide = () => { cleanup(); resolve(false); };
+      const cleanup = () => {
+        btnOk.removeEventListener('click', onOk);
+        modalEl.removeEventListener('hidden.bs.modal', onHide);
+      };
+
+      btnOk.addEventListener('click', onOk);
+      modalEl.addEventListener('hidden.bs.modal', onHide, { once:true });
+      bs.show();
+    });
+  }
+
+  // ===== Util UI existentes =====
   function setLoading(on) {
     if (on) {
       tbl.innerHTML = `<tr><td colspan="8" class="py-4 text-center">
@@ -38,26 +107,53 @@
     if (el) el.textContent = `${state.total} registro(s)`;
   }
 
-  // ===== Listado con paginación =====
+  // ===== Listado con paginación (auto-ajuste + última respuesta gana) =====
   async function listar(page = state.page) {
-    state.page = page;
+    state.page = page < 1 ? 1 : page;
     const q = encodeURIComponent(state.q || '');
     setLoading(true);
+
+    const mySeq = ++__LIST_REQ_SEQ__; // id de esta petición
+
     try {
       const res = await fetch(api(`action=list&q=${q}&page=${state.page}&per=${state.per}`));
-      const j = await res.json();
+      const j = await resToJsonSafe(res);
+
+      // si llegó otra petición más nueva, aborta pintar
+      if (mySeq !== __LIST_REQ_SEQ__) return;
 
       const items = j.items || [];
       state.total = parseInt(j.total ?? items.length, 10);
       state.page  = parseInt(j.page  ?? state.page, 10);
       state.per   = parseInt(j.per   ?? state.per, 10);
 
+      // ajustar página si quedó fuera de rango
+      const pages = Math.max(1, Math.ceil((state.total || 0) / (state.per || 10)));
+      if (state.total > 0 && state.page > pages) {
+        return listar(pages); // reintenta con la última página existente
+      }
+
+      // backend inconsistente: total>0 pero items vacíos en page 1 -> reintenta
+      if (state.total > 0 && items.length === 0 && state.page === 1) {
+        return listar(1);
+      }
+
+      if (!items.length) {
+        emptyState();
+        renderPager();
+        updateTotal();
+        return;
+      }
+
       renderTabla(items);
       renderPager();
       updateTotal();
     } catch (err) {
+      // si llegó otra petición más nueva, no pintes error
+      if (mySeq !== __LIST_REQ_SEQ__) return;
       console.error('Error listar:', err);
       emptyState();
+      uiToast('No se pudieron cargar los usuarios.', 'danger');
     }
   }
 
@@ -135,6 +231,11 @@
       const icon = btn.querySelector('i');
       if (icon) icon.className = `bi ${isActive ? 'bi-toggle-on' : 'bi-toggle-off'}`;
     }
+
+    // flash visual
+    tr.classList.remove('flash-success','flash-danger');
+    void tr.offsetWidth; // reflow para reiniciar la animación
+    tr.classList.add(isActive ? 'flash-success' : 'flash-danger');
   }
 
   function escapeHtml(s) {
@@ -265,15 +366,22 @@
     if (btn.dataset.editar) {
       const r = await fetch(api(`action=get&id=${id}`));
       const j = await r.json();
-      if (!j || !j.data) return alert('No se pudo cargar el usuario.');
+      if (!j || !j.data) { uiToast('No se pudo cargar el usuario.', 'danger'); return; }
       openEditor(j.data, 'Editar usuario');
       return;
     }
 
     if (btn.dataset.eliminar) {
-      if (!confirm('¿Eliminar usuario?')) return;
+      const ok = await uiConfirm({
+        title: 'Eliminar usuario',
+        body: '¿Seguro que deseas eliminar este usuario?\nEsta acción no se puede deshacer.',
+        confirmText: 'Sí, eliminar',
+        variant: 'danger'
+      });
+      if (!ok) return;
       await fetch(api('action=delete'), { method:'POST', body: formData({id_usuario:id}) });
-      listar();
+      uiToast('Usuario eliminado.', 'success');
+      listar(state.page);
       return;
     }
 
@@ -284,26 +392,34 @@
         ? '\n\nNota: al desactivar se rotará la contraseña automáticamente.'
         : '';
 
-      if (!confirm(`¿Seguro que deseas ${verbo} este usuario?${aviso}`)) return;
+      const ok = await uiConfirm({
+        title: `${verbo[0].toUpperCase()+verbo.slice(1)} usuario`,
+        body: `¿Seguro que deseas ${verbo} este usuario?${aviso}`,
+        confirmText: `Sí, ${verbo}`,
+        variant: active ? 'warning' : 'success'
+      });
+      if (!ok) return;
 
       try {
         const r = await fetch(api('action=toggle'), {
           method:'POST',
           body: formData({ id_usuario: id })
         });
-        const j = await r.json();
+        const j = await resToJsonSafe(r);
         if (!j.ok) throw new Error(j.msg || 'No se pudo cambiar el estado');
 
-        // Actualización optimista
+        // Actualización optimista + flash
         applyToggleToRow(id, j.estado);
+        uiToast(
+          j.msg || (j.estado && String(j.estado).toLowerCase().startsWith('activo')
+            ? 'Usuario activado.' : 'Usuario desactivado.'),
+          'success'
+        );
 
-        alert(j.msg || (j.estado && String(j.estado).toLowerCase().startsWith('activo')
-              ? 'Usuario activado.' : 'Usuario desactivado.'));
-
-        // Refrescar para quedar en sync con BD
+        // Refrescar para quedar en sync con BD (manteniendo página actual con auto-ajuste)
         listar(state.page);
       } catch (err) {
-        alert(err.message || 'Error al cambiar estado');
+        uiToast(err.message || 'Error al cambiar estado', 'danger');
       }
       return;
     }
@@ -338,7 +454,7 @@
 
     const plain = Object.fromEntries(fd.entries());
     const err = validate(plain, isUpdate);
-    if (err) return alert(err);
+    if (err) { uiToast(err, 'warning'); return; }
 
     const btnSubmit = frm.querySelector('button[type="submit"]');
     const prevHtml = btnSubmit.innerHTML;
@@ -348,12 +464,13 @@
     try {
       const action = isUpdate ? 'update' : 'create';
       const res = await fetch(api(`action=${action}`), { method:'POST', body: fd });
-      const j = await res.json();
+      const j = await resToJsonSafe(res);
       if (!j.ok) throw new Error(j.msg || 'Error al guardar');
       closeEditor();
-      listar();
+      uiToast(isUpdate ? 'Usuario actualizado.' : 'Usuario creado.', 'success');
+      listar(state.page);
     } catch (er) {
-      alert(er.message || 'Error al guardar');
+      uiToast(er.message || 'Error al guardar', 'danger');
     } finally {
       btnSubmit.disabled = false;
       btnSubmit.innerHTML = prevHtml;
@@ -366,4 +483,10 @@
   window.addEventListener('pageshow', (e) => { if (e.persisted) boot(); });
 
   function formData(obj){ const fd=new FormData(); Object.entries(obj).forEach(([k,v])=>fd.append(k,v)); return fd; }
+
+  // helper robusto para JSON (por si el backend devuelve HTML de error)
+  async function resToJsonSafe(res){
+    try { return await res.json(); }
+    catch { return { ok:false, msg:'Respuesta inválida del servidor' }; }
+  }
 })();
