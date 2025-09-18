@@ -10,7 +10,9 @@
       <div class="d-flex align-items-center gap-2">
         <i class="bi bi-people-fill fs-4 text-success"></i>
         <h1 class="h4 m-0">Inventario</h1>
-
+         <h1 class="h4 m-0">Productos</h1>
+        <div id="app-inventario"></div>
+        <script src="/assets/js/admin_inventario.js"></script>
       </div>
       <button id="btnNuevo" class="btn btn-success">
         <i class="bi bi-plus-lg me-1"></i> Nuevo

@@ -26,7 +26,7 @@ $rol = strtolower($_SESSION['admin']['rol'] ?? 'empleado'); // 'admin' | 'cajero
 // === ACL por rol
 // Usa ".view" para permisos solo-lectura (el item se muestra, pero internamente bloqueas mutaciones).
 $ACL = [
-  'admin'    => ['dashboard','ventas','inventario','productos','usuarios','configuracion','reportes'],
+  'admin'    => ['dashboard','ventas','inventario','productos','usuarios', 'Proveedores', 'configuracion','reportes'],
   'cajero'   => ['dashboard','ventas','inventario.view','productos.view'],
   'empleado' => ['dashboard','inventario','productos'],
 ];
@@ -58,7 +58,7 @@ $can = function(string $perm) use ($rol, $ACL): bool {
   <?php endif; ?>
 
   <?php if ($can('Proveedores')): ?>
-  <li class="<?= $active('Proveedores') ?>"><a href="?r=admin/Proveedores">Proveedores</a></li>
+  <li class="<?= $active('Proveedores') ?>"><a href="?r=admin/proveedores">Proveedores</a></li>
   <?php endif; ?>
 
 
