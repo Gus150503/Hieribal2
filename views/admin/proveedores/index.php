@@ -37,27 +37,21 @@
         <thead class="table-light position-sticky" style="top:0; z-index:1;">
           <tr>
             <th>ID</th>
-            <th>Nombre</th>
-            <th>Categoria</th>
-            <th>Marca</th>
-            <th>Presentacion</th>
-            <th>Unidad</th>
-            <th>Descripcion</th>
-            <th>Lote</th>
-            <th>Fecha Vencimiento</th>
-            <th>Precio Compra</th>
-            <th>Precio Venta</th>
-            <th>Iva</th>
-            <th>Codigo Barras</th>
-            <th>Ubicacion</th>
-            <th>Imagen</th>
+            <th>Empresa</th>
+            <th>NIT</th>
+            <th>Contacto</th>
+            <th>Telefono</th>
+            <th>Email</th>
+            <th>Dirección</th>
+            <th>Ciudad</th>
+            <th>Condiciones de Pago</th>
             <th>Creado</th>
             <th class="text-end">Acciones</th>
+            
           </tr>
         </thead>
         <tbody></tbody>
       </table>
-
       <div class="d-flex align-items-center justify-content-between mt-3">
         <div class="d-flex align-items-center gap-2">
           <label class="text-muted small me-1">Mostrar</label>
