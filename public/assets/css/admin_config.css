@@ -1,0 +1,10 @@
+/* ---- Tabs fallback (sin Bootstrap JS) ---- */
+.tab-pane{display:none}
+.tab-pane.active,
+.tab-pane.show.active{display:block}
+
+.nav-tabs .nav-link{cursor:pointer}
+
+/* opcional: un poco de suavizado */
+.tab-pane.active{animation:fadeIn .12s ease-out}
+@keyframes fadeIn{from{opacity:.7}to{opacity:1}}

@@ -167,6 +167,9 @@ switch ($r) {
     case 'admin_usuarios_api':            (new AdminUsuariosController($config))->api();               break;
     case 'admin_usuarios_verify_email':   (new AdminUsuariosController($config))->verifyEmail();       break;
     case 'admin_usuarios_resend_verif':   (new AdminUsuariosController($config))->resendVerification();break;
+    case 'admin_config_api':
+    require __DIR__ . '/api/config_api.php';
+    break;
 
     /* (Compat) ruta vieja -> nueva */
     case 'usuarioadmin':
