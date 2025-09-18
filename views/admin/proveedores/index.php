@@ -9,8 +9,9 @@
     <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
       <div class="d-flex align-items-center gap-2">
         <i class="bi bi-people-fill fs-4 text-success"></i>
-        <h1 class="h4 m-0">Productos</h1>
-
+        <h1 class="h4 m-0">Proveedores</h1>
+        <div id="app-proveedores"></div>
+        <script src="/assets/js/admin_proveedores.js"></script>
       </div>
       <button id="btnNuevo" class="btn btn-success">
         <i class="bi bi-plus-lg me-1"></i> Nuevo

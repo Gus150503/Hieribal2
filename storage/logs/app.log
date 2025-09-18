@@ -122,3 +122,169 @@ Trace:
 #4 {main}
 
 
+[2025-09-17 20:17:07] [2025-09-17 20:17:07] Uncaught: Class "controllers\AdminProveedores" not found in C:\xampp\htdocs\Hieribal2\public\index.php:184
+Trace:
+#0 {main}
+
+[2025-09-17 20:19:19] [2025-09-17 20:19:19] Uncaught: Class "controllers\AdminProveedores" not found in C:\xampp\htdocs\Hieribal2\public\index.php:184
+Trace:
+#0 {main}
+
+[2025-09-17 20:19:19] [2025-09-17 20:19:19] Uncaught: Class "controllers\AdminProveedores" not found in C:\xampp\htdocs\Hieribal2\public\index.php:184
+Trace:
+#0 {main}
+
+[2025-09-17 20:25:54] [2025-09-17 20:25:54] Uncaught: Class "controllers\AdminProveedores" not found in C:\xampp\htdocs\Hieribal2\public\index.php:184
+Trace:
+#0 {main}
+
+[2025-09-17 20:29:18] [2025-09-17 20:29:18] Uncaught: Class "controllers\AdminProveedores" not found in C:\xampp\htdocs\Hieribal2\public\index.php:184
+Trace:
+#0 {main}
+
+[2025-09-17 20:29:54] [2025-09-17 20:29:54] Uncaught: Class "controllers\AdminProveedores" not found in C:\xampp\htdocs\Hieribal2\public\index.php:184
+Trace:
+#0 {main}
+
+[2025-09-17 20:29:54] [2025-09-17 20:29:54] Uncaught: Class "controllers\AdminProveedores" not found in C:\xampp\htdocs\Hieribal2\public\index.php:184
+Trace:
+#0 {main}
+
+[2025-09-17 20:29:54] [2025-09-17 20:29:54] Uncaught: Class "controllers\AdminProveedores" not found in C:\xampp\htdocs\Hieribal2\public\index.php:184
+Trace:
+#0 {main}
+
+[2025-09-17 20:29:55] [2025-09-17 20:29:55] Uncaught: Class "controllers\AdminProveedores" not found in C:\xampp\htdocs\Hieribal2\public\index.php:184
+Trace:
+#0 {main}
+
+[2025-09-17 20:29:55] [2025-09-17 20:29:55] Uncaught: Class "controllers\AdminProveedores" not found in C:\xampp\htdocs\Hieribal2\public\index.php:184
+Trace:
+#0 {main}
+
+[2025-09-17 20:29:55] [2025-09-17 20:29:55] Uncaught: Class "controllers\AdminProveedores" not found in C:\xampp\htdocs\Hieribal2\public\index.php:184
+Trace:
+#0 {main}
+
+[2025-09-17 20:30:09] [2025-09-17 20:30:09] Uncaught: Class "controllers\AdminProveedores" not found in C:\xampp\htdocs\Hieribal2\public\index.php:184
+Trace:
+#0 {main}
+
+[2025-09-17 20:35:33] [2025-09-17 20:35:33] Uncaught: Class "controllers\AdminProveedores" not found in C:\xampp\htdocs\Hieribal2\public\index.php:184
+Trace:
+#0 {main}
+
+[2025-09-17 20:35:33] [2025-09-17 20:35:33] Uncaught: Class "controllers\AdminProveedores" not found in C:\xampp\htdocs\Hieribal2\public\index.php:184
+Trace:
+#0 {main}
+
+[2025-09-17 20:35:34] [2025-09-17 20:35:34] Uncaught: Class "controllers\AdminProveedores" not found in C:\xampp\htdocs\Hieribal2\public\index.php:184
+Trace:
+#0 {main}
+
+[2025-09-17 20:35:34] [2025-09-17 20:35:34] Uncaught: Class "controllers\AdminProveedores" not found in C:\xampp\htdocs\Hieribal2\public\index.php:184
+Trace:
+#0 {main}
+
+[2025-09-17 20:35:34] [2025-09-17 20:35:34] Uncaught: Class "controllers\AdminProveedores" not found in C:\xampp\htdocs\Hieribal2\public\index.php:184
+Trace:
+#0 {main}
+
+[2025-09-17 20:35:34] [2025-09-17 20:35:34] Uncaught: Class "controllers\AdminProveedores" not found in C:\xampp\htdocs\Hieribal2\public\index.php:184
+Trace:
+#0 {main}
+
+[2025-09-17 20:37:38] [2025-09-17 20:37:38] Uncaught: Class "Controllers\controllers" not found in C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php:9
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\vendor\composer\ClassLoader.php(576): include()
+#1 C:\xampp\htdocs\Hieribal2\vendor\composer\ClassLoader.php(427): Composer\Autoload\{closure}('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\Hieribal2\public\index.php(184): Composer\Autoload\ClassLoader->loadClass('Controllers\\Adm...')
+#3 {main}
+
+[2025-09-17 20:38:50] [2025-09-17 20:38:50] Uncaught: Class "Controllers\controllers" not found in C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\vendor\composer\ClassLoader.php(576): include()
+#1 C:\xampp\htdocs\Hieribal2\vendor\composer\ClassLoader.php(427): Composer\Autoload\{closure}('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\Hieribal2\public\index.php(184): Composer\Autoload\ClassLoader->loadClass('Controllers\\Adm...')
+#3 {main}
+
+[2025-09-17 20:39:35] [2025-09-17 20:39:35] Uncaught: Class "controllers\Controllers" not found in C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\vendor\composer\ClassLoader.php(576): include()
+#1 C:\xampp\htdocs\Hieribal2\vendor\composer\ClassLoader.php(427): Composer\Autoload\{closure}('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\Hieribal2\public\index.php(184): Composer\Autoload\ClassLoader->loadClass('Controllers\\Adm...')
+#3 {main}
+
+[2025-09-17 20:39:38] [2025-09-17 20:39:38] Uncaught: Class "controllers\Controllers" not found in C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\vendor\composer\ClassLoader.php(576): include()
+#1 C:\xampp\htdocs\Hieribal2\vendor\composer\ClassLoader.php(427): Composer\Autoload\{closure}('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\Hieribal2\public\index.php(184): Composer\Autoload\ClassLoader->loadClass('Controllers\\Adm...')
+#3 {main}
+
+[2025-09-17 20:40:12] [2025-09-17 20:40:12] Uncaught: Class "Models\Proveedor" not found in C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php:16
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\public\index.php(184): Controllers\AdminProveedores->__construct(Array)
+#1 {main}
+
+[2025-09-17 20:40:59] [2025-09-17 20:40:59] Uncaught: Class "Controllers\Proveedor" not found in C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php:16
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\public\index.php(184): Controllers\AdminProveedores->__construct(Array)
+#1 {main}
+
+[2025-09-17 20:41:01] [2025-09-17 20:41:01] Uncaught: Class "Controllers\Proveedor" not found in C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php:16
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\public\index.php(184): Controllers\AdminProveedores->__construct(Array)
+#1 {main}
+
+[2025-09-17 20:41:21] [2025-09-17 20:41:21] Uncaught: Class "Controllers\Proveedor" not found in C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php:16
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\public\index.php(184): Controllers\AdminProveedores->__construct(Array)
+#1 {main}
+
+[2025-09-17 20:41:27] [2025-09-17 20:41:27] Uncaught: Class "Controllers\Proveedor" not found in C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php:16
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\public\index.php(184): Controllers\AdminProveedores->__construct(Array)
+#1 {main}
+
+[2025-09-17 20:43:07] [2025-09-17 20:43:07] Uncaught: Class "Models\UsuarioProveedores" not found in C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php:16
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\public\index.php(184): Controllers\AdminProveedores->__construct(Array)
+#1 {main}
+
+[2025-09-17 20:45:21] [2025-09-17 20:45:21] Uncaught: Models\UsuarioProveedores::__construct(): Argument #1 ($db) must be of type PDO, array given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php on line 16 in C:\xampp\htdocs\Hieribal2\models\UsuarioProveedores.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php(16): Models\UsuarioProveedores->__construct(Array)
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(184): Controllers\AdminProveedores->__construct(Array)
+#2 {main}
+
+[2025-09-17 20:47:18] [2025-09-17 20:47:18] Uncaught: Models\UsuarioProveedores::__construct(): Argument #1 ($db) must be of type PDO, array given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php on line 16 in C:\xampp\htdocs\Hieribal2\models\UsuarioProveedores.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php(16): Models\UsuarioProveedores->__construct(Array)
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(184): Controllers\AdminProveedores->__construct(Array)
+#2 {main}
+
+[2025-09-17 20:47:29] [2025-09-17 20:47:29] Uncaught: Models\UsuarioProveedores::__construct(): Argument #1 ($db) must be of type PDO, array given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php on line 16 in C:\xampp\htdocs\Hieribal2\models\UsuarioProveedores.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php(16): Models\UsuarioProveedores->__construct(Array)
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(184): Controllers\AdminProveedores->__construct(Array)
+#2 {main}
+
+[2025-09-17 20:51:11] [2025-09-17 20:51:11] Uncaught: Undefined property: Controllers\AdminProveedores::$db in C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php:17
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php(17): {closure}(2, 'Undefined prope...', 'C:\\xampp\\htdocs...', 17)
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(184): Controllers\AdminProveedores->__construct(Array)
+#2 {main}
+
+[2025-09-17 20:55:14] [2025-09-17 20:55:14] Uncaught: Undefined property: Controllers\AdminProveedores::$db in C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php:17
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php(17): {closure}(2, 'Undefined prope...', 'C:\\xampp\\htdocs...', 17)
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(184): Controllers\AdminProveedores->__construct(Array)
+#2 {main}
+
+[2025-09-17 20:56:16] [2025-09-17 20:56:16] Uncaught: Undefined property: Controllers\AdminProveedores::$db in C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php:17
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProveedores.php(17): {closure}(2, 'Undefined prope...', 'C:\\xampp\\htdocs...', 17)
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(184): Controllers\AdminProveedores->__construct(Array)
+
+
