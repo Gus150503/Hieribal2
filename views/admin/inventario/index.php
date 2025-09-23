@@ -37,12 +37,13 @@
         <thead class="table-light position-sticky" style="top:0; z-index:1;">
           <tr>
             <th>ID</th>
-            <th>Usuario</th>
-            <th>Nombre</th>
-            <th>Correo</th>
-            <th>Rol</th>
-            <th>Estado</th>
-            <th>Verif.</th>
+            <th>Producto</th>
+            <th>Código Interno</th>
+            <th>Stock</th>
+            <th>Stock Mínimo</th>
+            <th>Stock Máximo</th>
+            <th>Punto Reorden</th>
+            <th>Ubicación</th>
             <th class="text-end">Acciones</th>
           </tr>
         </thead>

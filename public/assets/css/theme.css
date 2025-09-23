@@ -1,0 +1,476 @@
+/* ==========================================================================
+   THEME.CSS
+   - Tema oscuro “global” para el panel (y público si lo usas)
+   - Se activa con: <html data-theme="dark">  (o "light", "auto" desde JS)
+   - No modifica tu tema claro; sólo sobreescribe cuando data-theme="dark"
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   0) Tokens base (light) — opcional. Si ya los defines en app.css puedes
+      borrar este bloque. Se dejan como referencia/backup.
+--------------------------------------------------------------------------- */
+/*
+:root{
+  --brand:#198754;        --brand-50:#e6f4ea;
+  --ink:#0f172a;          --muted:#6b7280;
+  --bg:#f5f7fb;           --bg-soft:#f3f6fb;
+  --surface:#ffffff;      --border:#e9eef5;
+  --danger:#c03a2b;
+  --shadow:0 8px 24px rgba(15,23,42,.06);
+  --ring:rgba(25,135,84,.18);
+}
+*/
+
+/* --------------------------------------------------------------------------
+   1) Tema oscuro (activa con <html data-theme="dark">)
+--------------------------------------------------------------------------- */
+:root[data-theme="dark"]{
+  /* Tokens */
+  --ink:#e5e7eb;
+  --muted:#9ca3af;
+  --bg:#0b1220;         /* fondo general */
+  --bg-soft:#0e1729;    /* fondos suaves / gradientes */
+  --surface:#0f172a;    /* tarjetas, inputs y controles */
+  --border:#1f2a44;
+  --danger:#ef4444;
+  --shadow:0 10px 28px rgba(0,0,0,.45);
+  /* el brand/ring vienen de app.css; si no existen, estos actúan como fallback */
+  --brand: var(--brand, #198754);
+  --ring:  var(--ring, rgba(25,135,84,.25));
+
+  /* Sugerencia para que los controles nativos adopten el modo dark */
+  color-scheme: dark;
+}
+
+/* --------------------------------------------------------------------------
+   2) Lienzo completo (evita “islas” claras)
+   Forzamos fondo y color en los wrappers más comunes del layout admin/público
+--------------------------------------------------------------------------- */
+:root[data-theme="dark"] html,
+:root[data-theme="dark"] body,
+:root[data-theme="dark"] main,
+:root[data-theme="dark"] .site-main,
+:root[data-theme="dark"] .app,
+:root[data-theme="dark"] .admin-layout,
+:root[data-theme="dark"] .admin-layout .content,
+:root[data-theme="dark"] .content,
+:root[data-theme="dark"] .content-wrapper,
+:root[data-theme="dark"] .page-content,
+:root[data-theme="dark"] .main,
+:root[data-theme="dark"] .main-content,
+:root[data-theme="dark"] #content,
+:root[data-theme="dark"] #main,
+:root[data-theme="dark"] #app,
+:root[data-theme="dark"] body > .container,
+:root[data-theme="dark"] body > .container-fluid,
+:root[data-theme="dark"] .container,
+:root[data-theme="dark"] .container-fluid {
+  background-color: var(--bg) !important;
+  color: var(--ink) !important;
+}
+
+/* Utilitarios de Bootstrap que suelen forzar claro */
+:root[data-theme="dark"] .bg-light { background-color: var(--bg) !important; color: var(--ink) !important; }
+:root[data-theme="dark"] .bg-white { background-color: var(--surface) !important; color: var(--ink) !important; }
+
+/* --------------------------------------------------------------------------
+   3) Sidebar del admin
+--------------------------------------------------------------------------- */
+:root[data-theme="dark"] .sidebar,
+:root[data-theme="dark"] .admin-layout .sidebar,
+:root[data-theme="dark"] [class*="side"] {
+  background: #0e1729 !important;
+  border-right: 1px solid var(--border) !important;
+}
+:root[data-theme="dark"] .sidebar .nav-link,
+:root[data-theme="dark"] [class*="side"] .nav-link {
+  color: #cbd5e1 !important;
+}
+:root[data-theme="dark"] .sidebar .nav-link:hover,
+:root[data-theme="dark"] .sidebar .nav-link.active,
+:root[data-theme="dark"] [class*="side"] .nav-link:hover,
+:root[data-theme="dark"] [class*="side"] .nav-link.active {
+  background: #111827 !important;
+  color: #fff !important;
+}
+
+/* --------------------------------------------------------------------------
+   4) Cards
+--------------------------------------------------------------------------- */
+:root[data-theme="dark"] .card{
+  background: var(--surface);
+  border-color: var(--border);
+  box-shadow: var(--shadow);
+}
+:root[data-theme="dark"] .card .card-body{ color: var(--ink); }
+
+/* --------------------------------------------------------------------------
+   5) Formularios, selects, add-ons, botones
+--------------------------------------------------------------------------- */
+:root[data-theme="dark"] .form-control,
+:root[data-theme="dark"] .form-select,
+:root[data-theme="dark"] .input-group-text,
+:root[data-theme="dark"] .btn{
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--border);
+}
+:root[data-theme="dark"] .form-control::placeholder{ color:#94a3b8; }
+:root[data-theme="dark"] .form-control:focus,
+:root[data-theme="dark"] .form-select:focus{
+  border-color: var(--border);
+  box-shadow: 0 0 0 .2rem var(--ring);
+}
+:root[data-theme="dark"] .btn:hover{ background:#0c1424; }
+
+/* --------------------------------------------------------------------------
+   6) Nav tabs
+--------------------------------------------------------------------------- */
+:root[data-theme="dark"] .nav-tabs{ border-bottom:1px solid var(--border); }
+:root[data-theme="dark"] .nav-tabs .nav-link{ color:#cbd5e1; border-color:transparent; }
+:root[data-theme="dark"] .nav-tabs .nav-link:hover{ background: var(--surface); border-color: var(--border); }
+:root[data-theme="dark"] .nav-tabs .nav-link.active{
+  color:#fff; background:#111827; border-color:var(--border) var(--border) transparent;
+}
+
+/* --------------------------------------------------------------------------
+   7) Tablas
+--------------------------------------------------------------------------- */
+:root[data-theme="dark"] .table thead{
+  background: linear-gradient(180deg, var(--bg-soft), var(--surface));
+  box-shadow: 0 1px 0 var(--border);
+}
+:root[data-theme="dark"] .table th{ color:#cbd5e1; }
+:root[data-theme="dark"] .table td{
+  border-top:1px dashed var(--border);
+  color:var(--ink);
+}
+:root[data-theme="dark"] .table-hover tbody tr:hover{ background: rgba(25,135,84,.12); }
+
+/* thead.table-light */
+:root[data-theme="dark"] .table-light{
+  background: var(--surface) !important;
+  color:#cbd5e1 !important;
+}
+:root[data-theme="dark"] .table-light th,
+:root[data-theme="dark"] .table-light td{ border-color: var(--border) !important; }
+
+/* --------------------------------------------------------------------------
+   8) Alertas / badges “light”
+--------------------------------------------------------------------------- */
+:root[data-theme="dark"] .alert{
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--border);
+}
+:root[data-theme="dark"] .badge.bg-light{
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border-color: var(--border) !important;
+}
+
+/* --------------------------------------------------------------------------
+   9) Paginación
+--------------------------------------------------------------------------- */
+:root[data-theme="dark"] .page-link{
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--border);
+}
+:root[data-theme="dark"] .page-item.active .page-link{
+  background: var(--brand);
+  border-color: var(--brand);
+  color:#fff;
+}
+:root[data-theme="dark"] .page-item.disabled .page-link{
+  color:#64748b; background:#0c1424;
+}
+
+/* --------------------------------------------------------------------------
+   10) Toasts (si usas uiToast en JS)
+--------------------------------------------------------------------------- */
+.toast-host{
+  position:fixed; top:16px; right:16px; display:grid; gap:8px; z-index:1080;
+}
+:root[data-theme="dark"] .toast{
+  display:flex; align-items:center; gap:.6rem;
+  background: var(--surface);
+  color: var(--ink);
+  border:1px solid var(--border);
+  border-radius:12px; padding:.6rem .8rem; box-shadow: var(--shadow);
+}
+:root[data-theme="dark"] .toast .btn-close{ filter: invert(1) grayscale(1); opacity:.7; }
+:root[data-theme="dark"] .toast .btn-close:hover{ opacity:1; }
+:root[data-theme="dark"] .toast .dot{
+  width:.5rem; height:.5rem; border-radius:999px; background: var(--brand);
+}
+
+/* --------------------------------------------------------------------------
+   11) Transiciones suaves (opcional)
+--------------------------------------------------------------------------- */
+html[data-theme] body,
+html[data-theme] .card,
+html[data-theme] .form-control,
+html[data-theme] .form-select,
+html[data-theme] .input-group-text,
+html[data-theme] .btn,
+html[data-theme] .sidebar {
+  transition: background-color .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+/* ===================== PATCH DARK: Bootstrap vars & canvas ===================== */
+:root[data-theme="dark"]{
+  /* Bootstrap 5 variables clave */
+  --bs-body-bg:            var(--bg);
+  --bs-body-color:         var(--ink);
+  --bs-border-color:       var(--border);
+  --bs-link-color:         var(--brand);
+  --bs-link-hover-color:   color-mix(in oklab, var(--brand), white 18%);
+  --bs-card-bg:            var(--surface);
+  --bs-card-border-color:  var(--border);
+
+  /* Tablas Bootstrap */
+  --bs-table-bg:           transparent;
+  --bs-table-color:        var(--ink);
+  --bs-table-striped-bg:   rgba(255,255,255,.04);
+  --bs-table-striped-color:var(--ink);
+  --bs-table-hover-bg:     rgba(255,255,255,.06);
+  --bs-table-hover-color:  var(--ink);
+  --bs-table-border-color: var(--border);
+  --bs-table-striped-order: even;
+}
+
+/* Canvas/wrappers que a veces quedan blancos por dashboard.css u otros */
+:root[data-theme="dark"] body,
+:root[data-theme="dark"] body.app,
+:root[data-theme="dark"] body.admin-layout,
+:root[data-theme="dark"] main,
+:root[data-theme="dark"] main.site-main,
+:root[data-theme="dark"] .site-main,
+:root[data-theme="dark"] .content,
+:root[data-theme="dark"] .content-wrapper,
+:root[data-theme="dark"] .page-content,
+:root[data-theme="dark"] .app-content,
+:root[data-theme="dark"] .container,
+:root[data-theme="dark"] .container-fluid {
+  background-color: var(--bg) !important;
+  color: var(--ink) !important;
+}
+
+/* Sidebar (por si otro CSS reescribe) */
+:root[data-theme="dark"] .sidebar {
+  background: #0e1729 !important;
+  border-right: 1px solid var(--border) !important;
+}
+:root[data-theme="dark"] .sidebar .nav-link { color:#cbd5e1 !important; }
+:root[data-theme="dark"] .sidebar .nav-link:hover,
+:root[data-theme="dark"] .sidebar .nav-link.active {
+  background:#111827 !important; color:#fff !important;
+}
+
+/* ===================== PATCH DARK: Tablas más legibles ===================== */
+/* Encabezado */
+:root[data-theme="dark"] .table thead {
+  background: linear-gradient(180deg, var(--bg-soft), var(--surface));
+  box-shadow: 0 1px 0 var(--border);
+}
+:root[data-theme="dark"] .table thead th { color:#dbe3f1; }
+
+/* Celdas del body (a veces quedan muy pálidas por utilitarios) */
+:root[data-theme="dark"] .table tbody th,
+:root[data-theme="dark"] .table tbody td {
+  color: var(--ink) !important;
+  opacity: 1 !important;
+}
+
+/* Striped / hover */
+:root[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+  background-color: var(--bs-table-striped-bg);
+  color: var(--ink);
+}
+:root[data-theme="dark"] .table-hover > tbody > tr:hover > * {
+  background-color: var(--bs-table-hover-bg);
+  color: var(--ink);
+}
+
+/* thead.table-light clásico */
+:root[data-theme="dark"] .table-light {
+  background: var(--surface) !important;
+  color:#cbd5e1 !important;
+}
+:root[data-theme="dark"] .table-light th,
+:root[data-theme="dark"] .table-light td {
+  border-color: var(--border) !important;
+}
+
+/* “Muted”/secundario de Bootstrap en dark (evitar que se vea demasiado tenue) */
+:root[data-theme="dark"] .text-muted,
+:root[data-theme="dark"] .text-secondary {
+  color: #a8b3c7 !important;
+}
+
+/* Inputs/selects dentro de toolbars de tabla */
+:root[data-theme="dark"] .table .form-control,
+:root[data-theme="dark"] .table .form-select {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--border);
+}
+
+/* Paginación dentro de cards/listados */
+:root[data-theme="dark"] .pagination .page-link{
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--border);
+}
+:root[data-theme="dark"] .pagination .page-item.active .page-link{
+  background: var(--brand);
+  border-color: var(--brand);
+  color:#fff;
+}
+
+/* Transición suave (opcional) */
+html[data-theme] .table, html[data-theme] .pagination .page-link {
+  transition: background-color .18s ease, color .18s ease, border-color .18s ease;
+}
+
+/* =============== Forzar canvas oscuro del área central (layout) =============== */
+/* Muchos themes usan uno o varios de estos wrappers para el contenido */
+:root[data-theme="dark"] main,
+:root[data-theme="dark"] main.site-main,
+:root[data-theme="dark"] #content,
+:root[data-theme="dark"] .content,
+:root[data-theme="dark"] .content-body,
+:root[data-theme="dark"] .content-main,
+:root[data-theme="dark"] .content-wrapper,
+:root[data-theme="dark"] .page-content,
+:root[data-theme="dark"] .page-wrapper,
+:root[data-theme="dark"] .app-content,
+:root[data-theme="dark"] .app-main,
+:root[data-theme="dark"] .main,
+:root[data-theme="dark"] .main-content,
+:root[data-theme="dark"] .container,
+:root[data-theme="dark"] .container-fluid {
+  background-color: var(--bg) !important;
+  color: var(--ink) !important;
+}
+
+/* Sidebar por si otro CSS lo pisa */
+:root[data-theme="dark"] .sidebar {
+  background: #0e1729 !important;
+  border-right: 1px solid var(--border) !important;
+}
+:root[data-theme="dark"] .sidebar .nav-link { color: #cbd5e1 !important; }
+:root[data-theme="dark"] .sidebar .nav-link:hover,
+:root[data-theme="dark"] .sidebar .nav-link.active {
+  background:#111827 !important; color:#fff !important;
+}
+
+/* Cards del listado (header/footer incluidos) */
+:root[data-theme="dark"] .card,
+:root[data-theme="dark"] .card-header,
+:root[data-theme="dark"] .card-footer {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+}
+
+/* Tablas (encabezado + filas + hover) — asegura contraste bueno */
+:root[data-theme="dark"] .table thead {
+  background: linear-gradient(180deg, var(--bg-soft), var(--surface));
+  box-shadow: 0 1px 0 var(--border);
+}
+:root[data-theme="dark"] .table thead th { color:#dbe3f1; }
+:root[data-theme="dark"] .table tbody td,
+:root[data-theme="dark"] .table tbody th { color: var(--ink) !important; }
+:root[data-theme="dark"] .table-hover > tbody > tr:hover > * {
+  background-color: rgba(255,255,255,.06);
+  color: var(--ink);
+}
+
+/* Paginación del listado */
+:root[data-theme="dark"] .pagination .page-link{
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--border);
+}
+:root[data-theme="dark"] .pagination .page-item.active .page-link{
+  background: var(--brand);
+  border-color: var(--brand);
+  color:#fff;
+}
+
+/* ====== PATCH FINAL CANVAS OSCURO ====== */
+/* 1) Sobrescribe usando background (no sólo background-color) y con !important */
+:root[data-theme="dark"] html,
+:root[data-theme="dark"] body,
+:root[data-theme="dark"] main,
+:root[data-theme="dark"] main.site-main,
+:root[data-theme="dark"] .site-main,
+:root[data-theme="dark"] .admin-layout,
+:root[data-theme="dark"] .admin-layout .content,
+:root[data-theme="dark"] .content,
+:root[data-theme="dark"] .content-body,
+:root[data-theme="dark"] .content-main,
+:root[data-theme="dark"] .content-wrapper,
+:root[data-theme="dark"] .page-content,
+:root[data-theme="dark"] .page-wrapper,
+:root[data-theme="dark"] .app-content,
+:root[data-theme="dark"] .app-main,
+:root[data-theme="dark"] #content,
+:root[data-theme="dark"] #main,
+:root[data-theme="dark"] body > .container,
+:root[data-theme="dark"] body > .container-fluid,
+:root[data-theme="dark"] .container,
+:root[data-theme="dark"] .container-fluid,
+:root[data-theme="dark"] .row.content,
+:root[data-theme="dark"] .row.page-content {
+  background: var(--bg) !important;
+  color: var(--ink) !important;
+}
+
+/* 2) Cualquier “bg-white / bg-body” que se cuele */
+:root[data-theme="dark"] .bg-white,
+:root[data-theme="dark"] .bg-body,
+:root[data-theme="dark"] .bg-light {
+  background: var(--bg) !important;
+  color: var(--ink) !important;
+}
+
+/* 3) Cabecera/footers de cards del listado también oscuros */
+:root[data-theme="dark"] .card,
+:root[data-theme="dark"] .card-header,
+:root[data-theme="dark"] .card-footer {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+}
+
+/* 4) Tabla del listado más contrastada */
+:root[data-theme="dark"] .table thead {
+  background: linear-gradient(180deg, var(--bg-soft), var(--surface)) !important;
+  box-shadow: 0 1px 0 var(--border);
+}
+:root[data-theme="dark"] .table tbody td,
+:root[data-theme="dark"] .table tbody th { color: var(--ink) !important; }
+:root[data-theme="dark"] .table-hover > tbody > tr:hover > * {
+  background-color: rgba(255,255,255,.06) !important;
+  color: var(--ink) !important;
+}
+
+/* 5) Sidebar (por si otro CSS lo pisa) */
+:root[data-theme="dark"] .sidebar {
+  background: #0e1729 !important;
+  border-right: 1px solid var(--border) !important;
+}
+:root[data-theme="dark"] .sidebar .nav-link { color:#cbd5e1 !important; }
+:root[data-theme="dark"] .sidebar .nav-link:hover,
+:root[data-theme="dark"] .sidebar .nav-link.active {
+  background:#111827 !important; color:#fff !important;
+}
+
+/* 6) Asegura alto mínimo del lienzo */
+:root[data-theme="dark"] .site-main,
+:root[data-theme="dark"] main,
+:root[data-theme="dark"] .content,
+:root[data-theme="dark"] .page-content {
+  min-height: 100vh;
+}

@@ -1,14 +1,17 @@
 <?php
 /** Layout principal */
-$full  = $full  ?? false;                   // Vistas full-bleed (login/registro)
-$base  = $this->config['app']['base_url'];  // Atajo para rutas absolutas
-$isAdmin = !empty($esAdmin);                // Flag para panel admin
+$full    = $full  ?? false;                      // Vistas full-bleed (login/registro)
+$base    = $this->config['app']['base_url'];     // Atajo para rutas absolutas
+$isAdmin = !empty($esAdmin);                     // Flag para panel admin
 
 // Clases para <body>
 $bodyClasses = [];
 $bodyClasses[] = $full ? 'admin-login' : 'app';
 if ($isAdmin) $bodyClasses[] = 'admin-layout';
 $bodyClassAttr = implode(' ', $bodyClasses);
+
+// Respaldo por si localStorage aún no tiene valor
+$ui_tema_fallback = $ui_tema ?? 'light';
 ?>
 <!doctype html>
 <html lang="es">
@@ -16,6 +19,46 @@ $bodyClassAttr = implode(' ', $bodyClasses);
   <meta charset="utf-8">
   <title><?= htmlspecialchars($titulo ?? 'App') ?></title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- === APLICAR TEMA Y COLOR ANTES DEL CSS (evita FOUC) === -->
+  <script>
+  (function () {
+    try {
+      var LS = window.localStorage;
+      var pref  = (LS && LS.getItem('ui_tema')) || <?= json_encode($ui_tema_fallback) ?> || 'light';
+      var brand = (LS && LS.getItem('ui_color_principal')) || '#198754';
+
+      function resolveTheme(x){
+        if (x === 'auto') {
+          return (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        return (x === 'dark' || x === 'light') ? x : 'light';
+      }
+      function applyThemeAndColor(){
+        var t = resolveTheme(pref);
+        document.documentElement.setAttribute('data-theme', t);
+
+        // --brand y --ring (a partir del color principal)
+        document.documentElement.style.setProperty('--brand', brand);
+        try {
+          var v = brand.replace('#','');
+          var r = parseInt(v.substr(0,2),16) || 25,
+              g = parseInt(v.substr(2,2),16) || 135,
+              b = parseInt(v.substr(4,2),16) || 84;
+          document.documentElement.style.setProperty('--ring','rgba('+r+','+g+','+b+',.18)');
+        } catch(_){}
+      }
+
+      applyThemeAndColor();
+
+      // Si es "auto", seguir cambios del SO
+      if (pref === 'auto' && window.matchMedia) {
+        var mq = matchMedia('(prefers-color-scheme: dark)');
+        (mq.addEventListener || mq.addListener).call(mq, 'change', function(){ applyThemeAndColor(); });
+      }
+    } catch (e) { /* no romper render si algo falla */ }
+  })();
+  </script>
 
   <!-- CSS global público -->
   <link rel="stylesheet" href="<?= $base ?>/assets/css/app.css">
@@ -26,6 +69,7 @@ $bodyClassAttr = implode(' ', $bodyClasses);
     <link rel="stylesheet" href="<?= $base ?>/assets/vendor/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="<?= $base ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css">
     <link rel="stylesheet" href="<?= $base ?>/assets/css/dashboard.css">
+    <link rel="stylesheet" href="<?= $base ?>/assets/css/theme.css"><!-- Dark/Light -->
   <?php endif; ?>
 
   <!-- CSS extra por página -->
@@ -68,7 +112,6 @@ $bodyClassAttr = implode(' ', $bodyClasses);
   <!-- ===== Contenido ===== -->
   <main class="site-main <?= $full ? 'site-main--full' : '' ?>">
     <?php if ($full || $isAdmin): ?>
-      <!-- Sin .container en login ni en admin (las vistas de admin traen su propio layout interno) -->
       <?= $contenido ?? '' ?>
     <?php else: ?>
       <div class="container">
@@ -81,55 +124,28 @@ $bodyClassAttr = implode(' ', $bodyClasses);
     <!-- ===== Footer público (no en admin ni en full) ===== -->
     <footer class="site-footer">
       <div class="container">
-      
+        <!-- contenido footer -->
       </div>
     </footer>
   <?php endif; ?>
 
   <!-- ===== Scripts ===== -->
-
   <?php if ($isAdmin): ?>
-    <!-- Vendor admin primero (Bootstrap para modales, tooltips, etc.) -->
     <script src="<?= $base ?>/assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
   <?php endif; ?>
 
-  <!-- JS global de la app -->
   <script src="<?= $base ?>/assets/js/app.js" defer></script>
 
-  <!-- JS extra por página (después de Bootstrap) -->
   <?php if (!empty($extra_js) && is_array($extra_js)): ?>
     <?php foreach ($extra_js as $src): ?>
       <script src="<?= htmlspecialchars($src) ?>" defer></script>
     <?php endforeach; ?>
   <?php endif; ?>
 
-  <!-- Scripts opcionales sólo si la página lo pide (p.ej. Dashboard) -->
   <?php if (!empty($carga_chartjs)): ?>
     <script src="<?= $base ?>/assets/vendor/chartjs/chart.umd.min.js" defer></script>
     <script src="<?= $base ?>/assets/js/admin-dashboard.js" defer></script>
   <?php endif; ?>
-
-    <?php if ($isAdmin): ?>
-    <!-- Bootstrap primero: necesario para modales/tooltip -->
-    <script src="<?= $base ?>/assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
-  <?php endif; ?>
-
-  <!-- JS global de la app -->
-  <script src="<?= $base ?>/assets/js/app.js" defer></script>
-
-  <!-- JS extra por página (inyectado por el controlador) -->
-  <?php if (!empty($extra_js) && is_array($extra_js)): ?>
-    <?php foreach ($extra_js as $src): ?>
-      <script src="<?= htmlspecialchars($src) ?>" defer></script>
-    <?php endforeach; ?>
-  <?php endif; ?>
-
-  <!-- SOLO si la página lo pide -->
-  <?php if (!empty($carga_chartjs)): ?>
-    <script src="<?= $base ?>/assets/vendor/chartjs/chart.umd.min.js" defer></script>
-    <script src="<?= $base ?>/assets/js/admin-dashboard.js" defer></script>
-  <?php endif; ?>
-
 
 </body>
 </html>

@@ -57,6 +57,11 @@ $can = function(string $perm) use ($rol, $ACL): bool {
     <li class="<?= $active('productos') ?>"><a href="?r=admin/productos">Productos</a></li>
   <?php endif; ?>
 
+  <?php if ($can('Proveedores')): ?>
+  <li class="<?= $active('Proveedores') ?>"><a href="?r=admin/Proveedores">Proveedores</a></li>
+  <?php endif; ?>
+
+
   <?php if ($can('usuarios')): ?>
     <li class="<?= $active('usuarios') ?>"><a href="?r=admin/usuarios">Usuarios</a></li>
   <?php endif; ?>
