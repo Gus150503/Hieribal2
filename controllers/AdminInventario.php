@@ -1,19 +1,20 @@
 <?php
 declare(strict_types=1);
 
-namespace controllers;
+namespace Controllers;
 
 use Core\Controller;
-use Models\Inventario;
+use Core\Database;
+use Models\UsuarioInventario;
 
-final class AdminInventario extends controllers
+final class AdminInventario extends Controller
 {
-    private Inventario $Model;
+    private UsuarioInventario $model;
 
     public function __construct(array $config)
     {
         parent::__construct($config);
-        $this->Model = new UsuarioInventario($config);
+        $this->model = new UsuarioInventario(Database::get($config['db']));
     }
 
     private function json(array $data, int $status = 200): void
@@ -23,15 +24,25 @@ final class AdminInventario extends controllers
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
     }
 
-    private function ok(array $extra = [], int $status = 200): void { $this->json(['ok'=>true] + $extra, $status); }
-    private function fail(string $msg, int $status = 400, array $extra = []) { $this->json(['ok'=>false,'msg'=>$msg] + $extra, $status); }
+    private function ok(array $extra = [], int $status = 200): void
+    {
+        $this->json(['ok' => true] + $extra, $status);
+    }
+
+    private function fail(string $msg, int $status = 400, array $extra = []): void
+    {
+        $this->json(['ok' => false, 'msg' => $msg] + $extra, $status);
+    }
 
     private function ensureAdmin(): void
     {
-        if (session_status() !== \PHP_SESSION_ACTIVE) session_start();
+        if (session_status() !== \PHP_SESSION_ACTIVE) {
+            session_start();
+        }
         if (empty($_SESSION['admin'])) {
             $_SESSION['admin_error'] = 'Inicia sesión para continuar.';
-            header('Location: /?r=admin_login'); exit;
+            header('Location: /?r=admin_login');
+            exit;
         }
     }
 
@@ -43,6 +54,7 @@ final class AdminInventario extends controllers
         return $e->getMessage();
     }
 
+    /** Vista principal */
     public function index(): void
     {
         $this->ensureAdmin();
@@ -53,6 +65,7 @@ final class AdminInventario extends controllers
         ]);
     }
 
+    /** API CRUD */
     public function api(): void
     {
         $this->ensureAdmin();
@@ -63,97 +76,101 @@ final class AdminInventario extends controllers
             $action = $_REQUEST['action'] ?? '';
 
             if ($m === 'GET' && $action === 'list') {
-                try {
-                    $q = trim((string)($_GET['q'] ?? ''));
-                    $page = max(1, (int)($_GET['page'] ?? 1));
-                    $per = max(1, min(100, (int)($_GET['per'] ?? 10)));
-                    $data = $this->Model->listar($q, $page, $per);
-                    $this->json($data);
-                } catch (\Throwable $e) { $this->fail($this->friendlyDbError($e), 500); }
+                $q    = trim((string)($_GET['q'] ?? ''));
+                $page = max(1, (int)($_GET['page'] ?? 1));
+                $per  = max(1, min(100, (int)($_GET['per'] ?? 10)));
+                $data = $this->model->listar($q, $page, $per);
+                $this->json($data);
                 return;
             }
 
             if ($m === 'GET' && $action === 'get') {
-                try {
-                    $id = (int)($_GET['id'] ?? 0);
-                    if ($id <= 0) { $this->fail('ID inválido'); return; }
-                    $row = $this->Model->obtener($id);
-                    $this->json(['data'=>$row]);
-                } catch (\Throwable $e) { $this->fail($this->friendlyDbError($e), 500); }
+                $id = (int)($_GET['id'] ?? 0);
+                if ($id <= 0) {
+                    $this->fail('ID inválido');
+                    return;
+                }
+                $row = $this->model->obtener($id);
+                $this->json(['data' => $row]);
                 return;
             }
 
             if ($m === 'POST' && $action === 'create') {
-                try {
-                    $d = $this->sanitize($_POST, true);
-                    $id = $this->Model->crear($d);
-                    $this->ok(['id'=>$id], 201);
-                } catch (\Throwable $e) { $this->fail($this->friendlyDbError($e), 500); }
+                $d = $this->sanitize($_POST, true);
+                $id = $this->model->crear($d);
+                $this->ok(['id' => $id], 201);
                 return;
             }
 
             if ($m === 'POST' && $action === 'update') {
-                try {
-                    $id = (int)($_POST['id'] ?? 0);
-                    if ($id <= 0) { $this->fail('ID inválido'); return; }
-                    $d = $this->sanitize($_POST, false);
-                    $this->Model->actualizar($id, $d);
-                    $this->ok();
-                } catch (\Throwable $e) { $this->fail($this->friendlyDbError($e), 500); }
+                $id = (int)($_POST['id'] ?? 0);
+                if ($id <= 0) {
+                    $this->fail('ID inválido');
+                    return;
+                }
+                $d = $this->sanitize($_POST, false);
+                $this->model->actualizar($id, $d);
+                $this->ok();
                 return;
             }
 
             if ($m === 'POST' && $action === 'delete') {
-                try {
-                    $id = (int)($_POST['id'] ?? 0);
-                    if ($id <= 0) { $this->fail('ID inválido'); return; }
-                    $this->Model->eliminar($id);
-                    $this->ok();
-                } catch (\Throwable $e) { $this->fail($this->friendlyDbError($e), 500); }
+                $id = (int)($_POST['id'] ?? 0);
+                if ($id <= 0) {
+                    $this->fail('ID inválido');
+                    return;
+                }
+                $this->model->eliminar($id);
+                $this->ok();
                 return;
             }
 
             if ($m === 'POST' && $action === 'toggle') {
-                try {
-                    $id = (int)($_POST['id'] ?? 0);
-                    if ($id <= 0) { $this->fail('ID inválido'); return; }
-                    $res = $this->Model->toggleEstado($id);
-                    $this->ok(['estado'=>$res['estado'] ?? null]);
-                } catch (\Throwable $e) { $this->fail($this->friendlyDbError($e), 500); }
+                $id = (int)($_POST['id'] ?? 0);
+                if ($id <= 0) {
+                    $this->fail('ID inválido');
+                    return;
+                }
+                $res = $this->model->toggleEstado($id);
+                $this->ok(['estado' => $res['estado'] ?? null]);
                 return;
             }
 
             $this->fail('Acción no válida', 400);
+
         } catch (\Throwable $e) {
-            $this->fail($e->getMessage(), 500);
+            $this->fail($this->friendlyDbError($e), 500);
         }
     }
 
+    /** Sanitización de inputs */
     private function sanitize(array $in, bool $creating): array
     {
         $producto_id = (int)($in['producto_id'] ?? 0);
-        if ($producto_id <= 0) throw new \Exception('Producto inválido');
+        if ($producto_id <= 0) {
+            throw new \Exception('Producto inválido');
+        }
 
         $codigo_interno = trim($in['codigo_interno'] ?? '');
-        $stock = is_numeric($in['stock'] ?? null) ? (int)$in['stock'] : 0;
-        $stock_minimo = is_numeric($in['stock_minimo'] ?? null) ? (int)$in['stock_minimo'] : 0;
-        $stock_maximo = is_numeric($in['stock_maximo'] ?? null) ? (int)$in['stock_maximo'] : 0;
-        $punto_reorden = is_numeric($in['punto_reorden'] ?? null) ? (int)$in['punto_reorden'] : 0;
-        $ubicacion = trim($in['ubicacion'] ?? '');
+        $stock          = is_numeric($in['stock'] ?? null) ? (int)$in['stock'] : 0;
+        $stock_minimo   = is_numeric($in['stock_minimo'] ?? null) ? (int)$in['stock_minimo'] : 0;
+        $stock_maximo   = is_numeric($in['stock_maximo'] ?? null) ? (int)$in['stock_maximo'] : 0;
+        $punto_reorden  = is_numeric($in['punto_reorden'] ?? null) ? (int)$in['punto_reorden'] : 0;
+        $ubicacion      = trim($in['ubicacion'] ?? '');
 
         $estadoIn = strtolower(trim($in['estado'] ?? 'disponible'));
-        $allowed = ['disponible','agotado','pendiente'];
-        $estado = in_array($estadoIn, $allowed, true) ? $estadoIn : 'disponible';
+        $allowed  = ['disponible', 'agotado', 'pendiente'];
+        $estado   = in_array($estadoIn, $allowed, true) ? $estadoIn : 'disponible';
 
         return [
-            'producto_id' => $producto_id,
+            'producto_id'    => $producto_id,
             'codigo_interno' => $codigo_interno,
-            'stock' => $stock,
-            'stock_minimo' => $stock_minimo,
-            'stock_maximo' => $stock_maximo,
-            'punto_reorden' => $punto_reorden,
-            'ubicacion' => $ubicacion,
-            'estado' => $estado,
+            'stock'          => $stock,
+            'stock_minimo'   => $stock_minimo,
+            'stock_maximo'   => $stock_maximo,
+            'punto_reorden'  => $punto_reorden,
+            'ubicacion'      => $ubicacion,
+            'estado'         => $estado,
         ];
     }
 }
