@@ -6,6 +6,9 @@ use Controllers\HomeController;
 use Controllers\AdminAuthController;
 use Controllers\AdminDashboardController;
 use Controllers\AdminUsuariosController;
+use Controllers\AdminInventario;
+use Controllers\AdminProducto;
+use Controllers\AdminProveedores;
 
 // =============================
 //  ENTORNO Y AUTOLOAD
@@ -173,8 +176,28 @@ switch ($r) {
         header('Location: ' . (($config['app']['base_url'] ?? '') . '/?r=admin_usuarios'), true, 302);
         exit;
 
+
+        /* Modulos Michell */
+                case 'admin_productos':
+                $c = new \controllers\AdminProductos($config);
+                $c->index();
+                break;
+
+                case 'admin_proveedores':
+                $c = new \Controllers\AdminProveedores($config);
+                $c->index();
+                break;
+
+                case 'admin_inventario':
+                $c = new \controllers\AdminInventario($config);
+                $c->index();
+                break;
+
+
     /* ====== 404 ====== */
     default:
         http_response_code(404);
         echo '404 Página no encontrada';
 }
+
+
