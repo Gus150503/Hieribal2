@@ -1,5 +1,10 @@
 <?php $partial = !empty($_GET['partial']); ?>
 <?php if (!$partial) include __DIR__ . '/../_shell_start.php'; ?>
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
 <section class="card shadow-sm ui-pro border-0 rounded-4">
   <div class="card-body">
@@ -8,17 +13,21 @@
         <i class="bi bi-box-seam fs-4 text-success"></i>
         <h1 class="h4 m-0">Inventario</h1>
       </div>
+
+      <!-- Botón Nuevo -->
       <button id="btnNuevo" type="button" class="btn btn-success">
         <i class="bi bi-plus-lg me-1"></i> Nuevo
       </button>
     </div>
 
+    <!-- Buscador -->
     <div class="input-group mb-3" style="max-width:520px;">
       <span class="input-group-text"><i class="bi bi-search"></i></span>
       <input id="q" type="search" class="form-control" placeholder="Buscar por código interno o ubicación…">
       <button id="btnBuscar" class="btn btn-outline-success">Buscar</button>
     </div>
 
+    <!-- Tabla -->
     <div class="table-responsive">
       <table id="tblInventario" class="table table-sm align-middle table-hover">
         <thead class="table-light position-sticky" style="top:0; z-index:1;">
@@ -35,7 +44,9 @@
             <th class="text-end">Acciones</th>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody>
+          <!-- Aquí se cargarán los datos -->
+        </tbody>
       </table>
 
       <div class="d-flex align-items-center justify-content-between mt-3">
@@ -57,21 +68,18 @@
   </div>
 </section>
 
-<?php include __DIR__ . '/modal_inventario.php'; ?>
-<script src="/assets/js/admin_inventario.js"></script>
-
-<?php if (!$partial) include __DIR__ . '/../_shell_end.php'; ?>
-<!-- Modal Bootstrap -->
-<div class="modal fade" id="modalUsuario" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+<!-- Modal Inventario -->
+<div class="modal fade" id="modalInventario" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="modalTitle">Nuevo registro</h5>
+        <h5 class="modal-title" id="modalTitle">Nuevo Inventario</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
+
       <div class="modal-body">
-        <form id="frmUsuario" class="needs-validation" novalidate>
-          <input type="hidden" name="id_usuario" id="id_usuario">
+        <form id="frmInventario" class="needs-validation" novalidate>
+          <input type="hidden" name="id" id="id">
 
           <div class="row g-3">
             <div class="col-md-6">
@@ -112,7 +120,7 @@
 
             <div class="col-md-6">
               <label class="form-label">Ubicación</label>
-              <input type="text" class="form-control" name="ubicacion" id="ubicacion" maxlength="100" required>
+              <input type="text" class="form-control" name="ubicacion" id="ubicacion" maxlength="100">
               <div class="invalid-feedback">Ubicación inválida.</div>
             </div>
 
@@ -138,3 +146,21 @@
     </div>
   </div>
 </div>
+
+<!-- Bootstrap Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // Conectar botón con modal
+  document.getElementById('btnNuevo').addEventListener('click', function () {
+    const modal = new bootstrap.Modal(document.getElementById('modalInventario'));
+    modal.show();
+  });
+
+  // Definir API
+  window.INVENTARIO_API = '/controllers/AdminInventario.php';
+</script>
+
+<script src="/public/assets/js/admin_inventario.js?v=1"></script>
+
+<?php if (!$partial) include __DIR__ . '/../_shell_end.php'; ?>

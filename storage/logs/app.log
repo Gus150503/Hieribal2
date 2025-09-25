@@ -288,3 +288,21 @@ Trace:
 #1 C:\xampp\htdocs\Hieribal2\public\index.php(184): Controllers\AdminProveedores->__construct(Array)
 
 
+[2025-09-23 18:08:03] [2025-09-23 18:08:03] Uncaught: include(C:\xampp\htdocs\Hieribal2\views\admin\inventario/modal_inventario.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\Hieribal2\views\admin\inventario\index.php:60
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\views\admin\inventario\index.php(60): {closure}(2, 'include(C:\\xamp...', 'C:\\xampp\\htdocs...', 60)
+#1 C:\xampp\htdocs\Hieribal2\views\admin\inventario\index.php(60): include()
+#2 C:\xampp\htdocs\Hieribal2\core\Controller.php(23): require('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php(84): Core\Controller->render('admin/inventari...', Array)
+#4 C:\xampp\htdocs\Hieribal2\public\index.php(161): Controllers\AdminDashboardController->inventario()
+#5 {main}
+
+[2025-09-23 18:17:23] [2025-09-23 18:17:23] Uncaught: include(C:\xampp\htdocs\Hieribal2\views\admin\inventario/modal_inventario.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\Hieribal2\views\admin\inventario\index.php:61
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\views\admin\inventario\index.php(61): {closure}(2, 'include(C:\\xamp...', 'C:\\xampp\\htdocs...', 61)
+#1 C:\xampp\htdocs\Hieribal2\views\admin\inventario\index.php(61): include()
+#2 C:\xampp\htdocs\Hieribal2\core\Controller.php(23): require('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php(84): Core\Controller->render('admin/inventari...', Array)
+#4 C:\xampp\htdocs\Hieribal2\public\index.php(161): Controllers\AdminDashboardController->inventario()
+#5 {main}
+
