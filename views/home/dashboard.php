@@ -94,7 +94,9 @@
 </div>
 
 
-<script src="../public/assets/js/carrito.js"></script>
+<script src="/hieribal2/public/assets/js/carrito.js"></script>
+
+
 
 </body>
 </html>
