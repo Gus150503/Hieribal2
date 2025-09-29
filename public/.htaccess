@@ -1,0 +1,17 @@
+# Activa rewrite
+RewriteEngine On
+
+# 1) Deja pasar recursos estáticos SIEMPRE
+RewriteRule ^(assets|img|css|js|uploads|vendor)/ - [L]
+
+# 2) Si el recurso/dir existe, sírvelo
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# 3) Todo lo demás al front controller
+RewriteRule ^ index.php [QSA,L]
+
+# --- (opcional pero útil) asegura MIME correcto ---
+AddType text/css .css
+AddType application/javascript .js

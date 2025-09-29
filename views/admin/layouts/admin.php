@@ -1,32 +1,82 @@
 <?php
-$base   = $this->config['app']['base_url'] ?? '';
-$titulo = $titulo ?? 'Panel Admin';
+$base      = $this->config['app']['base_url'] ?? '';
+$titulo    = $titulo ?? 'Panel';
+$extra_css = $extra_css ?? [];
+$extra_js  = $extra_js  ?? [];
 ?>
 <!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <title><?= htmlspecialchars($titulo) ?></title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><?= htmlspecialchars($titulo) ?></title>
 
-  <!-- CSS admin (mismos que cargas cuando $isAdmin=true) -->
-  <link rel="stylesheet" href="<?= $base ?>/assets/vendor/bootstrap/bootstrap.min.css">
-  <link rel="stylesheet" href="<?= $base ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css">
-  <link rel="stylesheet" href="<?= $base ?>/assets/css/dashboard.css">
+  <!-- Bootstrap + Icons -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <!-- CSS global + sidebar/dashboard -->
+  <link href="<?= $base ?>/assets/css/app.css?v=1" rel="stylesheet">
+  <link href="<?= $base ?>/assets/css/sidebar.css?v=2" rel="stylesheet">
+  <link href="<?= $base ?>/assets/css/dashboard.css?v=2" rel="stylesheet">
+
+  <?php foreach ($extra_css as $href): ?>
+    <link rel="stylesheet" href="<?= htmlspecialchars($href) ?>">
+  <?php endforeach; ?>
 </head>
-<body class="admin-layout">
+<body class="admin-layout bg-body-tertiary">
 
-  <aside class="sidebar">
-    <?php include __DIR__ . '/../admin/sidebar.php'; ?>
-  </aside>
+  <div class="admin-shell">
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="adminSidebar">
+      <div class="sidebar__brand">
+        <img src="<?= $base ?>/assets/img/logo.png" alt="MI HIERIBAL">
+        <span>MI HIERIBAL</span>
+      </div>
 
-  <main class="content">
-    <?= $contenido ?? '' ?>
-  </main>
+      <button type="button" class="sidebar__collapse" data-toggle-sidebar aria-label="Colapsar">
+        ≪
+      </button>
 
-  <!-- JS admin -->
-  <script src="<?= $base ?>/assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
-  <script src="<?= $base ?>/assets/vendor/chartjs/chart.umd.min.js"></script>
-  <script src="<?= $base ?>/assets/js/admin-dashboard.js"></script>
+      <?php include __DIR__ . '/sidebar.php'; ?>
+    </nav>
+
+    <!-- Overlay móvil -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
+    <!-- CONTENIDO -->
+    <main class="content">
+      <?= $contenido ?? '' ?>
+    </main>
+  </div>
+
+  <!-- JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+  <script src="<?= $base ?>/assets/js/app.js" defer></script>
+
+  <?php foreach ($extra_js as $src): ?>
+    <script src="<?= htmlspecialchars($src) ?>" defer></script>
+  <?php endforeach; ?>
+
+  <script>
+  // Toggle sidebar (colapsar / móvil)
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn  = document.querySelector('[data-toggle-sidebar]');
+    const back = document.getElementById('sidebarBackdrop');
+    const root = document.body;
+
+    const open  = () => root.classList.add('sidebar-open');
+    const close = () => root.classList.remove('sidebar-open');
+
+    btn?.addEventListener('click', () => {
+      root.classList.contains('sidebar-open') ? close() : open();
+    });
+    back?.addEventListener('click', close);
+
+    // Cierra al navegar
+    document.querySelectorAll('#adminSidebar a').forEach(a => a.addEventListener('click', close));
+  });
+  </script>
 </body>
 </html>

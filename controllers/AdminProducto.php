@@ -1,20 +1,25 @@
 <?php
 declare(strict_types=1);
 
-namespace controllers;
+namespace Controllers;
 
 use Core\Controller;
+use Core\Database;      // <-- para obtener PDO
 use Models\Producto;
 
-final class AdminProducto extends controllers
+final class AdminProducto extends Controller
 {
     private Producto $Model;
 
     public function __construct(array $config)
     {
         parent::__construct($config);
-        // Si tu modelo espera PDO en lugar de $config, cámbialo aquí.
-        $this->Model = new UsuarioProducto($config);
+
+        // Obtén PDO desde tu helper Database::get($config['db'])
+        // Ajusta la ruta si tu config difiere (p.ej. $config directamente trae host, dbname, etc.)
+        $pdo = Database::get($config['db'] ?? $config);
+
+        $this->Model = new Producto($pdo);
     }
 
     /* ---------- Helpers ---------- */
@@ -40,7 +45,8 @@ final class AdminProducto extends controllers
         if (session_status() !== \PHP_SESSION_ACTIVE) session_start();
         if (empty($_SESSION['admin'])) {
             $_SESSION['admin_error'] = 'Inicia sesión para continuar.';
-            header('Location: /?r=admin_login'); exit;
+            header('Location: /?r=admin_login');
+            exit;
         }
     }
 
@@ -166,7 +172,6 @@ final class AdminProducto extends controllers
     /* ---------- Sanitización Productos ---------- */
     private function sanitize(array $in, bool $creating): array
     {
-        // Normalizaciones y validaciones mínimas
         $nombre = trim($in['nombre'] ?? '');
         if ($nombre === '' || strlen($nombre) > 255) throw new \Exception('Nombre inválido');
 
@@ -187,7 +192,6 @@ final class AdminProducto extends controllers
         $estadoIn = strtolower(trim($in['estado'] ?? 'activo'));
         $estado = in_array($estadoIn, ['activo','inactivo'], true) ? $estadoIn : 'activo';
 
-        // Fecha permitida (si viene)
         if ($f_vencimiento) {
             $ts = strtotime($f_vencimiento);
             if ($ts === false) throw new \Exception('Fecha de vencimiento inválida');
