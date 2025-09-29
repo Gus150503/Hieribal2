@@ -1,7 +1,7 @@
 <?php
 /** Layout principal */
 $full    = $full  ?? false;                      // Vistas full-bleed (login/registro)
-$base    = $this->config['app']['base_url'];     // Atajo para rutas absolutas
+$base    = $this->config['app']['base_url'] ?? ''; // Atajo para rutas absolutas
 $isAdmin = !empty($esAdmin);                     // Flag para panel admin
 
 // Clases para <body>
@@ -38,7 +38,6 @@ $ui_tema_fallback = $ui_tema ?? 'light';
         var t = resolveTheme(pref);
         document.documentElement.setAttribute('data-theme', t);
 
-        // --brand y --ring (a partir del color principal)
         document.documentElement.style.setProperty('--brand', brand);
         try {
           var v = brand.replace('#','');
@@ -51,26 +50,25 @@ $ui_tema_fallback = $ui_tema ?? 'light';
 
       applyThemeAndColor();
 
-      // Si es "auto", seguir cambios del SO
       if (pref === 'auto' && window.matchMedia) {
         var mq = matchMedia('(prefers-color-scheme: dark)');
         (mq.addEventListener || mq.addListener).call(mq, 'change', function(){ applyThemeAndColor(); });
       }
-    } catch (e) { /* no romper render si algo falla */ }
+    } catch (e) {}
   })();
   </script>
 
   <!-- CSS global público -->
   <link rel="stylesheet" href="<?= $base ?>/assets/css/app.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
-  <?php if ($isAdmin): ?>
-    <!-- CSS del panel admin -->
-    <link rel="stylesheet" href="<?= $base ?>/assets/vendor/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" href="<?= $base ?>/assets/vendor/bootstrap-icons/bootstrap-icons.css">
-    <link rel="stylesheet" href="<?= $base ?>/assets/css/dashboard.css">
-    <link rel="stylesheet" href="<?= $base ?>/assets/css/theme.css"><!-- Dark/Light -->
-  <?php endif; ?>
+<?php if ($isAdmin): ?>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="<?= $base ?>/assets/css/sidebar.css?v=5"><!-- <-- unificado -->
+  <link rel="stylesheet" href="<?= $base ?>/assets/css/dashboard.css?v=8"><!-- estilos propios del dashboard -->
+  <link rel="stylesheet" href="<?= $base ?>/assets/css/theme.css?v=3">
+<?php endif; ?>
+
 
   <!-- CSS extra por página -->
   <?php if (!empty($extra_css) && is_array($extra_css)): ?>
@@ -131,9 +129,11 @@ $ui_tema_fallback = $ui_tema ?? 'light';
 
   <!-- ===== Scripts ===== -->
   <?php if ($isAdmin): ?>
-    <script src="<?= $base ?>/assets/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
+    <!-- Bootstrap por CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
   <?php endif; ?>
 
+  <!-- JS global -->
   <script src="<?= $base ?>/assets/js/app.js" defer></script>
 
   <?php if (!empty($extra_js) && is_array($extra_js)): ?>
@@ -143,7 +143,7 @@ $ui_tema_fallback = $ui_tema ?? 'light';
   <?php endif; ?>
 
   <?php if (!empty($carga_chartjs)): ?>
-    <script src="<?= $base ?>/assets/vendor/chartjs/chart.umd.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
     <script src="<?= $base ?>/assets/js/admin-dashboard.js" defer></script>
   <?php endif; ?>
 

@@ -1,8 +1,10 @@
-<?php $partial = !empty($_GET['partial']); ?>
-<?php if (!$partial) include __DIR__ . '/../_shell_start.php'; ?>
+<?php
+$partial = !empty($_GET['partial']);
+if (!$partial) include __DIR__ . '/../_shell_start.php';
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+// Asegura base URL para rutas absolutas
+$base = $base ?? ($this->config['app']['base_url'] ?? '');
+?>
 
 <section class="card shadow-sm ui-pro border-0 rounded-4">
   <div class="card-body">
@@ -16,12 +18,14 @@
       </button>
     </div>
 
+    <!-- Buscador -->
     <div class="input-group mb-3" style="max-width:520px;">
       <span class="input-group-text"><i class="bi bi-search"></i></span>
       <input id="qProveedor" type="search" class="form-control" placeholder="Buscar por empresa o contacto…">
       <button id="btnBuscarProveedor" class="btn btn-outline-warning">Buscar</button>
     </div>
 
+    <!-- Tabla -->
     <div class="table-responsive">
       <table id="tblProveedor" class="table table-sm align-middle table-hover">
         <thead class="table-light position-sticky" style="top:0; z-index:1;">
@@ -51,7 +55,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Nuevo Proveedor</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
       <div class="modal-body">
         <form id="frmProveedor" class="needs-validation" novalidate>
@@ -61,10 +65,12 @@
             <div class="col-md-6">
               <label class="form-label">Empresa</label>
               <input type="text" class="form-control" name="empresa" id="empresa" required>
+              <div class="invalid-feedback">Ingresa el nombre de la empresa.</div>
             </div>
             <div class="col-md-6">
               <label class="form-label">NIT</label>
               <input type="text" class="form-control" name="nit" id="nit" required>
+              <div class="invalid-feedback">Ingresa un NIT válido.</div>
             </div>
             <div class="col-md-6">
               <label class="form-label">Contacto</label>
@@ -77,6 +83,7 @@
             <div class="col-md-6">
               <label class="form-label">Email</label>
               <input type="email" class="form-control" name="email" id="email">
+              <div class="invalid-feedback">Ingresa un email válido.</div>
             </div>
             <div class="col-md-6">
               <label class="form-label">Dirección</label>
@@ -109,12 +116,21 @@
 </div>
 
 <script>
-  document.getElementById('btnNuevoProveedor').addEventListener('click', () => {
-    const modal = new bootstrap.Modal(document.getElementById('modalProveedor'));
-    modal.show();
+  // Endpoint base (evita hardcodear /public)
+  window.PROVEEDOR_API = "<?= $base ?>/controllers/AdminProveedor.php";
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const btn = document.getElementById('btnNuevoProveedor');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        const el = document.getElementById('modalProveedor');
+        if (el && window.bootstrap) new bootstrap.Modal(el).show();
+      });
+    }
   });
-  window.PROVEEDOR_API = '/controllers/AdminProveedor.php';
 </script>
-<script src="/public/assets/js/admin_proveedor.js?v=1"></script>
+
+<!-- JS específico de la página -->
+<script src="<?= $base ?>/assets/js/admin_proveedor.js?v=1" defer></script>
 
 <?php if (!$partial) include __DIR__ . '/../_shell_end.php'; ?>

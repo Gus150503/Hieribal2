@@ -15,32 +15,25 @@ class Producto
     // ================== LISTAR ==================
     public function listar(string $q, int $page, int $per): array
     {
-        $off  = ($page - 1) * $per;
+        $off  = max(0, ($page - 1) * $per);
+        $per  = max(1, min(100, $per));
         $like = "%{$q}%";
 
+        // Nota: en MySQL, bindear LIMIT a veces falla si no hay emulación de prepares.
+        // Interpolamos enteros casteados para seguridad.
         $sql = "SELECT *
                 FROM productos
-                WHERE (nombre LIKE ? OR categoria LIKE ? OR marca LIKE ? OR descripcion LIKE ?)
+                WHERE (nombre LIKE :like OR categoria LIKE :like OR marca LIKE :like OR descripcion LIKE :like)
                 ORDER BY id DESC
-                LIMIT ?, ?";
+                LIMIT {$off}, {$per}";
         $st = $this->db->prepare($sql);
-        $st->bindValue(1, $like, PDO::PARAM_STR);
-        $st->bindValue(2, $like, PDO::PARAM_STR);
-        $st->bindValue(3, $like, PDO::PARAM_STR);
-        $st->bindValue(4, $like, PDO::PARAM_STR);
-        $st->bindValue(5, (int)$off, PDO::PARAM_INT);
-        $st->bindValue(6, (int)$per, PDO::PARAM_INT);
-        $st->execute();
-        $items = $st->fetchAll();
+        $st->execute([':like' => $like]);
+        $items = $st->fetchAll(PDO::FETCH_ASSOC);
 
         $sql2 = "SELECT COUNT(*) FROM productos
-                 WHERE (nombre LIKE ? OR categoria LIKE ? OR marca LIKE ? OR descripcion LIKE ?)";
+                 WHERE (nombre LIKE :like OR categoria LIKE :like OR marca LIKE :like OR descripcion LIKE :like)";
         $st2 = $this->db->prepare($sql2);
-        $st2->bindValue(1, $like, PDO::PARAM_STR);
-        $st2->bindValue(2, $like, PDO::PARAM_STR);
-        $st2->bindValue(3, $like, PDO::PARAM_STR);
-        $st2->bindValue(4, $like, PDO::PARAM_STR);
-        $st2->execute();
+        $st2->execute([':like' => $like]);
         $total = (int)$st2->fetchColumn();
 
         return ['items' => $items, 'page' => $page, 'per' => $per, 'total' => $total];
@@ -51,7 +44,7 @@ class Producto
     {
         $st = $this->db->prepare("SELECT * FROM productos WHERE id=:id");
         $st->execute([':id' => $id]);
-        $row = $st->fetch();
+        $row = $st->fetch(PDO::FETCH_ASSOC);
         return $row ?: null;
     }
 
@@ -114,6 +107,13 @@ class Producto
             ':imagen'         => $d['imagen'],
             ':id'             => $id,
         ]);
+    }
+
+    // ================== ELIMINAR ==================
+    public function eliminar(int $id): void
+    {
+        $st = $this->db->prepare("DELETE FROM productos WHERE id=?");
+        $st->execute([$id]);
     }
 
     // ================== TOGGLE ESTADO ==================

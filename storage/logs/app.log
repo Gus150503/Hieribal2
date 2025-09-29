@@ -306,3 +306,425 @@ Trace:
 #4 C:\xampp\htdocs\Hieribal2\public\index.php(161): Controllers\AdminDashboardController->inventario()
 #5 {main}
 
+[2025-09-29 10:17:39] [2025-09-29 10:17:39] Uncaught: require(C:\xampp\htdocs\Hieribal2\public/../vendor/autoload.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\Hieribal2\public\index.php:104
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\public\index.php(104): {closure}(2, 'require(C:\\xamp...', 'C:\\xampp\\htdocs...', 104)
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(104): require()
+#2 {main}
+
+[2025-09-29 10:17:48] [2025-09-29 10:17:48] Uncaught: require(C:\xampp\htdocs\Hieribal2\vendor\autoload.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\Hieribal2\public\index.php:104
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\public\index.php(104): {closure}(2, 'require(C:\\xamp...', 'C:\\xampp\\htdocs...', 104)
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(104): require()
+#2 {main}
+
+[2025-09-29 10:17:48] [2025-09-29 10:17:48] Uncaught: require(C:\xampp\htdocs\Hieribal2\public/../vendor/autoload.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\Hieribal2\public\index.php:104
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\public\index.php(104): {closure}(2, 'require(C:\\xamp...', 'C:\\xampp\\htdocs...', 104)
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(104): require()
+#2 {main}
+
+[2025-09-29 10:17:54] [2025-09-29 10:17:54] Uncaught: require(C:\xampp\htdocs\Hieribal2\public/../vendor/autoload.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\Hieribal2\public\index.php:104
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\public\index.php(104): {closure}(2, 'require(C:\\xamp...', 'C:\\xampp\\htdocs...', 104)
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(104): require()
+#2 {main}
+
+[2025-09-29 10:24:56] [2025-09-29 10:24:56] Uncaught: require(C:\xampp\htdocs\Hieribal2\public/../vendor/autoload.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\Hieribal2\public\index.php:104
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\public\index.php(104): {closure}(2, 'require(C:\\xamp...', 'C:\\xampp\\htdocs...', 104)
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(104): require()
+#2 {main}
+
+[2025-09-29 10:24:59] [2025-09-29 10:24:59] Uncaught: require(C:\xampp\htdocs\Hieribal2\public/../vendor/autoload.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\Hieribal2\public\index.php:104
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\public\index.php(104): {closure}(2, 'require(C:\\xamp...', 'C:\\xampp\\htdocs...', 104)
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(104): require()
+#2 {main}
+
+[2025-09-29 10:25:00] [2025-09-29 10:25:00] Uncaught: require(C:\xampp\htdocs\Hieribal2\public/../vendor/autoload.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\Hieribal2\public\index.php:104
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\public\index.php(104): {closure}(2, 'require(C:\\xamp...', 'C:\\xampp\\htdocs...', 104)
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(104): require()
+#2 {main}
+
+[2025-09-29 11:28:19] [2025-09-29 11:28:19] Uncaught: Class "controllers\controllers" not found in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php:9
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\vendor\composer\ClassLoader.php(576): include()
+#1 C:\xampp\htdocs\Hieribal2\vendor\composer\ClassLoader.php(427): Composer\Autoload\{closure}('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\Hieribal2\public\index.php(191): Composer\Autoload\ClassLoader->loadClass('Controllers\\Adm...')
+#3 {main}
+
+[2025-09-29 11:28:32] [2025-09-29 11:28:32] Uncaught: Class "controllers\controllers" not found in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php:9
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\vendor\composer\ClassLoader.php(576): include()
+#1 C:\xampp\htdocs\Hieribal2\vendor\composer\ClassLoader.php(427): Composer\Autoload\{closure}('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\Hieribal2\public\index.php(191): Composer\Autoload\ClassLoader->loadClass('Controllers\\Adm...')
+#3 {main}
+
+[2025-09-29 11:36:02] [2025-09-29 11:36:02] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 11:37:58] [2025-09-29 11:37:58] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 11:40:28] [2025-09-29 11:40:28] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 11:46:18] [2025-09-29 11:46:18] Uncaught: syntax error, unexpected token "<", expecting end of file in C:\xampp\htdocs\Hieribal2\views\admin\dashboard.php:5
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php(48): Core\Controller->render('admin/dashboard', Array)
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(166): Controllers\AdminDashboardController->index()
+#2 {main}
+
+[2025-09-29 11:51:12] [2025-09-29 11:51:12] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 11:52:49] [2025-09-29 11:52:49] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 11:53:34] [2025-09-29 11:53:34] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 11:54:43] [2025-09-29 11:54:43] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 11:58:12] [2025-09-29 11:58:12] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 11:58:37] [2025-09-29 11:58:37] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 11:58:42] [2025-09-29 11:58:42] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:00:46] [2025-09-29 12:00:46] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:02:02] [2025-09-29 12:02:02] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:08:50] [2025-09-29 12:08:50] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:12:34] [2025-09-29 12:12:34] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:25:37] [2025-09-29 12:25:37] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:25:41] [2025-09-29 12:25:41] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:29:16] [2025-09-29 12:29:16] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:31:54] [2025-09-29 12:31:54] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:32:01] [2025-09-29 12:32:01] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:40:58] [2025-09-29 12:40:58] Uncaught: Models\Usuario::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php on line 28 in C:\xampp\htdocs\Hieribal2\models\Usuario.php:14
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php(28): Models\Usuario->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(134): Controllers\AdminDashboardController->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:49:12] [2025-09-29 12:49:12] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php on line 33 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php(33): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(134): Controllers\AdminDashboardController->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:49:13] [2025-09-29 12:49:13] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php on line 33 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php(33): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(134): Controllers\AdminDashboardController->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:49:14] [2025-09-29 12:49:14] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php on line 33 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php(33): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(134): Controllers\AdminDashboardController->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:49:51] [2025-09-29 12:49:51] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php on line 33 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php(33): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(134): Controllers\AdminDashboardController->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:49:52] [2025-09-29 12:49:52] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php on line 33 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php(33): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(134): Controllers\AdminDashboardController->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:49:52] [2025-09-29 12:49:52] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php on line 33 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php(33): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(134): Controllers\AdminDashboardController->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:49:55] [2025-09-29 12:49:55] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php on line 33 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php(33): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(134): Controllers\AdminDashboardController->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:50:27] [2025-09-29 12:50:27] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php on line 33 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php(33): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(134): Controllers\AdminDashboardController->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:50:27] [2025-09-29 12:50:27] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php on line 33 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php(33): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(134): Controllers\AdminDashboardController->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:50:27] [2025-09-29 12:50:27] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php on line 33 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php(33): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(134): Controllers\AdminDashboardController->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:50:28] [2025-09-29 12:50:28] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php on line 33 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php(33): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(134): Controllers\AdminDashboardController->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:50:28] [2025-09-29 12:50:28] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php on line 33 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminDashboardController.php(33): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(134): Controllers\AdminDashboardController->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:51:36] [2025-09-29 12:51:36] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:53:02] [2025-09-29 12:53:02] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 12:59:53] [2025-09-29 12:59:53] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 13:48:17] [2025-09-29 13:48:17] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 13:49:16] [2025-09-29 13:49:16] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 14:06:20] [2025-09-29 14:06:20] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 14:06:36] [2025-09-29 14:06:36] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 14:23:16] [2025-09-29 14:23:16] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 14:23:28] [2025-09-29 14:23:28] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 14:27:15] [2025-09-29 14:27:15] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 14:43:05] [2025-09-29 14:43:05] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 14:47:11] [2025-09-29 14:47:11] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 14:49:57] [2025-09-29 14:49:57] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 14:51:56] [2025-09-29 14:51:56] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 14:59:35] [2025-09-29 14:59:35] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 15:03:54] [2025-09-29 15:03:54] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 15:06:55] [2025-09-29 15:06:55] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 15:08:49] [2025-09-29 15:08:49] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 15:09:26] [2025-09-29 15:09:26] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 15:09:59] [2025-09-29 15:09:59] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 15:16:07] [2025-09-29 15:16:07] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 15:29:00] [2025-09-29 15:29:00] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 15:30:12] [2025-09-29 15:30:12] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 15:45:08] [2025-09-29 15:45:08] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 15:46:21] [2025-09-29 15:46:21] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 15:47:52] [2025-09-29 15:47:52] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 15:48:36] [2025-09-29 15:48:36] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
+[2025-09-29 15:49:10] [2025-09-29 15:49:10] Uncaught: Models\Producto::__construct(): Argument #1 ($config) must be of type array, PDO given, called in C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php on line 22 in C:\xampp\htdocs\Hieribal2\models\Producto.php:10
+Trace:
+#0 C:\xampp\htdocs\Hieribal2\controllers\AdminProducto.php(22): Models\Producto->__construct(Object(PDO))
+#1 C:\xampp\htdocs\Hieribal2\public\index.php(191): Controllers\AdminProducto->__construct(Array)
+#2 {main}
+
