@@ -1,47 +1,44 @@
-</main>
-</div>
+<?php
+/* views/admin/_shell_end.php */
+$extra_js       = $extra_js ?? [];
+$carga_chartjs  = $carga_chartjs ?? false;
+$base           = $this->config['app']['base_url'] ?? '';
+?>
+  </main>
+</div><!-- /.admin-wrap -->
+
+<!-- JS comunes -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+<script src="<?= $base ?>/assets/js/app.js" defer></script>
+
+<?php if ($carga_chartjs): ?>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+<?php endif; ?>
+
+<?php foreach ($extra_js as $src): ?>
+  <script src="<?= htmlspecialchars($src) ?>" defer></script>
+<?php endforeach; ?>
+
+<!-- Sidebar toggle (persistente) -->
 <script>
-window.bootstrap = window.bootstrap || {};
-if (!window.bootstrap.Modal) {
-  class VanillaModal {
-    constructor(el, opts={}) {
-      this.el = el;
-      this.opts = {backdrop:true, keyboard:true, ...opts};
-      this._esc = this._esc.bind(this);
-      this.el.addEventListener('click', (e)=>{
-        if (e.target.matches('[data-bs-dismiss="modal"], .btn-close')) this.hide();
-      });
-    }
-    _makeBackdrop(){
-      if (!this.opts.backdrop) return null;
-      const bd = document.createElement('div');
-      bd.className = 'modal-backdrop';
-      document.body.appendChild(bd);
-      if (this.opts.backdrop === true) {
-        bd.addEventListener('click', ()=> this.hide());
-      }
-      return bd;
-    }
-    show(){
-      if (this._shown) return;
-      this._shown = true;
-      this._bd = this._makeBackdrop();
-      document.body.style.overflow = 'hidden';
-      this.el.classList.add('show');
-      this.el.style.display = 'block';
-      if (this.opts.keyboard) document.addEventListener('keydown', this._esc);
-    }
-    hide(){
-      if (!this._shown) return;
-      this._shown = false;
-      this.el.classList.remove('show');
-      this.el.style.display = 'none';
-      if (this._bd) this._bd.remove();
-      document.body.style.overflow = '';
-      document.removeEventListener('keydown', this._esc);
-    }
-    _esc(e){ if (e.key === 'Escape') this.hide(); }
-  }
-  window.bootstrap.Modal = VanillaModal;
-}
+document.addEventListener('DOMContentLoaded', () => {
+  const wrap     = document.querySelector('.admin-wrap');
+  const sidebar  = document.getElementById('adminSidebar');
+  const toggle   = document.querySelector('[data-collapse]');
+  const KEY      = 'admin_sidebar_collapsed';
+
+  const apply = (v) => wrap.classList.toggle('is-collapsed', !!v);
+
+  // Restaurar estado
+  apply(localStorage.getItem(KEY) === '1');
+
+  toggle?.addEventListener('click', () => {
+    const now = !wrap.classList.contains('is-collapsed');
+    localStorage.setItem(KEY, now ? '1' : '0');
+    apply(now);
+  });
+});
 </script>
+
+</body>
+</html>
