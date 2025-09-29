@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 29-08-2025 a las 22:53:54
+-- Tiempo de generación: 13-09-2025 a las 02:41:56
 -- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.2.12
+-- Versión de PHP: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -72,7 +72,9 @@ CREATE TABLE `clientes` (
 --
 
 INSERT INTO `clientes` (`id_cliente`, `cedula`, `nombres`, `apellidos`, `telefono`, `correo`, `contraseña`, `fecha_registro`, `verificado`, `token_verificacion`, `token_recuperacion`, `recuperacion_expira`) VALUES
-(1, NULL, 'María Pérez', '', NULL, '', '', '2025-08-28 09:25:01', 0, NULL, NULL, NULL);
+(1, NULL, 'María Pérez', '', NULL, '', '', '2025-08-28 09:25:01', 0, NULL, NULL, NULL),
+(27, NULL, 'gustavo cuevas', '', '', 'gustavoalexiscuevas@gmail.com', '$2y$10$NbxIi/Xm1aEQFdHCjgfWFODabA7zTSNh5htmy1YUZeJvNpT5yELTK', '2025-08-29 20:13:32', 1, NULL, NULL, NULL),
+(28, '1000078934', 'Gustavo', 'Cuevas', '3215489656', 'michel18lugo@gmail.com', '$2y$10$yGKdO161glHtDp4tx8QbT.Y/wS5ASD6mFvCvhG.tN7zB37pyJzYwy', '2025-08-29 20:15:07', 0, '7020570bec6d2a484ed48dcb1ff82bbb78dddfb7a9aba07ec22d17fcfeb66a42', '3af886de405f33ea9683ce7bedb728cfd381163ed0fc484d04b6e820ccbc280c', '2025-08-30 04:16:19');
 
 -- --------------------------------------------------------
 
@@ -213,8 +215,8 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id_usuario`, `usuario`, `password`, `rol`, `nombres`, `apellidos`, `correo`, `correo_verificado`, `correo_verificacion_token`, `correo_verificacion_expira`, `fecha_creacion`, `estado`, `token_recuperacion`) VALUES
-(10, 'admin2', '$2y$10$LvpQy0.ZqiOtntxjhFJL9u2bKMvixaoszhKn8frc2/ODEF5po9EKy', 'Admin', 'gustavo', 'cuevas', 'gustavoalexiscuevas@gmail.com', 1, NULL, NULL, '2024-07-16 10:42:01', 'Activo', NULL),
-(22, 'admin', '$2y$10$E1z8SbfDBxWp5GsZ0zhAaOh6HzahiaIsZd/MNVEcsZGzsu.Fsf.FC', 'Cajero', 'gustavo', 'cuevas', 'usty49@gmail.com', 0, 'e2ca375f3a6da07af3725cb6287292c0', '2025-08-30 19:57:30', '2025-08-29 12:57:30', 'Activo', NULL);
+(10, 'admin2', '$2y$10$EChSgTaUdTfPJHSrsshjaulvQZxW5c9GAwzOk.9pA/Pa2WFLq2eUK', 'Admin', 'Gustavo Alexis', 'Cuevas Morales', 'gustavoalexiscuevass@gmail.com', 1, NULL, NULL, '2024-07-16 10:42:01', 'Inactivo', NULL),
+(28, 'Admin3', '$2y$10$9twPnU0s1ZghqZ886SbcS.qka16P/i24YlCzLULJPrF.gRNLyqLZG', 'Admin', 'Gustavo', 'Cuevas', 'gustavoalexiscuevas@gmail.com', 0, 'bc2aefd656e8bb360626af4e66b7fcc7', '2025-08-31 03:21:24', '2025-08-29 20:21:24', 'Activo', NULL);
 
 -- --------------------------------------------------------
 
@@ -252,8 +254,8 @@ ALTER TABLE `carrito`
 --
 ALTER TABLE `clientes`
   ADD PRIMARY KEY (`id_cliente`),
-  ADD UNIQUE KEY `cedula` (`cedula`),
-  ADD UNIQUE KEY `correo` (`correo`);
+  ADD UNIQUE KEY `correo` (`correo`),
+  ADD UNIQUE KEY `cedula` (`cedula`);
 
 --
 -- Indices de la tabla `historial_pedido`
@@ -312,7 +314,7 @@ ALTER TABLE `carrito`
 -- AUTO_INCREMENT de la tabla `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT de la tabla `historial_pedido`
@@ -342,7 +344,7 @@ ALTER TABLE `proveedores`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT de la tabla `ventas`

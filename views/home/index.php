@@ -24,24 +24,24 @@
     </div>
 
     <div class="imagenes-bienvenida">
-      <div class="img-card grande"><img src="<?= $base ?>/assets/img/ia1.jpg" alt="Persona 1"></div>
-      <div class="img-card"><img src="<?= $base ?>/assets/img/ia2.jpg" alt="Persona 2"></div>
-      <div class="img-card"><img src="<?= $base ?>/assets/img/ia3.jpg" alt="Persona 3"></div>
-      <div class="img-card grande"><img src="<?= $base ?>/assets/img/persona4.jpg" alt="Persona 4"></div>
+      <div class="img-card grande"><img src="<?= $base ?>.../assets/img/IA 1.jpg" alt="Persona 1"></div>
+      <div class="img-card"><img src="<?= $base ?>.../assets/img/IA 3.jpg" alt="Persona 2"></div>
+      <div class= <img src="<?= $base ?>/assets/img/IA3.jpg" alt="Persona 3">
+      <div class=<img src="<?= $base ?>.../assets/img/IA 4.jpg" alt="Persona 4" alt="Persona 4"></div>
     </div>
   </section>
-  <section class="image-section">
-  <video autoplay loop playsinline controls class="video-pequeno">
-    <source src="<?= $base ?>/assets/video/Hieribal.mp4" type="video/mp4">
-    Tu navegador no soporta videos en HTML5.
-  </video>
-</section>
-
-
-</main>
 
   <!-- QUIÉNES SOMOS -->
   <main id="quienes-somos" class="main-content">
+    <!-- VIDEO -->
+    <div class="image-section">
+      <video autoplay loop playsinline controls class="video-pequeno">
+        <source src="<?= $base ?>/assets/video/Hieribal.mp4" type="video/mp4">
+        Tu navegador no soporta videos en HTML5.
+      </video>
+    </div>
+
+    <!-- TEXTO -->
     <section class="text-section">
       <h1>¿Quiénes somos?</h1>
       <p>
@@ -50,12 +50,13 @@
         En nuestra tienda, encontrarás más que simples productos; encontrarás un compromiso con tu bienestar integral.
       </p>
       <div class="text-section-buttons">
-        <a href="https://wa.me/573212322978?text=Hola%2C%20me%20gustaría%20más%20información%20sobre%20sus%20productos" class="btn btn-contactanos">Contáctanos</a>
-        <button class="btn btn-mas-nosotros" onclick="document.getElementById('nosotros').scrollIntoView({ behavior: 'smooth' })">Más sobre nosotros</button>
+        <a href="https://wa.me/573212322978?text=Hola%2C%20me%20gustaría%20más%20información%20sobre%20sus%20productos"
+          class="btn btn-contactanos">Contáctanos</a>
+        <button class="btn btn-mas-nosotros"
+                onclick="document.getElementById('nosotros').scrollIntoView({ behavior: 'smooth' })">
+          Más sobre nosotros
+        </button>
       </div>
-    </section>
-    <section class="image-section">
-      <img src="<?= $base ?>/assets/img/nature.jpg" alt="Nature background" />
     </section>
   </main>
 
