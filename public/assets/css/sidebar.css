@@ -52,3 +52,24 @@
 
 /* Contenido */
 .content{ min-width: 0; }
+
+/* Botón arriba a la derecha (ajústalo a tu gusto) */
+.toggle-btn{
+  position: fixed; /* o dentro del header si prefieres */
+  top: 10px; right: 16px;
+  z-index: 1100;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px;
+  border: 1px solid var(--border, #e5e7eb);
+  background: var(--card, #fff);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  cursor: pointer;
+}
+
+/* Colapso solo con CSS (checkbox hack) */
+.sidebar{ width: 220px; transition: width .3s ease; overflow: hidden; }
+#toggleSidebar:checked ~ .sidebar{ width: 64px; }
+#toggleSidebar:checked ~ .sidebar .label{ display: none; }
+#toggleSidebar:checked ~ .sidebar .menu a{ justify-content: center; } /* centra iconos */
+

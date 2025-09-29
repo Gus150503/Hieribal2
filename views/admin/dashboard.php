@@ -22,16 +22,6 @@ $normFoto = function(array $row): string {
   <main class="p-4">
     <div class="dash-container"><!-- ancho máx y centrado -->
 
-      <!-- Barra móvil -->
-      <div class="mobile-bar">
-        <button id="sidebarToggle"
-                class="menu-toggle"
-                aria-label="Abrir menú"
-                aria-controls="adminSidebar"
-                aria-expanded="false"></button>
-  
-      </div>
-
       <!-- Cabecera -->
       <header class="page-head">
         <h1 class="dash-title">
