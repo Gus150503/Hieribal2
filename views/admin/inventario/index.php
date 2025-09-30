@@ -149,6 +149,23 @@
 
 <!-- Bootstrap Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+  /* Encabezado verde para la tabla de Inventario */
+  #tblInventario thead.table-light{
+    /* pisa a Bootstrap */
+    --bs-table-bg: var(--brand, #198754);
+    --bs-table-color: #fff;
+    --bs-table-border-color: rgba(255,255,255,.25);
+
+    background: var(--brand, #198754) !important;
+    color: #fff !important;
+    background-image: none !important;
+  }
+  #tblInventario thead.table-light th{
+    color: #fff !important;
+  }
+</style>
+
 
 <script>
   // Conectar botón con modal
