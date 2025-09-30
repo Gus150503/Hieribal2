@@ -4,6 +4,17 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
+<style>#tblProducto thead.table-light {
+  --bs-table-bg: #0d6efd; /* azul Bootstrap por defecto */
+  --bs-table-color: #fff;
+  --bs-table-border-color: rgba(255,255,255,.25);
+  background: #0d6efd !important;
+  color: #fff !important;
+  background-image: none !important;
+}
+#tblProducto thead.table-light th { color: #fff !important; }
+</style>
+
 <section class="card shadow-sm ui-pro border-0 rounded-4">
   <div class="card-body">
     <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
@@ -135,6 +146,8 @@
     </div>
   </div>
 </div>
+
+
 
 <script>
   document.getElementById('btnNuevoProducto').addEventListener('click', () => {
