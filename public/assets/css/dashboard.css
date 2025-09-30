@@ -52,9 +52,8 @@ body {
 /* ------- Sidebar (compacta, logo pequeño) ------- */
 .sidebar{
   width: 220px;
-  background: var(--card);
+  background: #6FBC43;
   border: 1px solid var(--border);
-  border-radius: 10px;
   padding: 10px;
   position: sticky; top: 16px; align-self: start;
   box-shadow: 0 1px 2px rgba(16,24,40,.04);
@@ -72,11 +71,11 @@ body {
   display:flex; align-items:center; gap:8px;
   padding:8px 10px;
   border-radius:8px; text-decoration:none;
-  color:#111827; font-size: var(--fs-14);
+  color:#ffffff; font-size: var(--fs-14);
   border:1px solid transparent; transition:.15s;
 }
-.sidebar .menu a:hover{background: var(--ring)}
-.sidebar .menu li.active a{background: var(--ring); font-weight: 600}
+.sidebar .menu a:hover{background: #F6A30D}
+.sidebar .menu li.active a{background:#F6A30D; font-weight: 600}
 
 /* Overlay móvil */
 .sidebar-backdrop{display:none}
@@ -146,10 +145,10 @@ body {
 }
 .kpi-name{ font-weight: 1000; opacity: .95; margin-bottom: 6px; font-size: var(--fs-12) }
 .kpi-num{ font-size: var(--fs-22); font-weight: 700; line-height: 1 }  /* 🔽 tamaño */
-.kpi-red{    background:#e05252 }
-.kpi-amber{  background:#f0ad4e }
-.kpi-green{  background:#47b881 }
-.kpi-cyan{   background:#5bc0de }
+.kpi-red{    background:#6FBC43 }
+.kpi-amber{  background:#8B572A }
+.kpi-green{  background:#F6A30D }
+.kpi-cyan{   background:#97E6B8 }
 
 /* ------- Panels / Héroes ------- */
 .panel{
@@ -167,8 +166,8 @@ body {
   letter-spacing:.2px;
 }
 
-.hero{ background: linear-gradient(180deg, #0f172a, #1f2937); color: #fff; }
-.hero-red{ background: linear-gradient(180deg,#b51f2a,#8f1c25); color: #fff; }
+.hero{ background: linear-gradient(180deg, #f0ad4e, #F6A30D); color: #fff; }
+.hero-red{ background: linear-gradient(180deg,#6FBC43,#6FBC43); color: #fff; }
 .hero-title{ margin: 0 0 8px; font-size: var(--fs-14); font-weight: 700; letter-spacing:.2px }
 
 /* Slider (una tarjeta visible) */
