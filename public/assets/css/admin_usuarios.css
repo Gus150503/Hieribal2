@@ -190,3 +190,20 @@ img{max-width:100%; display:block}
 @keyframes flashDanger{
   0%{ background: #fdeaea; } 100%{ background: transparent; }
 }
+
+/* Encabezado verde (usa tu --brand) */
+.table thead.table-light{
+  /* Sobrescribe variables de Bootstrap para esa cabecera */
+  --bs-table-bg: var(--brand);
+  --bs-table-color: #fff;
+  --bs-table-border-color: rgba(255,255,255,.25);
+
+  background: var(--brand);      /* por si acaso */
+  color: #fff;
+  background-image: none;        /* evita degradados previos */
+}
+
+.table thead.table-light th{
+  color: var(--bs-table-color);  /* asegura texto blanco */
+}
+
