@@ -58,7 +58,25 @@
         <tbody></tbody>
       </table>
     </div>
+    <div class="d-flex align-items-center justify-content-between mt-3">
+        <div class="d-flex align-items-center gap-2">
+          <label class="text-muted small me-1">Mostrar</label>
+          <select id="perPage" class="form-select form-select-sm" style="width:80px">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+          <span id="totalProducto" class="text-muted small ms-2"></span>
+        </div>
+        <nav aria-label="Paginación">
+          <ul id="paginador" class="pagination pagination-sm mb-0"></ul>
+        </nav>
+      </div>
+    </div>
   </div>
+  </div>
+      
 </section>
 
 <!-- Modal Producto -->
