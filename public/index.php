@@ -6,6 +6,9 @@ use Controllers\HomeController;
 use Controllers\AdminAuthController;
 use Controllers\AdminDashboardController;
 use Controllers\AdminUsuariosController;
+use Controllers\AdminInventario;   // módulos de tu compañera
+use Controllers\AdminProducto;     // (ojo: singular)
+use Controllers\AdminProveedores;
 
 // =============================
 //  ENTORNO Y AUTOLOAD
@@ -98,7 +101,14 @@ register_shutdown_function(function () {
         : "Ha ocurrido un error inesperado. Intenta más tarde.";
 });
 
-require __DIR__ . '/../vendor/autoload.php';
+// Autoload (Composer)
+$autoload = __DIR__ . '/../vendor/autoload.php';
+if (!is_file($autoload)) {
+    http_response_code(500);
+    echo "<pre>Falta vendor/autoload.php. Ejecuta: composer install</pre>";
+    exit;
+}
+require $autoload;
 
 // =============================
 //  CONFIGURACIÓN
@@ -112,12 +122,11 @@ if (is_file($appCfg)) {
     $config = require $envCfg;
 } else {
     http_response_code(500);
-    // Cae en el exception handler si hay problemas arriba
     throw new RuntimeException('No se encontró config/app.php ni config/env.php');
 }
 
 // =============================
-//  CONTROLADORES
+//  CONTROLADORES PRINCIPALES
 // =============================
 $auth   = new AuthController($config);
 $home   = new HomeController($config);
@@ -150,28 +159,41 @@ switch ($r) {
     case 'google_callback':  $auth->googleCallback();break;
     case 'verify':           $auth->verify();        break;
 
-    /* ====== Admin ====== */
+    /* ====== Admin (auth + dashboard) ====== */
     case 'admin_login':         $adminA->loginForm();     break;
     case 'admin_do_login':      $adminA->login();         break;
     case 'admin_logout':        $adminA->logout();        break;
     case 'admin_dashboard':     $adminD->index();         break;
-    case 'admin_inventario':    $adminD->inventario();    break;
-    case 'admin_productos':     $adminD->productos();     break;
     case 'admin_configuracion': $adminD->configuracion(); break;
 
     /* ====== Módulo Usuarios (Admin) ====== */
-    case 'admin_usuarios':                (new AdminUsuariosController($config))->index();             break;
-    case 'admin_usuarios_api':            (new AdminUsuariosController($config))->api();               break;
-    case 'admin_usuarios_verify_email':   (new AdminUsuariosController($config))->verifyEmail();       break;
-    case 'admin_usuarios_resend_verif':   (new AdminUsuariosController($config))->resendVerification();break;
-    case 'admin_config_api':
-    require __DIR__ . '/api/config_api.php';
-    break;
+    case 'admin_usuarios':                (new AdminUsuariosController($config))->index();               break;
+    case 'admin_usuarios_api':            (new AdminUsuariosController($config))->api();                 break;
+    case 'admin_usuarios_verify_email':   (new AdminUsuariosController($config))->verifyEmail();         break;
+    case 'admin_usuarios_resend_verif':   (new AdminUsuariosController($config))->resendVerification();  break;
 
-    /* (Compat) ruta vieja -> nueva */
+    /* ====== API config admin ====== */
+    case 'admin_config_api':
+        require __DIR__ . '/api/config_api.php';
+        break;
+
+    /* ====== (Compat) ruta vieja -> nueva ====== */
     case 'usuarioadmin':
         header('Location: ' . (($config['app']['base_url'] ?? '') . '/?r=admin_usuarios'), true, 302);
         exit;
+
+    /* ====== Módulos de Inventario/Productos/Proveedores ====== */
+    case 'admin_inventario':
+        (new AdminInventario($config))->index();
+        break;
+
+    case 'admin_productos':
+        (new AdminProducto($config))->index();  // OJO: clase singular
+        break;
+
+    case 'admin_proveedores':
+        (new AdminProveedores($config))->index();
+        break;
 
     /* ====== 404 ====== */
     default:

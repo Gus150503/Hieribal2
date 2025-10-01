@@ -1,199 +1,161 @@
 <?php $partial = !empty($_GET['partial']); ?>
 <?php if (!$partial) include __DIR__ . '/../_shell_start.php'; ?>
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
-
+<style>#tblProducto thead.table-light {
+  --bs-table-bg: #0d6efd; /* azul Bootstrap por defecto */
+  --bs-table-color: #fff;
+  --bs-table-border-color: rgba(255,255,255,.25);
+  background: #0d6efd !important;
+  color: #fff !important;
+  background-image: none !important;
+}
+#tblProducto thead.table-light th { color: #fff !important; }
+</style>
 
 <section class="card shadow-sm ui-pro border-0 rounded-4">
   <div class="card-body">
     <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
       <div class="d-flex align-items-center gap-2">
-        <i class="bi bi-people-fill fs-4 text-success"></i>
+        <i class="bi bi-basket fs-4 text-primary"></i>
         <h1 class="h4 m-0">Productos</h1>
-
       </div>
-      <button id="btnNuevo" class="btn btn-success">
+      <button id="btnNuevoProducto" type="button" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i> Nuevo
       </button>
     </div>
 
-    <?php if (session_status() !== PHP_SESSION_ACTIVE) session_start(); ?>
-    <?php if (!empty($_SESSION['flash'])):
-      $f = $_SESSION['flash']; unset($_SESSION['flash']); ?>
-      <div class="alert alert-<?= htmlspecialchars($f['type'] ?? 'info') ?> alert-dismissible fade show" role="alert">
-        <?= htmlspecialchars($f['msg'] ?? '') ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    <?php endif; ?>
-
     <div class="input-group mb-3" style="max-width:520px;">
       <span class="input-group-text"><i class="bi bi-search"></i></span>
-      <input id="q" type="search" class="form-control" placeholder="Buscar por nombre, usuario o correo…">
-      <button id="btnBuscar" class="btn btn-outline-success">Buscar</button>
+      <input id="qProducto" type="search" class="form-control" placeholder="Buscar por nombre, marca o categoría…">
+      <button id="btnBuscarProducto" class="btn btn-outline-primary">Buscar</button>
     </div>
 
     <div class="table-responsive">
-      <table id="tblUsuarios" class="table table-sm align-middle table-hover">
+      <table id="tblProducto" class="table table-sm align-middle table-hover">
         <thead class="table-light position-sticky" style="top:0; z-index:1;">
           <tr>
             <th>ID</th>
             <th>Nombre</th>
-            <th>Categoria</th>
+            <th>Categoría</th>
             <th>Marca</th>
-            <th>Presentacion</th>
+            <th>Presentación</th>
             <th>Unidad</th>
-            <th>Descripcion</th>
+            <th>Descripción</th>
             <th>Lote</th>
-            <th>Fecha Vencimiento</th>
+            <th>F. Vencimiento</th>
             <th>Precio Compra</th>
             <th>Precio Venta</th>
-            <th>Iva</th>
-            <th>Codigo Barras</th>
-            <th>Ubicacion</th>
-            <th>Imagen</th>
-            <th>Creado</th>
+            <th>IVA</th>
+            <th>SKU</th>
+            <th>Ubicación</th>
+            <th>Estado</th>
             <th class="text-end">Acciones</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
-
-      <div class="d-flex align-items-center justify-content-between mt-3">
-        <div class="d-flex align-items-center gap-2">
-          <label class="text-muted small me-1">Mostrar</label>
-          <select id="perPage" class="form-select form-select-sm" style="width:80px">
-            <option value="5">5</option>
-            <option value="10" selected>10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-          </select>
-          <span id="totalUsuarios" class="text-muted small ms-2"></span>
-        </div>
-        <nav aria-label="Paginación">
-          <ul id="paginador" class="pagination pagination-sm mb-0"></ul>
-        </nav>
-      </div>
     </div>
   </div>
 </section>
 
-<!-- Modal Bootstrap -->
-<div class="modal fade" id="modalUsuario" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content border-0 rounded-4 shadow">
-      <div class="modal-header border-0 pb-0">
-        <h5 class="modal-title fw-semibold" id="modalTitle">Nuevo Producto</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+<!-- Modal Producto -->
+<div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nuevo Producto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
+      <div class="modal-body">
+        <form id="frmProducto" class="needs-validation" novalidate>
+          <input type="hidden" name="id" id="idProducto">
 
-      <form id="frmUsuario" class="needs-validation" novalidate>
-        <div class="modal-body pt-3">
-          <input type="hidden" name="id_usuario" id="id_usuario">
           <div class="row g-3">
-            <div class="col-md-4">
-              <label class="form-label">Usuario</label>
-              <input
-                class="form-control"
-                name="usuario"
-                id="usuario"
-                required
-                minlength="3"
-                maxlength="30"
-                pattern="[A-Za-z0-9._-]{3,30}"
-                title="De 3 a 30 caracteres: letras, números, punto, guión y guión bajo."
-                autocomplete="username"
-              >
-              <div class="invalid-feedback">Usuario inválido (3–30, letras/números . _ -).</div>
+            <div class="col-md-6">
+              <label class="form-label">Nombre</label>
+              <input type="text" class="form-control" name="nombre" id="nombre" required>
             </div>
-
-            <div class="col-md-4">
-              <label class="form-label">Rol</label>
-              <select class="form-select" name="rol" id="rol" required>
-                <option value="empleado">Empleado</option>
-                <option value="admin">Admin</option>
-                <option value="cajero">Cajero</option>
-              </select>
-              <div class="invalid-feedback">Selecciona un rol.</div>
+            <div class="col-md-6">
+              <label class="form-label">Categoría</label>
+              <input type="text" class="form-control" name="categoria" id="categoria" required>
             </div>
-
-            <div class="col-md-4">
+            <div class="col-md-6">
+              <label class="form-label">Marca</label>
+              <input type="text" class="form-control" name="marca" id="marca">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Presentación</label>
+              <input type="text" class="form-control" name="presentacion" id="presentacion">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Unidad</label>
+              <input type="text" class="form-control" name="unidad" id="unidad">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Descripción</label>
+              <textarea class="form-control" name="descripcion" id="descripcion"></textarea>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Lote</label>
+              <input type="text" class="form-control" name="lote" id="lote">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">F. Vencimiento</label>
+              <input type="date" class="form-control" name="fvencimiento" id="fvencimiento">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Precio Compra</label>
+              <input type="number" class="form-control" name="precio_compra" id="precio_compra" min="0">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Precio Venta</label>
+              <input type="number" class="form-control" name="precio_venta" id="precio_venta" min="0">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">IVA</label>
+              <input type="number" class="form-control" name="iva" id="iva" min="0" max="100">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Código SKU</label>
+              <input type="text" class="form-control" name="codigo_sku" id="codigo_sku">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Ubicación</label>
+              <input type="text" class="form-control" name="ubicacion" id="ubicacion">
+            </div>
+            <div class="col-md-6">
               <label class="form-label">Estado</label>
-              <select class="form-select" name="estado" id="estado" required>
+              <select class="form-select" name="estado" id="estado">
                 <option value="activo">Activo</option>
                 <option value="inactivo">Inactivo</option>
               </select>
-              <div class="invalid-feedback">Selecciona un estado.</div>
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label">Nombres</label>
-              <input
-                class="form-control"
-                name="nombres"
-                id="nombres"
-                required
-                pattern="[A-Za-zÁÉÍÓÚÑáéíóúñ ]{2,60}"
-                title="Sólo letras y espacios (2–60)."
-                autocomplete="given-name"
-              >
-              <div class="invalid-feedback">Sólo letras y espacios (2–60).</div>
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label">Apellidos</label>
-              <input
-                class="form-control"
-                name="apellidos"
-                id="apellidos"
-                required
-                pattern="[A-Za-zÁÉÍÓÚÑáéíóúñ ]{2,60}"
-                title="Sólo letras y espacios (2–60)."
-                autocomplete="family-name"
-              >
-              <div class="invalid-feedback">Sólo letras y espacios (2–60).</div>
-            </div>
-
-            <div class="col-md-8">
-              <label class="form-label">Correo</label>
-              <input
-                class="form-control"
-                type="email"
-                name="correo"
-                id="correo"
-                required
-                inputmode="email"
-                autocomplete="email"
-              >
-              <div class="invalid-feedback">Correo inválido.</div>
-            </div>
-
-            <div class="col-md-4">
-              <label class="form-label">
-                Password
-                <small class="text-muted">(mín. 8; vacío no cambia)</small>
-              </label>
-              <input
-                class="form-control"
-                type="password"
-                name="password"
-                id="password"
-                minlength="8"
-                autocomplete="new-password"
-              >
-              <div class="invalid-feedback">La contraseña debe tener al menos 8 caracteres.</div>
             </div>
           </div>
-        </div>
 
-        <div class="modal-footer border-0 pt-0">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-success">
-            <i class="bi bi-check2-circle me-1"></i> Guardar
-          </button>
-        </div>
-      </form>
+          <div class="modal-footer border-0 pt-3">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check2-circle me-1"></i> Guardar
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </div>
+
+
+
+<script>
+  document.getElementById('btnNuevoProducto').addEventListener('click', () => {
+    const modal = new bootstrap.Modal(document.getElementById('modalProducto'));
+    modal.show();
+  });
+  window.PRODUCTO_API = '/controllers/AdminProducto.php';
+</script>
+<script src="/public/assets/js/admin_producto.js?v=1"></script>
 
 <?php if (!$partial) include __DIR__ . '/../_shell_end.php'; ?>
