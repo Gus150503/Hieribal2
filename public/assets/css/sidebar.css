@@ -1,75 +1,99 @@
-/* ===== Sidebar común ===== */
-.admin-wrap{min-height:100dvh}
-.sidebar{
+/* ==== Sidebar ==== */
+.sidebar {
   width: 240px;
+  transition: width .3s ease;
   background: #6FBC43;
-  border-right: 1px solid #eaecef;
-  padding: 14px 12px;
-  position: sticky;
-  top: 0;
-  align-self: flex-start;
-  height: 100dvh;
-  overflow: auto;
+  min-height: 100vh;
+  border-right: 1px solid #e5e7eb;
 }
 
-/* Logo compacto y consistente */
-.sidebar .logo{
-  display:flex; align-items:center; gap:10px;
-  padding: 6px 8px 14px; margin-bottom: 6px;
-  border-bottom: 1px dashed #e9ecef;
-}
-.sidebar .logo img{
-  height: 28px; width: auto; display:block; /* <- forzar tamaño */
-}
-.sidebar .brand{font-weight:700; font-size:14px}
-
-/* Menú */
-.sidebar .menu{ list-style:none; margin:10px 0 0; padding:0; display:flex; flex-direction:column; gap:6px }
-.sidebar .menu a{
-  display:flex; align-items:center; gap:10px;
-  padding: 10px 12px; border-radius:10px; text-decoration:none;
-  color:#ffffff; border:1px solid transparent;
-}
-.sidebar .menu a:hover{ background:#F6A30D }
-.sidebar .menu li.active a{
-  background: #F6A30D;
-  border-color: #F6A30D;
-  font-weight:600;
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .75rem .85rem;
 }
 
-/* Botón colapsar */
-.collapse-btn{
-  display:inline-flex; align-items:center; justify-content:center;
-  width:32px; height:32px; border-radius:8px; border:1px solid #e5e7eb; background:#fff;
-  cursor:pointer; margin: 6px 0 10px;
+.sidebar-header .brand {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
 }
 
-/* Estado colapsado */
-.admin-wrap.is-collapsed .sidebar{ width: 76px }
-.admin-wrap.is-collapsed .sidebar .brand{ display:none }
-.admin-wrap.is-collapsed .sidebar .menu a span.text{ display:none }
-.admin-wrap.is-collapsed .sidebar .menu a{ justify-content:center }
+.sidebar-header img {
+  height: 158px;
+}
 
-/* Contenido */
-.content{ min-width: 0; }
+.menu {
+  list-style: none;
+  margin: 0;
+  padding: .5rem;
+}
 
-/* Botón arriba a la derecha (ajústalo a tu gusto) */
-.toggle-btn{
-  position: fixed; /* o dentro del header si prefieres */
-  top: 10px; right: 16px;
-  z-index: 1100;
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 36px; height: 36px;
-  border: 1px solid var(--border, #e5e7eb);
-  background: var(--card, #fff);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+.menu li {
+  margin: 2px 0;
+}
+
+.menu a {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .55rem .65rem;
+  border-radius: .6rem;
+  color: #111827;
+  text-decoration: none;
+}
+
+.menu a:hover {
+  background: #f3f4f6;
+}
+
+.menu .label {
+  transition: opacity .2s ease;
+}
+
+/* ==== Estado colapsado ==== */
+.sidebar-collapsed .sidebar {
+  width: 72px;
+}
+
+.sidebar-collapsed .menu .label {
+  display: none;
+}
+
+.sidebar-collapsed .sidebar-header .brand-text {
+  display: none;
+}
+
+.sidebar-collapsed .pin-btn i {
+  transform: rotate(180deg);
+}
+
+/* ==== Botón pin bonito ==== */
+.pin-btn {
+  position: absolute;       /* flotante dentro del sidebar */
+  top: 10px;                /* margen desde arriba */
+  left: 50%;                /* centrado horizontal */
+  transform: translateX(-50%);
+  
+  border: none;
+  background: #ffffff;
+  color: #6FBC43;
   cursor: pointer;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: all .3s ease;
+  z-index: 1000;            /* encima de todo */
 }
 
-/* Colapso solo con CSS (checkbox hack) */
-.sidebar{ width: 220px; transition: width .3s ease; overflow: hidden; }
-#toggleSidebar:checked ~ .sidebar{ width: 64px; }
-#toggleSidebar:checked ~ .sidebar .label{ display: none; }
-#toggleSidebar:checked ~ .sidebar .menu a{ justify-content: center; } /* centra iconos */
-
+.pin-btn:hover {
+  background: #6FBC43;
+  color: #fff;
+  transform: translateX(-50%) rotate(15deg); /* mantiene centrado con el giro */
+}
