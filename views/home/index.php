@@ -25,10 +25,8 @@
 
     <div class="imagenes-bienvenida">
       <div class="img-card grande"><img src="<?= $base ?>.../assets/img/IA 1.jpg" alt="Persona 1"></div>
+      <div class="img-card"><img src="<?= $base ?>.../assets/img/IA 2.jpg" alt="Persona 2"></div>
       <div class="img-card"><img src="<?= $base ?>.../assets/img/IA 3.jpg" alt="Persona 2"></div>
-      <div class= <img src="<?= $base ?>/assets/img/IA3.jpg" alt="Persona 3">
-      <div class=<img src="<?= $base ?>.../assets/img/IA 4.jpg" alt="Persona 4" alt="Persona 4"></div>
-    </div>
   </section>
 
   <!-- QUIÉNES SOMOS -->
