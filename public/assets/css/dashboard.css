@@ -1,390 +1,648 @@
-/* ===============================
-   Dashboard (compacto, fluido, sin solapes)
-   =============================== */
-
-/* ------- Tema + escala global ------- */
-/* Cambia --scale si lo quieres aún más compacto: 0.9, 0.85, etc. */
-:root{
-  --scale: 0.92;
-
-  --bg: #f4f6f9;
-  --card: #fff;
-  --border: #e5e7eb;
-  --muted: #6b7280;
-  --ring: rgba(25, 135, 84, .14);
-  --brand: #198754;
-
-  /* Tipografía base compacta */
-  --fs-12: calc(12px * var(--scale));
-  --fs-13: calc(13px * var(--scale));
-  --fs-14: calc(14px * var(--scale));
-  --fs-16: calc(16px * var(--scale));
-  --fs-18: calc(18px * var(--scale));
-  --fs-22: calc(22px * var(--scale));
-  --fs-24: calc(24px * var(--scale));
-  --fs-26: calc(26px * var(--scale));
+/* ================================
+   RESET Y VARIABLES
+================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-html, body {height: 100%}
+:root {
+  --verde-principal: #6FBC43;
+  --verde-hover: #5da636;
+  --naranja: #F6A30D;
+  --naranja-hover: #e09809;
+  --cafe: #8B572A;
+  --gris-claro: #f8f9fa;
+  --gris-medio: #e9ecef;
+  --texto: #2c3e50;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto; /* Asegurar scroll vertical */
+}
+
 body {
-  background: var(--bg);
-  font-size: var(--fs-14);
-  line-height: 1.35;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  color: var(--texto);
+  line-height: 1.6;
+  min-height: 100vh; /* Asegurar altura mínima */
 }
 
-/* Contenedor FLUIDO (aprovecha ancho real, sin “gran centrado”) */
-.dash-container{
-  width: 100%;
-  max-width: 1800px;          /* subí el límite para pantallas anchas */
-  margin: 0;                  /* nada de centrado forzado */
-  padding-inline: 16px;
+/* ================================
+   HEADER
+================================== */
+.header {
+  background: linear-gradient(135deg, var(--verde-principal) 0%, #5da636 100%);
+  padding: 20px 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-/* Header de la página */
-.page-head{margin: 8px 0 14px}
-.dash-title{
-  margin: 0 0 4px;
-  font-size: clamp(var(--fs-18), 1.8vw, var(--fs-22));
-  line-height: 1.2;
-}
-.dash-sub{margin:0; color: var(--muted); font-size: var(--fs-13)}
-
-/* ------- Sidebar (compacta, logo pequeño) ------- */
-.sidebar{
-  width: 220px;
-  background: #6FBC43;
-
-  padding: 10px;
-  position: sticky; top: 16px; align-self: start;
-  box-shadow: 0 1px 2px rgba(16,24,40,.04);
-}
-.sidebar .logo{
-  display:flex; align-items:center; gap:8px;
-  padding:6px 6px 10px; border-bottom:1px dashed var(--border); margin-bottom:10px
-}
-.sidebar .logo img{
-  height: 26px;               /* 🔽 logo reducido */
-  width:auto; max-width: 150px; object-fit: contain;
-}
-.sidebar .menu{list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:4px}
-.sidebar .menu a{
-  display:flex; align-items:center; gap:8px;
-  padding:8px 10px;
-  border-radius:8px; text-decoration:none;
-  color:#ffffff; font-size: var(--fs-14);
-  border:1px solid transparent; transition:.15s;
-}
-.sidebar .menu a:hover{background: #F6A30D}
-.sidebar .menu li.active a{background:#F6A30D; font-weight: 600}
-
-/* Overlay móvil */
-.sidebar-backdrop{display:none}
-@media (max-width: 1100px){
-  .sidebar{
-    position: fixed; inset:0 auto 0 0; height:100vh; z-index: 1000;
-    transform: translateX(-100%); transition: transform .25s ease; width: 240px;
-    border-radius: 0;
-  }
-  body.sidebar-open .sidebar{ transform: translateX(0) }
-  .sidebar-backdrop{
-    display:block; position: fixed; inset:0; z-index: 999;
-    background: rgba(0,0,0,.28); opacity:0; visibility:hidden; transition:.2s;
-  }
-  body.sidebar-open .sidebar-backdrop{opacity:1; visibility:visible}
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-/* ------- Grid principal ------- */
-/* 220px para la barra + contenido fluido */
-.dashboard-layout{
-  display: grid;
-  grid-template-columns: 220px minmax(0,1fr);
-  gap: 16px;                  /* 🔽 gap más compacto */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+  font-size: 28px;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
 }
 
-/* Dentro del contenido: KPIs + paneles */
-.hero-grid{
-  display: grid;
-  grid-template-columns: 220px 1fr 1fr;   /* KPIs + 2 paneles */
-  gap: 12px;                               /* 🔽 compactado */
-  align-items: stretch;
-  margin-bottom: 12px;
+.logo span {
+  color: var(--naranja);
 }
 
-/* Más aire en pantallas MUY anchas, sin “zoom” visual */
-@media (min-width: 1600px){
-  .hero-grid{ gap: 14px; grid-template-columns: 240px 1fr 1fr; }
+/* ================================
+   PERFIL DE USUARIO
+================================== */
+.profile-mini {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,0.2);
+  padding: 8px 16px;
+  border-radius: 25px;
+  color: white;
 }
 
-/* 2 columnas (tablet/portátil) */
-@media (max-width: 1200px){
-  .dashboard-layout{ grid-template-columns: 1fr; }
-  .hero-grid{ grid-template-columns: 1fr 1fr; }
-  /* Los KPIs pasan a fila de 4 */
-  .kpi-list{
-    grid-column: 1 / -1;
-    display: grid; grid-template-columns: repeat(4, minmax(140px,1fr)); gap: 10px;
-  }
+.profile-mini img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid white;
+  object-fit: cover;
 }
 
-/* 1 columna (móvil) */
-@media (max-width: 720px){
-  .hero-grid{ grid-template-columns: 1fr; }
-  .kpi-list{ grid-template-columns: 1fr 1fr; }
+/* ================================
+   BUSCADOR Y FILTROS
+================================== */
+.search-section {
+  background: white;
+  padding: 30px 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-/* ------- KPIs (más sobrios) ------- */
-.kpi-list{
-  display: grid; gap: 10px;
-  align-content: start;
-}
-.kpi-tile{
-  border-radius: 10px; padding: 10px; color: #fff;
-  box-shadow: 0 1px 4px rgba(16,24,40,.06);
-  min-height: 104px;           /* altura controlada para que no “salten” */
-  display:flex; flex-direction:column; justify-content:center;
-}
-.kpi-name{ font-weight: 1000; opacity: .95; margin-bottom: 6px; font-size: var(--fs-12) }
-.kpi-num{ font-size: var(--fs-22); font-weight: 700; line-height: 1 }  /* 🔽 tamaño */
-.kpi-red{    background:#6FBC43 }
-.kpi-amber{  background:#8B572A }
-.kpi-green{  background:#F6A30D }
-.kpi-cyan{   background:#97E6B8 }
-
-/* ------- Panels / Héroes ------- */
-.panel{
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px;
-  box-shadow: 0 1px 2px rgba(16,24,40,.04);
-  overflow: hidden;           /* evita desbordes dentro del panel */
-}
-.panel .panel-title{
-  margin: 0 0 8px;
-  font-size: var(--fs-14);
-  font-weight: 700;
-  letter-spacing:.2px;
+.search-container {
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.hero{ background: linear-gradient(180deg, #f0ad4e, #F6A30D); color: #fff; }
-.hero-red{ background: linear-gradient(180deg,#6FBC43,#6FBC43); color: #fff; }
-.hero-title{ margin: 0 0 8px; font-size: var(--fs-14); font-weight: 700; letter-spacing:.2px }
-
-/* Slider (una tarjeta visible) */
-.slider{ position: relative }
-.slider-track{
-  display: grid; grid-auto-flow: column; grid-auto-columns: 100%;
-  gap: 8px; overflow: hidden; scroll-snap-type: x mandatory;
-}
-.hero-card{
-  scroll-snap-align: start;
-  display: grid; place-items: center; text-align: center;
-  min-height: 160px;          /* 🔽 más bajo */
-  padding: 12px;
-  color: inherit; border-radius: 8px; border: 1px dashed rgba(255,255,255,.18);
-  background: rgba(255,255,255,.04);
-}
-.hero-avatar{
-  width: 90px; height: 90px;  /* 🔽 avatar más pequeño */
-  border-radius: 50%; object-fit: cover; background:#fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,.2)
-}
-.hero-text{ margin-top: 6px }
-.hero-name{ font-weight: 700; font-size: var(--fs-16); line-height: 1.1 }
-.hero-sub{ opacity: .9; font-size: var(--fs-12) }
-.hero-empty{ background: rgba(255,255,255,.07) }
-
-/* Flechas del slider */
-.slider-btn{
-  position: absolute; top: 50%; transform: translateY(-50%);
-  width: 28px; height: 28px; border-radius: 50%;
-  border: 1px solid rgba(255,255,255,.35); color: #fff;
-  background: rgba(255,255,255,.12);
-  display: grid; place-items: center; cursor: pointer;
-}
-.slider-btn.prev{ left: 6px } .slider-btn.next{ right: 6px }
-
-/* ------- Charts (sin solapes) ------- */
-.charts-grid{
-  display: grid; gap: 12px; grid-template-columns: 1fr 1fr;
-  align-items: stretch;
-}
-@media (max-width: 980px){ .charts-grid{ grid-template-columns: 1fr } }
-
-/* Los charts se acomodan solos; evita alturas fijas agresivas */
-.chart-card{
-  min-height: 240px;          /* 🔽 menor pero suficiente */
-  display:flex; align-items:center; justify-content:center;
+.search-box {
+  display: flex;
+  max-width: 600px;
+  margin: 0 auto 25px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-radius: 30px;
   overflow: hidden;
 }
-.chart-card canvas, .chart-card svg{
-  max-width: 100%; height: auto; display:block;
+
+.search-box input {
+  flex: 1;
+  padding: 15px 25px;
+  border: none;
+  outline: none;
+  font-size: 16px;
 }
 
-/* ------- Orden específico de paneles ------- */
-/* Si puedes, agrega estas clases a los bloques:
-   .panel--inventario-destacado  y  .panel--productos-agotados
-   para forzar el orden correcto y que se alineen bonitos. */
-.hero-grid{ align-items:start }   /* evita estirones verticales desparejos */
-
-.panel--inventario-destacado{ order: 1 }
-.panel--productos-agotados{ order: 2 }
-
-/* Si ambos están dentro de un contenedor flex/grid distinto,
-   puedes usar un “grid” de 2x2 para alinearlos en fila */
-.grid-2x2{
-  display:grid; gap:12px; grid-template-columns: repeat(4, minmax(180px,1fr));
-}
-@media (max-width: 1400px){ .grid-2x2{ grid-template-columns: repeat(2, 1fr) } }
-@media (max-width: 720px){ .grid-2x2{ grid-template-columns: 1fr } }
-
-/* ------- Utilidades ------- */
-.text-danger{ color: #dc3545 }
-
-/* Evitar que cualquier imagen/iframe gigante rompa el layout */
-img, video, iframe{ max-width: 100%; height: auto }
-
-/* Botones/inputs coherentes con escala */
-button, .btn, input, select{
-  font-size: var(--fs-14);
-  line-height: 1.2;
-  padding: 8px 10px;
+.search-box button {
+  background: var(--verde-principal);
+  color: white;
+  border: none;
+  padding: 0 30px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
 }
 
-/* ====== LAYOUT GENERAL (sidebar + contenido) ====== */
-.dashboard-layout{
-  display:grid;
-  grid-template-columns: 220px minmax(0,1fr);
-  gap:16px;
+.search-box button:hover {
+  background: var(--verde-hover);
 }
 
-/* ====== CABECERA ====== */
-.page-head{margin:8px 0 14px}
-
-/* ====== CONTENEDOR HÉROE (zona superior) ====== */
-/* 3 columnas: KPIs | panel medio | panel derecho
-   2 filas:     kpis ocupa ambas filas; el resto 2x2 */
-.hero-grid{
-  display:grid;
-  grid-template-columns: 260px 1fr 1fr;     /* KPIs fijo + 2 fluidas */
-  grid-template-rows: auto auto;
-  grid-template-areas:
-    "kpis mid1 right1"
-    "kpis mid2 right2";
-  gap:12px;
-  align-items:stretch;
-  margin-bottom:12px;
+/* ================================
+   CATEGORÍAS
+================================== */
+.categories {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-/* KPIs columna izquierda (torre) */
-.kpi-list{
-  grid-area:kpis;
-  display:grid;
-  grid-auto-rows:minmax(84px, auto);
-  gap:10px;
-  align-content:start;
+.cat-btn {
+  background: var(--gris-claro);
+  border: 2px solid transparent;
+  padding: 12px 24px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-/* Paneles superiores (2x2) */
-.panel--mid1   { grid-area: mid1; }
-.panel--mid2   { grid-area: mid2; }
-.panel--right1 { grid-area: right1; }
-.panel--right2 { grid-area: right2; }
-
-/* Alturas coherentes para que los 4 paneles queden alineados */
-.hero-grid .panel{
-  min-height: 182px;           /* ajusta a tu contenido */
-  display:flex;
-  flex-direction:column;
+.cat-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-/* ====== CHARTS DEBAJO (2 columnas) ====== */
-.charts-grid{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:12px;
-  align-items:stretch;
-}
-.chart-card{
-  min-height:240px;
-  display:flex; align-items:center; justify-content:center;
-  overflow:hidden;
+.cat-btn.active {
+  background: var(--verde-principal);
+  color: white;
+  border-color: var(--verde-principal);
 }
 
-/* ====== RESPONSIVE ====== */
-@media (min-width:1600px){
-  .hero-grid{ grid-template-columns: 280px 1fr 1fr; gap:14px; }
-}
-@media (max-width:1200px){
-  .dashboard-layout{ grid-template-columns: 1fr; }
-  .hero-grid{
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      "kpis kpis"
-      "mid1 right1"
-      "mid2 right2";
-  }
-  .kpi-list{
-    grid-template-columns: repeat(4, minmax(140px,1fr));
-    grid-auto-rows:auto;
-    display:grid;
-    gap:10px;
-  }
-}
-@media (max-width:720px){
-  .hero-grid{
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "kpis"
-      "mid1"
-      "right1"
-      "mid2"
-      "right2";
-  }
-  .kpi-list{ grid-template-columns: 1fr 1fr; }
+/* ================================
+   CONTENEDOR PRINCIPAL
+================================== */
+.main-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 30px;
 }
 
-/* ====== CHARTS (3 columnas) ====== */
-.charts-grid{
-  display:grid;
-  grid-template-columns: repeat(3, 1fr);  /* 🔹 ahora 3 en una fila */
-  gap:12px;
-  align-items:stretch;
-  margin-top: 56px;
+/* ================================
+   SECCIONES DE CATEGORÍAS
+================================== */
+.category-section {
+  scroll-margin-top: 100px;
+  margin-bottom: 50px;
 }
 
-.chart-card{
-  min-height: 220px;   /* un poco más bajo para que entren bien los 3 */
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 3px solid var(--verde-principal);
 }
 
-/* Responsive: baja a 2 o 1 columna */
-@media (max-width:1200px){
-  .charts-grid{ grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width:720px){
-  .charts-grid{ grid-template-columns: 1fr; }
+.category-header h2 {
+  font-size: 32px;
+  color: var(--texto);
 }
 
-/* Botón arriba a la derecha (ajústalo a tu gusto) */
-.toggle-btn{
-  position: fixed; /* o dentro del header si prefieres */
-  top: 10px; right: 16px;
-  z-index: 1100;
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 36px; height: 36px;
-  border: 1px solid var(--border, #e5e7eb);
-  background: var(--card, #fff);
+.category-header .emoji {
+  font-size: 40px;
+}
+
+/* ================================
+   GRID DE PRODUCTOS
+================================== */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 25px;
+}
+
+.product-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.product-image {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+.product-card h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: var(--texto);
+  min-height: 44px;
+}
+
+.product-price {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--verde-principal);
+  margin-bottom: 15px;
+}
+
+.add-to-cart-btn {
+  background: linear-gradient(135deg, var(--naranja) 0%, var(--naranja-hover) 100%);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  margin-top: auto;
+}
+
+.add-to-cart-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(246, 163, 13, 0.4);
+}
+
+/* ================================
+   CARRITO LATERAL
+================================== */
+.cart-sidebar {
+  position: sticky;
+  top: 120px;
+  height: fit-content;
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.cart-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--gris-medio);
+}
+
+.cart-header h2 {
+  font-size: 24px;
+  color: var(--texto);
+}
+
+.cart-count {
+  background: var(--naranja);
+  color: white;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.cart-items {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+.cart-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: var(--gris-claro);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.cart-item img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+.cart-item-info {
+  flex: 1;
+}
+
+.cart-item-name {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.cart-item-price {
+  color: var(--verde-principal);
+  font-weight: bold;
+}
+
+.remove-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+}
+
+.remove-btn:hover {
+  background: #c82333;
+  transform: scale(1.1);
+}
+
+.cart-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+}
+
+.cart-total {
+  padding: 20px 0;
+  border-top: 2px solid var(--gris-medio);
+  margin-bottom: 15px;
+}
+
+.cart-total-label {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.cart-total-amount {
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--verde-principal);
+}
+
+.checkout-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--verde-principal) 0%, var(--verde-hover) 100%);
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.checkout-btn:hover:not(:disabled) {
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(111, 188, 67, 0.4);
+}
+
+.checkout-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ================================
+   RESPONSIVE
+================================== */
+@media (max-width: 1024px) {
+  .main-container {
+    grid-template-columns: 1fr;
+  }
+
+  .cart-sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    border-radius: 20px 20px 0 0;
+    max-height: 70vh;
+    overflow-y: auto;
+    z-index: 99;
+  }
+}
+
+@media (max-width: 768px) {
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+  }
+
+  .category-header h2 {
+    font-size: 24px;
+  }
+
+  .logo {
+    font-size: 20px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
+/* ================================
+   SCROLLBAR PERSONALIZADO (TODO EL SITIO)
+================================== */
+/* Scrollbar para el body completo */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--gris-claro);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--verde-principal) 0%, var(--verde-hover) 100%);
+  border-radius: 10px;
+  border: 2px solid var(--gris-claro);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--naranja) 0%, var(--naranja-hover) 100%);
   cursor: pointer;
 }
 
-/* Colapso solo con CSS (checkbox hack) */
-.sidebar{ width: 220px; transition: width .3s ease; overflow: hidden; }
-#toggleSidebar:checked ~ .sidebar{ width: 64px; }
-#toggleSidebar:checked ~ .sidebar .label{ display: none; }
-#toggleSidebar:checked ~ .sidebar .menu a{ justify-content: center; } /* centra iconos */
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--verde-principal) var(--gris-claro);
+}
+
+/* Scrollbar específico para el carrito */
+.cart-items::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cart-items::-webkit-scrollbar-track {
+  background: var(--gris-claro);
+  border-radius: 10px;
+}
+
+.cart-items::-webkit-scrollbar-thumb {
+  background: var(--verde-principal);
+  border-radius: 10px;
+}
+
+.cart-items::-webkit-scrollbar-thumb:hover {
+  background: var(--verde-hover);
+}
+
+/* ================================
+   EFECTOS HOVER MEJORADOS
+================================== */
+/* Efecto hover en botones de categoría */
+.cat-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.cat-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(111, 188, 67, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.4s, height 0.4s;
+}
+
+.cat-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.cat-btn:active {
+  transform: translateY(-2px) scale(0.98);
+}
+
+/* Efecto ripple en botones de añadir al carrito */
+.add-to-cart-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.add-to-cart-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.add-to-cart-btn:hover::after {
+  width: 300px;
+  height: 300px;
+}
+
+.add-to-cart-btn:active {
+  transform: scale(0.95);
+}
+
+/* Efecto brillo en tarjetas de producto al hover */
+.product-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.product-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transform: rotate(45deg);
+  transition: all 0.5s;
+}
+
+.product-card:hover::before {
+  left: 100%;
+}
+
+/* Cursor pointer en elementos interactivos */
+.cat-btn,
+.add-to-cart-btn,
+.checkout-btn,
+.remove-btn,
+.search-box button {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Efecto de pulsación en botones */
+.cat-btn:active,
+.remove-btn:active,
+.checkout-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* Transición suave en imágenes de productos */
+.product-image {
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+/* Efecto hover en el header de categoría */
+.category-header {
+  transition: all 0.3s ease;
+}
+
+.category-header:hover .emoji {
+  transform: scale(1.2) rotate(10deg);
+  transition: transform 0.3s ease;
+}
+
+/* Efecto en el input de búsqueda */
+.search-box input:focus {
+  box-shadow: 0 0 0 3px rgba(111, 188, 67, 0.3);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Animación al agregar al carrito */
+@keyframes addToCart {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.cart-count.animate {
+  animation: addToCart 0.3s ease;
+}
