@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-09-2025 a las 02:41:56
+-- Tiempo de generación: 03-10-2025 a las 03:13:48
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -73,8 +73,39 @@ CREATE TABLE `clientes` (
 
 INSERT INTO `clientes` (`id_cliente`, `cedula`, `nombres`, `apellidos`, `telefono`, `correo`, `contraseña`, `fecha_registro`, `verificado`, `token_verificacion`, `token_recuperacion`, `recuperacion_expira`) VALUES
 (1, NULL, 'María Pérez', '', NULL, '', '', '2025-08-28 09:25:01', 0, NULL, NULL, NULL),
-(27, NULL, 'gustavo cuevas', '', '', 'gustavoalexiscuevas@gmail.com', '$2y$10$NbxIi/Xm1aEQFdHCjgfWFODabA7zTSNh5htmy1YUZeJvNpT5yELTK', '2025-08-29 20:13:32', 1, NULL, NULL, NULL),
-(28, '1000078934', 'Gustavo', 'Cuevas', '3215489656', 'michel18lugo@gmail.com', '$2y$10$yGKdO161glHtDp4tx8QbT.Y/wS5ASD6mFvCvhG.tN7zB37pyJzYwy', '2025-08-29 20:15:07', 0, '7020570bec6d2a484ed48dcb1ff82bbb78dddfb7a9aba07ec22d17fcfeb66a42', '3af886de405f33ea9683ce7bedb728cfd381163ed0fc484d04b6e820ccbc280c', '2025-08-30 04:16:19');
+(27, NULL, 'gustavo cuevas', '', '', 'gustavoalexiscuevas@gmail.com', '$2y$10$NbxIi/Xm1aEQFdHCjgfWFODabA7zTSNh5htmy1YUZeJvNpT5yELTK', '2025-08-29 20:13:32', 1, NULL, 'dbc8861aebe474f967dfa626d203f965d337f9413ef3636806e3ddcd271cdc5e', '2025-10-01 21:51:10'),
+(28, '1000078934', 'Gustavo', 'Cuevas', '3215489656', 'michel18lugo@gmail.com', '$2y$10$yGKdO161glHtDp4tx8QbT.Y/wS5ASD6mFvCvhG.tN7zB37pyJzYwy', '2025-08-29 20:15:07', 0, '7020570bec6d2a484ed48dcb1ff82bbb78dddfb7a9aba07ec22d17fcfeb66a42', '3af886de405f33ea9683ce7bedb728cfd381163ed0fc484d04b6e820ccbc280c', '2025-08-30 04:16:19'),
+(29, '1000789324', 'gustavo', 'cuevas', '3102324232', 'gustavoalexiiscuevas@gmail.com', '$2y$10$Ez.b0X1jeg3wxvxWUO8mhOK71RAgjHRz8xD5zKVP5.3ddIC44iwiS', '2025-10-01 20:52:58', 0, '7793c335a3ef13b9fd04f4fc8900d2495f4fcfc87f0aba838682710a95eef8e8', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `config`
+--
+
+CREATE TABLE `config` (
+  `clave` varchar(80) NOT NULL,
+  `valor` text NOT NULL,
+  `tipo` enum('str','int','bool','json') DEFAULT 'str',
+  `actualizado_en` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `config`
+--
+
+INSERT INTO `config` (`clave`, `valor`, `tipo`, `actualizado_en`) VALUES
+('correo_activo', '0', 'bool', '2025-09-16 01:36:33'),
+('correo_from', '', 'str', '2025-09-16 01:36:33'),
+('correo_host', '', 'str', '2025-09-16 01:36:33'),
+('correo_puerto', '587', 'int', '2025-09-16 01:36:33'),
+('correo_seguridad', 'tls', 'str', '2025-09-16 01:36:33'),
+('correo_usuario', '', 'str', '2025-09-16 01:36:33'),
+('empresa_direccion', '', 'str', '2025-09-16 01:36:33'),
+('empresa_nombre', 'Mi Hieribal', 'str', '2025-09-18 01:09:23'),
+('empresa_ruc', '', 'str', '2025-09-16 01:36:33'),
+('ui_color_principal', '#198754', 'str', '2025-09-18 00:26:26'),
+('ui_tema', 'light', 'str', '2025-10-01 23:32:41');
 
 -- --------------------------------------------------------
 
@@ -215,8 +246,7 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id_usuario`, `usuario`, `password`, `rol`, `nombres`, `apellidos`, `correo`, `correo_verificado`, `correo_verificacion_token`, `correo_verificacion_expira`, `fecha_creacion`, `estado`, `token_recuperacion`) VALUES
-(10, 'admin2', '$2y$10$EChSgTaUdTfPJHSrsshjaulvQZxW5c9GAwzOk.9pA/Pa2WFLq2eUK', 'Admin', 'Gustavo Alexis', 'Cuevas Morales', 'gustavoalexiscuevass@gmail.com', 1, NULL, NULL, '2024-07-16 10:42:01', 'Inactivo', NULL),
-(28, 'Admin3', '$2y$10$9twPnU0s1ZghqZ886SbcS.qka16P/i24YlCzLULJPrF.gRNLyqLZG', 'Admin', 'Gustavo', 'Cuevas', 'gustavoalexiscuevas@gmail.com', 0, 'bc2aefd656e8bb360626af4e66b7fcc7', '2025-08-31 03:21:24', '2025-08-29 20:21:24', 'Activo', NULL);
+(35, 'admin', '$2y$10$9xRKeEkag5E0xJ82iDOwtuJYXp9vsThZM7ocTJ6aBOCy6AZmHwwYO', 'Admin', 'gustavo', 'cuevas', 'gustavoalexiscuevas@gmail.com', 1, NULL, NULL, '2025-10-01 20:44:08', 'Activo', NULL);
 
 -- --------------------------------------------------------
 
@@ -256,6 +286,12 @@ ALTER TABLE `clientes`
   ADD PRIMARY KEY (`id_cliente`),
   ADD UNIQUE KEY `correo` (`correo`),
   ADD UNIQUE KEY `cedula` (`cedula`);
+
+--
+-- Indices de la tabla `config`
+--
+ALTER TABLE `config`
+  ADD PRIMARY KEY (`clave`);
 
 --
 -- Indices de la tabla `historial_pedido`
@@ -314,7 +350,7 @@ ALTER TABLE `carrito`
 -- AUTO_INCREMENT de la tabla `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT de la tabla `historial_pedido`
@@ -344,7 +380,7 @@ ALTER TABLE `proveedores`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT de la tabla `ventas`
