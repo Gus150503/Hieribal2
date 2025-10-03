@@ -24,7 +24,60 @@
   const $  = (s) => document.querySelector(s);
   const tbl = $('#tblUsuarios tbody');
 
-  // ===== Helpers UI: Toasts + Confirm =====
+  // ===== Toast CSS + Host (inyección one-time) =====
+  function ensureToastCSS() {
+    if (document.getElementById('_usuarios_toast_css')) return;
+    const css = document.createElement('style');
+    css.id = '_usuarios_toast_css';
+    css.textContent = `
+    .toast-host{
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 1080; /* > 1050 (backdrop bootstrap) */
+      pointer-events: none;
+    }
+    .toast{
+      pointer-events: auto;
+      min-width: 280px;
+      max-width: 420px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.18);
+      background: #111;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: .98;
+      transform: translateY(20px);
+      animation: _toastSlideIn .20s ease-out forwards;
+      border: 1px solid transparent;
+    }
+    .toast .btn-close{
+      margin-left: auto;
+      filter: invert(1);
+      opacity: .8;
+    }
+    .toast-success{ background:#0f5132; color:#d1f7e5; border-color:#0f5132; }
+    .toast-danger { background:#842029; color:#ffd7db; border-color:#842029; }
+    .toast-warning{ background:#664d03; color:#fff3cd; border-color:#664d03; }
+    .toast-info   { background:#0b5ed7; color:#dbe8ff; border-color:#0b5ed7; }
+    .toast .dot{ width:8px; height:8px; border-radius:50%; background: currentColor; opacity:.8; }
+
+    @keyframes _toastSlideIn { to { transform: translateY(0); } }
+
+    .flash-success{ animation: _flashGreen .9s ease-in-out; }
+    .flash-danger { animation: _flashRed   .9s ease-in-out; }
+    @keyframes _flashGreen{ 0%,100%{ background-color: transparent;} 30%{ background-color: #e8f8f0; } }
+    @keyframes _flashRed  { 0%,100%{ background-color: transparent;} 30%{ background-color: #fdecef; } }
+    `;
+    document.head.appendChild(css);
+  }
+
   function ensureToastHost(){
     let host = document.getElementById('toastHost');
     if(!host){
@@ -35,22 +88,51 @@
     }
     return host;
   }
+
   /** uiToast('mensaje', 'success'|'danger'|'warning'|'info', ms=3500) */
-  function uiToast(msg, variant='info', ms=3500){
-    const host = ensureToastHost();
-    const t = document.createElement('div');
-    t.className = `toast toast-${variant}`;
-    t.innerHTML = `
-      <div class="dot"></div>
-      <div class="toast-msg">${escapeHtml(String(msg))}</div>
-      <button class="btn-close" aria-label="Cerrar"></button>
-    `;
-    host.appendChild(t);
-    const close = () => t.remove();
-    t.querySelector('.btn-close')?.addEventListener('click', close);
-    const timer = setTimeout(close, ms);
-    // si pasas el mouse, se queda
-    t.addEventListener('mouseenter', () => clearTimeout(timer), { once:true });
+  /** uiToast('mensaje', 'success'|'danger'|'warning'|'info', ms=3500) */
+function uiToast(msg, variant='info', ms=3500){
+  const host = ensureToastHost();
+  const t = document.createElement('div');
+  t.className = `toast toast-${variant}`;
+  t.innerHTML = `
+    <div class="dot"></div>
+    <div class="toast-msg">${escapeHtml(String(msg))}</div>
+    <button class="btn-close" aria-label="Cerrar"></button>
+  `;
+  host.appendChild(t);
+
+  // 👇 Necesario cuando hay Bootstrap: sin .show el toast queda con opacity:0
+  t.classList.add('show');
+
+  const close = () => t.remove();
+  t.querySelector('.btn-close')?.addEventListener('click', close);
+  const timer = setTimeout(close, ms);
+  // si pasas el mouse, se queda
+  t.addEventListener('mouseenter', () => clearTimeout(timer), { once:true });
+}
+
+  // ===== Confirm genérico (Bootstrap) + fallback =====
+  function ensureConfirmModal(){
+    if (document.getElementById('confirmModal')) return;
+    const wrap = document.createElement('div');
+    wrap.innerHTML = `
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-3">
+          <div class="modal-header">
+            <h5 class="modal-title" id="confirmTitle">Confirmar acción</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body" id="confirmBody">¿Seguro?</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-success" id="btnOkConfirm">Sí, continuar</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+    document.body.appendChild(wrap.firstElementChild);
   }
 
   /** uiConfirm({title, body, confirmText, variant}) -> Promise<boolean> (Bootstrap modal) */
@@ -478,7 +560,12 @@
   });
 
   // ===== Init =====
-  function boot(){ ensureHidden(); listar(1); }
+  function boot(){
+    ensureToastCSS();
+    ensureConfirmModal();
+    ensureHidden();
+    listar(1);
+  }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
   window.addEventListener('pageshow', (e) => { if (e.persisted) boot(); });
 

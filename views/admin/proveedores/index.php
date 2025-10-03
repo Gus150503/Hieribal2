@@ -5,6 +5,16 @@ if (!$partial) include __DIR__ . '/../_shell_start.php';
 // Asegura base URL para rutas absolutas
 $base = $base ?? ($this->config['app']['base_url'] ?? '');
 ?>
+<style>#tblProveedor thead.table-light {
+  --bs-table-bg: ##ffc107; /* azul Bootstrap por defecto */
+  --bs-table-color: #ffc107;
+  --bs-table-border-color: rgba(255,255,255,.25);
+  background: #ffc107 !important;
+  color: #fff !important;
+  background-image: none !important;
+}
+#tblProveedor thead.table-light th { color: #fff !important; }
+</style>
 
 <section class="card shadow-sm ui-pro border-0 rounded-4">
   <div class="card-body">
@@ -46,7 +56,25 @@ $base = $base ?? ($this->config['app']['base_url'] ?? '');
         <tbody></tbody>
       </table>
     </div>
+          <div class="d-flex align-items-center justify-content-between mt-3">
+        <div class="d-flex align-items-center gap-2">
+          <label class="text-muted small me-1">Mostrar</label>
+          <select id="perPage" class="form-select form-select-sm" style="width:80px">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+          <span id="totalProveedores" class="text-muted small ms-2"></span>
+        </div>
+        <nav aria-label="Paginación">
+          <ul id="paginador" class="pagination pagination-sm mb-0"></ul>
+        </nav>
+      </div>
+    </div>
   </div>
+  </div>
+
 </section>
 
 <!-- Modal Proveedor -->

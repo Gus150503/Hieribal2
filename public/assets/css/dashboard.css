@@ -53,7 +53,7 @@ body {
 .sidebar{
   width: 220px;
   background: #6FBC43;
-  border: 1px solid var(--border);
+
   padding: 10px;
   position: sticky; top: 16px; align-self: start;
   box-shadow: 0 1px 2px rgba(16,24,40,.04);
@@ -185,7 +185,7 @@ body {
   background: rgba(255,255,255,.04);
 }
 .hero-avatar{
-  width: 56px; height: 56px;  /* 🔽 avatar más pequeño */
+  width: 90px; height: 90px;  /* 🔽 avatar más pequeño */
   border-radius: 50%; object-fit: cover; background:#fff;
   box-shadow: 0 2px 8px rgba(0,0,0,.2)
 }
