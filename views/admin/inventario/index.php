@@ -1,5 +1,8 @@
 <?php $partial = !empty($_GET['partial']); ?>
 <?php if (!$partial) include __DIR__ . '/../_shell_start.php'; ?>
+
+
+
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -78,8 +81,9 @@
       </div>
 
       <div class="modal-body">
-        <form id="frmInventario" class="needs-validation" novalidate>
-          <input type="hidden" name="id" id="id">
+        <form id="frmInventario" class="needs-validation" method="POST" action="/Hieribal2/controllers/AdminInventario.php" novalidate>
+            <input type="hidden" name="action" id="inventarioAction" value="create">
+            <input type="hidden" name="id" id="idInventario">
 
           <div class="row g-3">
             <div class="col-md-6">
@@ -178,6 +182,6 @@
   window.INVENTARIO_API = '/controllers/AdminInventario.php';
 </script>
 
-<script src="/public/assets/js/admin_inventario.js?v=1"></script>
+<script src="/Hieribal2/public/assets/js/admin_inventario.js?v=1" defer></script>
 
 <?php if (!$partial) include __DIR__ . '/../_shell_end.php'; ?>
