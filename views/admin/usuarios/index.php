@@ -13,7 +13,7 @@
 
       </div>
       <button id="btnNuevo" class="btn btn-success">
-        <i class="bi bi-plus-lg me-1"></i> Nuevo
+        <i class="bi bi-plus-lg me-1"></i> Nuevoo
       </button>
     </div>
 
