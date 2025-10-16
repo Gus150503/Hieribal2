@@ -1,22 +1,9 @@
-
 <?php
 // views/admin/inventario/index.php
 // ← Esta vista se renderiza dentro de plantilla.php (con sidebar y <main>)
-//    No incluir _shell_start/_shell_end ni Bootstrap aquí.
+//    No incluir _shell_start/_shell_end ni Bootstrap aquí (ya los carga la plantilla).
 $base = $this->config['app']['base_url'] ?? '';
 ?>
-=======
-<?php $partial = !empty($_GET['partial']); ?>
-<?php if (!$partial) include __DIR__ . '/../_shell_start.php'; ?>
-
-
-
-<!-- Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<!-- Bootstrap Icons -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
 
 <section class="card shadow-sm ui-pro border-0 rounded-4">
   <div class="card-body">
@@ -90,9 +77,9 @@ $base = $this->config['app']['base_url'] ?? '';
       </div>
 
       <div class="modal-body">
-        <form id="frmInventario" class="needs-validation" method="POST" action="/Hieribal2/controllers/AdminInventario.php" novalidate>
-            <input type="hidden" name="action" id="inventarioAction" value="create">
-            <input type="hidden" name="id" id="idInventario">
+        <form id="frmInventario" class="needs-validation" method="POST" action="<?= $base ?>/controllers/AdminInventario.php" novalidate>
+          <input type="hidden" name="action" id="inventarioAction" value="create">
+          <input type="hidden" name="id" id="idInventario">
 
           <div class="row g-3">
             <div class="col-md-6">
@@ -175,7 +162,7 @@ $base = $this->config['app']['base_url'] ?? '';
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // Conectar botón con modal (Bootstrap ya está cargado por la plantilla)
+  // Conectar botón con modal (Bootstrap debe estar cargado por la plantilla)
   const btnNuevo = document.getElementById('btnNuevo');
   if (btnNuevo){
     btnNuevo.addEventListener('click', () => {
@@ -189,10 +176,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-
-<!-- JS propio de la página -->
+<!-- JS propio de la página (solo uno) -->
 <script src="<?= $base ?>/assets/js/admin_inventario.js?v=2"></script>
-
-<script src="/Hieribal2/public/assets/js/admin_inventario.js?v=1" defer></script>
-
-<?php if (!$partial) include __DIR__ . '/../_shell_end.php'; ?>
