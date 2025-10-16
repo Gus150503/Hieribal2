@@ -132,3 +132,76 @@ document.addEventListener("DOMContentLoaded", () => {
 
   cargarInventario();
 });
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("frmInventario");
+  const modalEl = document.getElementById("modalInventario");
+  const modal = new bootstrap.Modal(modalEl);
+  const table = document.getElementById("tblInventario").querySelector("tbody");
+
+  document.getElementById("btnNuevo").addEventListener("click", () => {
+    form.reset();
+    form.classList.remove("was-validated");
+    modalEl.querySelector(".modal-title").textContent = "Nuevo Inventario";
+    modal.show();
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!form.checkValidity()) {
+      form.classList.add("was-validated");
+      return;
+    }
+
+    const formData = new FormData(form);
+    try {
+      const res = await fetch(window.INVENTARIO_API, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert("✅ Inventario guardado correctamente");
+        modal.hide();
+        location.reload();
+      } else {
+        alert("⚠️ Error: " + (data.message || "No se pudo guardar"));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error al guardar inventario");
+    }
+  });
+
+  table.addEventListener("click", async (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+
+    const id = btn.dataset.id;
+
+    if (btn.classList.contains("btn-edit")) {
+      const res = await fetch(`${window.INVENTARIO_API}?action=get&id=${id}`);
+      const data = await res.json();
+      if (data) {
+        Object.keys(data).forEach((key) => {
+          if (form[key]) form[key].value = data[key];
+        });
+        modalEl.querySelector(".modal-title").textContent = "Editar Inventario";
+        modal.show();
+      }
+    }
+
+    if (btn.classList.contains("btn-delete")) {
+      if (confirm("¿Seguro de eliminar este registro?")) {
+        const res = await fetch(window.INVENTARIO_API, {
+          method: "POST",
+          body: new URLSearchParams({ action: "delete", id }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert("✅ Registro eliminado");
+          location.reload();
+        }
+      }
+    }
+  });
+});

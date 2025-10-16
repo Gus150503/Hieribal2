@@ -79,92 +79,112 @@
       
 </section>
 
-<!-- Modal Producto -->
+<!-- Modal Productos jj-->
 <div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-  <div class="modal-dialog modal-xl">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Nuevo Producto</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <h5 class="modal-title" id="modalTitleProducto">Nuevo Producto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
+
       <div class="modal-body">
-          <form id="frmProducto" method="POST" action="/Hieribal2/public/?r=admin_producto/api">
-              <input type="hidden" name="action" value="create" id="productoAction">
-              <input type="hidden" name="id" id="idProducto">
-    <!-- aquí van los demás campos -->
+        <form id="frmProducto" class="needs-validation" method="POST" action="/Hieribal2/controllers/AdminProducto.php" novalidate>
+          <input type="hidden" name="action" id="productoAction" value="create">
+          <input type="hidden" name="id" id="idProducto">
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Nombre</label>
-              <input type="text" class="form-control" name="nombre" id="nombre" required>
+              <input type="text" class="form-control" name="nombre" id="nombre" required maxlength="100">
+              <div class="invalid-feedback">Nombre inválido.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Categoría</label>
-              <input type="text" class="form-control" name="categoria" id="categoria" required>
+              <input type="text" class="form-control" name="categoria" id="categoria" required maxlength="100">
+              <div class="invalid-feedback">Categoría inválida.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Marca</label>
-              <input type="text" class="form-control" name="marca" id="marca">
+              <input type="text" class="form-control" name="marca" id="marca" maxlength="100">
+              <div class="invalid-feedback">Marca inválida.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Presentación</label>
-              <input type="text" class="form-control" name="presentacion" id="presentacion">
+              <input type="text" class="form-control" name="presentacion" id="presentacion" maxlength="100">
+              <div class="invalid-feedback">Presentación inválida.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Unidad</label>
-              <input type="text" class="form-control" name="unidad" id="unidad">
+              <input type="text" class="form-control" name="unidad" id="unidad" maxlength="50">
+              <div class="invalid-feedback">Unidad inválida.</div>
             </div>
-            <div class="col-md-6">
+
+            <div class="col-md-12">
               <label class="form-label">Descripción</label>
-              <textarea class="form-control" name="descripcion" id="descripcion"></textarea>
+              <textarea class="form-control" name="descripcion" id="descripcion" maxlength="255"></textarea>
+              <div class="invalid-feedback">Descripción inválida.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Lote</label>
-              <input type="text" class="form-control" name="lote" id="lote">
+              <input type="text" class="form-control" name="lote" id="lote" maxlength="50">
+              <div class="invalid-feedback">Lote inválido.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">F. Vencimiento</label>
-              <input type="date" class="form-control" name="fvencimiento" id="fvencimiento">
+             <input type="date" class="form-control" name="f_vencimiento" id="fvencimiento">
+              <div class="invalid-feedback">Fecha inválida.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Precio Compra</label>
-              <input type="number" class="form-control" name="precio_compra" id="precio_compra" min="0">
+              <input type="number" class="form-control" name="precio_compra" id="precio_compra" required step="0.01" min="0">
+              <div class="invalid-feedback">Precio de compra inválido.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Precio Venta</label>
-              <input type="number" class="form-control" name="precio_venta" id="precio_venta" min="0">
+              <input type="number" class="form-control" name="precio_venta" id="precio_venta" required step="0.01" min="0">
+              <div class="invalid-feedback">Precio de venta inválido.</div>
             </div>
-            <div class="col-md-6">
-              <label class="form-label">IVA</label>
-              <input type="number" class="form-control" name="iva" id="iva" min="0" max="100">
+
+            <div class="col-md-4">
+              <label class="form-label">IVA (%)</label>
+              <input type="number" class="form-control" name="iva" id="iva" step="0.01" min="0">
+              <div class="invalid-feedback">IVA inválido.</div>
             </div>
-            <div class="col-md-6">
-              <label class="form-label">Código SKU</label>
-              <input type="text" class="form-control" name="codigo_sku" id="codigo_sku">
+
+            <div class="col-md-4">
+              <label class="form-label">SKU</label>
+              <input type="text" class="form-control" name="codigo_sku" id="sku" maxlength="50">
+              <div class="invalid-feedback">SKU inválido.</div>
             </div>
-            <div class="col-md-6">
+
+            <div class="col-md-4">
               <label class="form-label">Ubicación</label>
-              <input type="text" class="form-control" name="ubicacion" id="ubicacion">
+              <input type="text" class="form-control" name="ubicacion" id="ubicacion" maxlength="100">
+              <div class="invalid-feedback">Ubicación inválida.</div>
             </div>
-
-            <div class="col-md-6">
-                <label class="form-label">Imagen</label>
-                <input type="file" name="imagen" class="form-control" accept="image/*">
-            </div>
-
 
             <div class="col-md-6">
               <label class="form-label">Estado</label>
-
-              <select class="form-select" name="estado" id="estado">
+              <select class="form-select" name="estado" id="estado" required>
                 <option value="activo">Activo</option>
                 <option value="inactivo">Inactivo</option>
               </select>
+              <div class="invalid-feedback">Selecciona un estado.</div>
             </div>
           </div>
 
           <div class="modal-footer border-0 pt-3">
             <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-primary">
+            
+            <button type="submit" class="btn btn-success">
               <i class="bi bi-check2-circle me-1"></i> Guardar
             </button>
           </div>
@@ -174,15 +194,12 @@
   </div>
 </div>
 
-
-
 <script>
-  document.getElementById('btnNuevoProducto').addEventListener('click', () => {
+  document.getElementById('btnNuevoProducto').addEventListener('click', function () {
     const modal = new bootstrap.Modal(document.getElementById('modalProducto'));
     modal.show();
   });
+
   window.PRODUCTO_API = '/controllers/AdminProducto.php';
 </script>
-<script src="/public/assets/js/admin_producto.js?v=1"></script>
-
-<?php if (!$partial) include __DIR__ . '/../_shell_end.php'; ?>
+<script src="/Hieribal2/public/assets/js/admin_productos.js?v=1" defer></script>
