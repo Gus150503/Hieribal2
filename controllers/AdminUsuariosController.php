@@ -60,8 +60,8 @@ final class AdminUsuariosController extends Controller
         $this->render('admin/usuarios/index', [
             'page_title' => 'Usuarios',
             'esAdmin'    => true,
-            'extra_css'  => [$this->config['app']['base_url'] . '/assets/css/admin_usuarios.css?v=5'],
-            'extra_js'   => [$this->config['app']['base_url'] . '/assets/js/admin_usuarios.js?v=5'],
+            'extra_css'  => [$this->config['app']['base_url'] . '/assets/css/admin_usuarios.css?v=6'],
+            'extra_js'   => [$this->config['app']['base_url'] . '/assets/js/admin_usuarios.js?v=6'],
         ]);
     }
 
