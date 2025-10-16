@@ -1,19 +1,20 @@
 <?php
-$partial = !empty($_GET['partial']);
-if (!$partial) include __DIR__ . '/../_shell_start.php';
-
-// Asegura base URL para rutas absolutas
-$base = $base ?? ($this->config['app']['base_url'] ?? '');
+// views/admin/proveedores/index.php
+// Esta vista se renderiza dentro de plantilla.php (con sidebar y Bootstrap cargados)
+$base = $this->config['app']['base_url'] ?? '';
 ?>
-<style>#tblProveedor thead.table-light {
-  --bs-table-bg: ##ffc107; /* azul Bootstrap por defecto */
-  --bs-table-color: #ffc107;
+
+<style>
+/* Encabezado amarillo para la tabla de Proveedores */
+#tblProveedor thead.table-light{
+  --bs-table-bg: #ffc107;
+  --bs-table-color: #fff;
   --bs-table-border-color: rgba(255,255,255,.25);
   background: #ffc107 !important;
   color: #fff !important;
   background-image: none !important;
 }
-#tblProveedor thead.table-light th { color: #fff !important; }
+#tblProveedor thead.table-light th{ color:#fff !important; }
 </style>
 
 <section class="card shadow-sm ui-pro border-0 rounded-4">
@@ -56,25 +57,23 @@ $base = $base ?? ($this->config['app']['base_url'] ?? '');
         <tbody></tbody>
       </table>
     </div>
-          <div class="d-flex align-items-center justify-content-between mt-3">
-        <div class="d-flex align-items-center gap-2">
-          <label class="text-muted small me-1">Mostrar</label>
-          <select id="perPage" class="form-select form-select-sm" style="width:80px">
-            <option value="5">5</option>
-            <option value="10" selected>10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-          </select>
-          <span id="totalProveedores" class="text-muted small ms-2"></span>
-        </div>
-        <nav aria-label="Paginación">
-          <ul id="paginador" class="pagination pagination-sm mb-0"></ul>
-        </nav>
+
+    <div class="d-flex align-items-center justify-content-between mt-3">
+      <div class="d-flex align-items-center gap-2">
+        <label class="text-muted small me-1">Mostrar</label>
+        <select id="perPageProveedor" class="form-select form-select-sm" style="width:80px">
+          <option value="5">5</option>
+          <option value="10" selected>10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+        </select>
+        <span id="totalProveedores" class="text-muted small ms-2"></span>
       </div>
+      <nav aria-label="Paginación">
+        <ul id="paginadorProveedor" class="pagination pagination-sm mb-0"></ul>
+      </nav>
     </div>
   </div>
-  </div>
-
 </section>
 
 <!-- Modal Proveedor -->
@@ -144,21 +143,21 @@ $base = $base ?? ($this->config['app']['base_url'] ?? '');
 </div>
 
 <script>
-  // Endpoint base (evita hardcodear /public)
-  window.PROVEEDOR_API = "<?= $base ?>/controllers/AdminProveedor.php";
+  // Endpoint base
+  window.PROVEEDOR_API = '<?= $base ?>/controllers/AdminProveedor.php';
 
-  document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', () => {
     const btn = document.getElementById('btnNuevoProveedor');
-    if (btn) {
-      btn.addEventListener('click', function () {
+    if (btn){
+      btn.addEventListener('click', () => {
         const el = document.getElementById('modalProveedor');
-        if (el && window.bootstrap) new bootstrap.Modal(el).show();
+        if (el && window.bootstrap){
+          new bootstrap.Modal(el).show();
+        }
       });
     }
   });
 </script>
 
 <!-- JS específico de la página -->
-<script src="<?= $base ?>/assets/js/admin_proveedor.js?v=1" defer></script>
-
-<?php if (!$partial) include __DIR__ . '/../_shell_end.php'; ?>
+<script src="<?= $base ?>/assets/js/admin_proveedor.js?v=2"></script>

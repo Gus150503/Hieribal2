@@ -35,63 +35,53 @@ $can = function (string $perm) use ($rol, $ACL): bool {
 };
 ?>
 
-<link rel="stylesheet" href="<?= $base ?>/assets/css/sidebar.css">
-
-<aside class="sidebar">
-  <div class="sidebar-header">
-    <div class="brand">
-      <img src="<?= htmlspecialchars($base, ENT_QUOTES) ?>/assets/img/logo.png" alt="Logo" />
-    </div>
-
-    <!-- Botón colapsar/expandir -->
-    <button type="button" id="pinBtn" class="pin-btn" aria-label="Colapsar/Expandir menú" title="Colapsar">
-      <i class="bi bi-chevron-double-left"></i>
-    </button>
+<!-- ⚠️ ESTE PARCIAL NO DEBE CARGAR CSS/JS NI CREAR <aside> -->
+<div class="sidebar-header">
+  <div class="brand">
+    <img src="<?= htmlspecialchars($base, ENT_QUOTES) ?>/assets/img/logo.png" alt="Logo" />
   </div>
+</div>
 
-  <ul class="menu">
-    <?php if ($can('dashboard')): ?>
-      <li class="<?= $active('dashboard') ?>">
-        <a href="?r=admin/dashboard"><i class="bi bi-house-door"></i><span class="label">Inicio</span></a>
-      </li>
-    <?php endif; ?>
-
-    <?php if ($can('inventario')): ?>
-      <li class="<?= $active('inventario') ?>">
-        <a href="?r=admin/inventario"><i class="bi bi-box-seam"></i><span class="label">Inventario</span></a>
-      </li>
-    <?php endif; ?>
-
-    <?php if ($can('productos')): ?>
-      <li class="<?= $active('productos') ?>">
-        <a href="?r=admin/productos"><i class="bi bi-bag"></i><span class="label">Productos</span></a>
-      </li>
-    <?php endif; ?>
-
-    <?php if ($can('proveedores')): ?>
-      <li class="<?= $active('proveedores') ?>">
-        <a href="?r=admin/proveedores"><i class="bi bi-truck"></i><span class="label">Proveedores</span></a>
-      </li>
-    <?php endif; ?>
-
-    <?php if ($can('usuarios')): ?>
-      <li class="<?= $active('usuarios') ?>">
-        <a href="?r=admin/usuarios"><i class="bi bi-people"></i><span class="label">Usuarios</span></a>
-      </li>
-    <?php endif; ?>
-
-    <?php if ($can('configuracion')): ?>
-      <li class="<?= $active('configuracion') ?>">
-        <a href="?r=admin/configuracion"><i class="bi bi-gear"></i><span class="label">Configuración</span></a>
-      </li>
-    <?php endif; ?>
-
-    <li>
-      <a href="?r=admin_logout" data-no-spa rel="nofollow">
-        <i class="bi bi-box-arrow-right"></i><span class="label">Salir</span>
-      </a>
+<ul class="menu">
+  <?php if ($can('dashboard')): ?>
+    <li class="<?= $active('dashboard') ?>">
+      <a href="?r=admin/dashboard"><i class="bi bi-house-door"></i><span class="label">Inicio</span></a>
     </li>
-  </ul>
-</aside>
+  <?php endif; ?>
 
-<script src="<?= $base ?>/assets/js/sidebar.js"></script>
+  <?php if ($can('inventario')): ?>
+    <li class="<?= $active('inventario') ?>">
+      <a href="?r=admin/inventario"><i class="bi bi-box-seam"></i><span class="label">Inventario</span></a>
+    </li>
+  <?php endif; ?>
+
+  <?php if ($can('productos')): ?>
+    <li class="<?= $active('productos') ?>">
+      <a href="?r=admin/productos"><i class="bi bi-bag"></i><span class="label">Productos</span></a>
+    </li>
+  <?php endif; ?>
+
+  <?php if ($can('proveedores')): ?>
+    <li class="<?= $active('proveedores') ?>">
+      <a href="?r=admin/proveedores"><i class="bi bi-truck"></i><span class="label">Proveedores</span></a>
+    </li>
+  <?php endif; ?>
+
+  <?php if ($can('usuarios')): ?>
+    <li class="<?= $active('usuarios') ?>">
+      <a href="?r=admin/usuarios"><i class="bi bi-people"></i><span class="label">Usuarios</span></a>
+    </li>
+  <?php endif; ?>
+
+  <?php if ($can('configuracion')): ?>
+    <li class="<?= $active('configuracion') ?>">
+      <a href="?r=admin/configuracion"><i class="bi bi-gear"></i><span class="label">Configuración</span></a>
+    </li>
+  <?php endif; ?>
+
+  <li>
+    <a href="?r=admin_logout" data-no-spa rel="nofollow">
+      <i class="bi bi-box-arrow-right"></i><span class="label">Salir</span>
+    </a>
+  </li>
+</ul>

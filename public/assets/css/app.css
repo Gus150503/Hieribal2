@@ -177,3 +177,81 @@ html, body {
   /* Ajuste menor de paddings si lo ves necesario */
   /* .login .left-panel{ padding: 28px 22px; } */
 }
+/* Layout base */
+.dashboard-layout{
+  display: grid;
+  grid-template-columns: 260px 1fr;  /* ancho sidebar + contenido */
+  min-height: 100vh;
+}
+
+/* Sidebar fija a la izquierda */
+.sidebar{
+  background: #58b04f;          /* tu verde */
+  width: 260px;                  /* coherente con la grid */
+  overflow-y: auto;
+}
+
+/* Contenido principal */
+.main-content{
+  min-width: 0;                  /* evita overflow en grids */
+  background: #f4f6f8;
+}
+
+/* Contenedor central del dashboard */
+.dash-container{
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Móvil: sidebar superpuesta */
+@media (max-width: 992px){
+  .dashboard-layout{
+    grid-template-columns: 1fr;     /* una sola columna */
+  }
+  .sidebar{
+    position: fixed;
+    inset: 0 auto 0 0;
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+    z-index: 1040;
+  }
+  body.sidebar-open .sidebar{
+    transform: translateX(0);
+  }
+  .sidebar-backdrop{
+    position: fixed; inset: 0; 
+    background: rgba(0,0,0,.35);
+    opacity: 0; pointer-events: none; 
+    transition: opacity .2s;
+    z-index: 1030;
+  }
+  body.sidebar-open .sidebar-backdrop{
+    opacity: 1; pointer-events: auto;
+  }
+}
+/* --- Reset del empuje heredado --- */
+html, body{
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+.dashboard-layout .main-content{
+  margin-left: 0 !important;
+  padding-left: 2rem;   /* o lo que uses de padding interno */
+}
+
+/* Asegura que la grid y la sidebar concuerden */
+.dashboard-layout{
+  display: grid;
+  grid-template-columns: 260px 1fr; /* mismo ancho que la sidebar */
+}
+
+.sidebar{ width: 260px; } /* que coincida con lo anterior */
+.dashboard-layout .content,
+.dashboard-layout .wrapper,
+.dashboard-layout .page-content{
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+

@@ -1,10 +1,9 @@
-<?php $partial = !empty($_GET['partial']); ?>
-<?php if (!$partial) include __DIR__ . '/../_shell_start.php'; ?>
-<!-- Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<!-- Bootstrap Icons -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<?php
+// views/admin/inventario/index.php
+// ← Esta vista se renderiza dentro de plantilla.php (con sidebar y <main>)
+//    No incluir _shell_start/_shell_end ni Bootstrap aquí.
+$base = $this->config['app']['base_url'] ?? '';
+?>
 
 <section class="card shadow-sm ui-pro border-0 rounded-4">
   <div class="card-body">
@@ -147,37 +146,34 @@
   </div>
 </div>
 
-<!-- Bootstrap Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <style>
   /* Encabezado verde para la tabla de Inventario */
   #tblInventario thead.table-light{
-    /* pisa a Bootstrap */
     --bs-table-bg: var(--brand, #198754);
     --bs-table-color: #fff;
     --bs-table-border-color: rgba(255,255,255,.25);
-
     background: var(--brand, #198754) !important;
     color: #fff !important;
     background-image: none !important;
   }
-  #tblInventario thead.table-light th{
-    color: #fff !important;
-  }
+  #tblInventario thead.table-light th{ color:#fff !important; }
 </style>
 
-
 <script>
-  // Conectar botón con modal
-  document.getElementById('btnNuevo').addEventListener('click', function () {
-    const modal = new bootstrap.Modal(document.getElementById('modalInventario'));
-    modal.show();
-  });
+document.addEventListener('DOMContentLoaded', () => {
+  // Conectar botón con modal (Bootstrap ya está cargado por la plantilla)
+  const btnNuevo = document.getElementById('btnNuevo');
+  if (btnNuevo){
+    btnNuevo.addEventListener('click', () => {
+      const modal = new bootstrap.Modal(document.getElementById('modalInventario'));
+      modal.show();
+    });
+  }
 
-  // Definir API
-  window.INVENTARIO_API = '/controllers/AdminInventario.php';
+  // Definir API (ajusta si tu ruta es distinta)
+  window.INVENTARIO_API = '<?= $base ?>/controllers/AdminInventario.php';
+});
 </script>
 
-<script src="/public/assets/js/admin_inventario.js?v=1"></script>
-
-<?php if (!$partial) include __DIR__ . '/../_shell_end.php'; ?>
+<!-- JS propio de la página -->
+<script src="<?= $base ?>/assets/js/admin_inventario.js?v=2"></script>

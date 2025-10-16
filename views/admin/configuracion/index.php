@@ -1,5 +1,8 @@
-<?php $partial = !empty($_GET['partial']); ?>
-<?php if (!$partial) include __DIR__ . '/../_shell_start.php'; ?>
+<?php
+// views/admin/configuracion/index.php
+// Se inyecta dentro de plantilla.php (Bootstrap y sidebar ya cargan allí)
+$base = $this->config['app']['base_url'] ?? '';
+?>
 
 <section class="card shadow-sm border-0 rounded-4">
   <div class="card-body">
@@ -10,7 +13,7 @@
       </button>
     </div>
 
-    <!-- Forzamos visibilidad correcta de tabs si no está Bootstrap JS -->
+    <!-- Fallback por si Bootstrap JS no activa las tabs -->
     <style>
       .tab-pane{display:none}
       .tab-pane.active{display:block}
@@ -95,18 +98,24 @@
             <select id="ui_tema" class="form-select">
               <option value="light">Claro</option>
               <option value="dark">Oscuro</option>
+              <option value="auto">Automático</option>
             </select>
           </div>
+          <div class="col-md-4">
+            <label class="form-label">Color principal</label>
+            <input id="ui_color_principal" class="form-control" type="color" value="#198754" title="Color de marca">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Previsualización</label>
+            <div class="form-control d-flex align-items-center" style="height: 38px;">
+              <span class="badge text-bg-success" id="ui_preview">Botón</span>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </div> <!-- /tab-content -->
   </div>
 </section>
 
-<?php if (!$partial) { ?>
-  <!-- Ruta relativa para que cargue bajo /Hieribal2/public -->
-  <script src="assets/js/admin_config.js?v=4"></script>
-<?php } ?>
-<?php if (!$partial) include __DIR__ . '/../_shell_end.php'; ?>
+<!-- JS específico de Configuración -->
+<script src="<?= $base ?>/assets/js/admin_config.js?v=4"></script>
