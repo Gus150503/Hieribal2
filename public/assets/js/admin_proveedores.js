@@ -1,136 +1,113 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const modalProveedor = new bootstrap.Modal(document.getElementById("modalProveedor"));
-  const frmProveedor = document.getElementById("frmProveedor");
-  const btnNuevo = document.getElementById("btnNuevoProveedor");
-  const tabla = document.getElementById("tablaProveedores");
+  const form = document.getElementById("frmProveedor");
 
-  // === NUEVO PROVEEDOR ===
-  if (btnNuevo) {
-    btnNuevo.addEventListener("click", () => {
-      frmProveedor.reset();
-      document.getElementById("idProveedor").value = "";
-      document.querySelector("#modalProveedor .modal-title").textContent = "Nuevo Proveedor";
-      modalProveedor.show();
+  if (form) {
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (!form.checkValidity()) {
+        form.classList.add("was-validated");
+      } else {
+        guardarProveedor();
+      }
     });
   }
 
-  // === EDITAR PROVEEDOR ===
-  tabla.addEventListener("click", async (e) => {
-    if (e.target.classList.contains("btn-editar")) {
-      const id = e.target.dataset.id;
-      try {
-        const res = await fetch(`/controllers/AdminProveedor.php?action=get&id=${id}`);
-        const data = await res.json();
-        if (!data.data) throw new Error("Proveedor no encontrado");
+  function guardarProveedor() {
+    const data = new FormData(form);
 
-        const p = data.data;
-        document.getElementById("idProveedor").value = p.id;
-        document.getElementById("empresa").value = p.empresa;
-        document.getElementById("nit").value = p.nit;
-        document.getElementById("contacto").value = p.contacto;
-        document.getElementById("telefono").value = p.telefono;
-        document.getElementById("email").value = p.email;
-        document.getElementById("direccion").value = p.direccion;
-        document.getElementById("ciudad").value = p.ciudad;
-        document.getElementById("condiciones_pago").value = p.condiciones_pago;
-        document.getElementById("creado").value = p.creado;
+    fetch(window.PROVEEDOR_API, {
+      method: "POST",
+      body: data
+    })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          alert("Proveedor guardado con éxito");
+          bootstrap.Modal.getInstance(document.getElementById("modalProveedor")).hide();
+          form.reset();
+          form.classList.remove("was-validated");
+        } else {
+          alert("Error: " + (res.message || "No se pudo guardar"));
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Error en el servidor");
+      });
+  }
+});
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("frmProveedor");
+  const modalEl = document.getElementById("modalProveedor");
+  const modal = new bootstrap.Modal(modalEl);
+  const table = document.getElementById("tblProveedor").querySelector("tbody");
 
-        document.querySelector("#modalProveedor .modal-title").textContent = "Editar Proveedor";
-        modalProveedor.show();
-      } catch (err) {
-        alert("Error cargando proveedor: " + err.message);
-      }
-    }
+  document.getElementById("btnNuevoProveedor").addEventListener("click", () => {
+    form.reset();
+    form.classList.remove("was-validated");
+    modalEl.querySelector(".modal-title").textContent = "Nuevo Proveedor";
+    modal.show();
   });
 
-  // === GUARDAR PROVEEDOR ===
-  frmProveedor.addEventListener("submit", async (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const formData = new FormData(frmProveedor);
-    const id = formData.get("id");
+    if (!form.checkValidity()) {
+      form.classList.add("was-validated");
+      return;
+    }
 
-    const action = id ? "update" : "create";
-
+    const formData = new FormData(form);
     try {
-      const res = await fetch(`/controllers/AdminProveedor.php?action=${action}`, {
+      const res = await fetch(window.PROVEEDOR_API, {
         method: "POST",
         body: formData,
       });
       const data = await res.json();
-
-      if (!data.ok) throw new Error(data.msg || "Error en el servidor");
-
-      modalProveedor.hide();
-      frmProveedor.reset();
-      cargarProveedores();
+      if (data.success) {
+        alert("✅ Proveedor guardado correctamente");
+        modal.hide();
+        location.reload();
+      } else {
+        alert("⚠️ Error: " + (data.message || "No se pudo guardar"));
+      }
     } catch (err) {
-      alert("Error: " + err.message);
+      console.error(err);
+      alert("Error al guardar el proveedor");
     }
   });
 
-  // === ELIMINAR PROVEEDOR ===
-  tabla.addEventListener("click", async (e) => {
-    if (e.target.classList.contains("btn-eliminar")) {
-      const id = e.target.dataset.id;
-      if (!confirm("¿Eliminar este proveedor?")) return;
+  table.addEventListener("click", async (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
 
-      try {
-        const formData = new FormData();
-        formData.append("id", id);
+    const id = btn.dataset.id;
 
-        const res = await fetch(`/controllers/AdminProveedor.php?action=delete`, {
+    if (btn.classList.contains("btn-edit")) {
+      const res = await fetch(`${window.PROVEEDOR_API}?action=get&id=${id}`);
+      const data = await res.json();
+      if (data) {
+        Object.keys(data).forEach((key) => {
+          if (form[key]) form[key].value = data[key];
+        });
+        modalEl.querySelector(".modal-title").textContent = "Editar Proveedor";
+        modal.show();
+      }
+    }
+
+    if (btn.classList.contains("btn-delete")) {
+      if (confirm("¿Seguro de eliminar este proveedor?")) {
+        const res = await fetch(window.PROVEEDOR_API, {
           method: "POST",
-          body: formData,
+          body: new URLSearchParams({ action: "delete", id }),
         });
         const data = await res.json();
-
-        if (!data.ok) throw new Error(data.msg || "Error al eliminar");
-
-        cargarProveedores();
-      } catch (err) {
-        alert("Error: " + err.message);
+        if (data.success) {
+          alert("✅ Proveedor eliminado");
+          location.reload();
+        }
       }
     }
   });
-
-  // === LISTAR PROVEEDORES ===
-  async function cargarProveedores() {
-    try {
-      const res = await fetch(`/controllers/AdminProveedor.php?action=list`);
-      const data = await res.json();
-
-      if (!data.items) return;
-
-      const tbody = tabla.querySelector("tbody");
-      tbody.innerHTML = "";
-      data.items.forEach((p) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${p.id}</td>
-          <td>${p.empresa}</td>
-          <td>${p.nit}</td>
-          <td>${p.contacto}</td>
-          <td>${p.telefono}</td>
-          <td>${p.email}</td>
-          <td>${p.direccion}</td>
-          <td>${p.ciudad}</td>
-          <td>${p.condiciones_pago}</td>
-          <td>${p.creado}</td>
-          <td>
-            <button class="btn btn-sm btn-warning btn-editar" data-id="${p.id}">
-              <i class="bi bi-pencil"></i>
-            </button>
-            <button class="btn btn-sm btn-danger btn-eliminar" data-id="${p.id}">
-              <i class="bi bi-trash"></i>
-            </button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    } catch (err) {
-      console.error("Error cargando proveedores:", err);
-    }
-  }
-
-  cargarProveedores();
 });

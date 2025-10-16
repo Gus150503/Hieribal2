@@ -1,20 +1,19 @@
 <?php
-// views/admin/proveedores/index.php
-// Esta vista se renderiza dentro de plantilla.php (con sidebar y Bootstrap cargados)
-$base = $this->config['app']['base_url'] ?? '';
-?>
+$partial = !empty($_GET['partial']);
+if (!$partial) include __DIR__ . '/../_shell_start.php';
 
-<style>
-/* Encabezado amarillo para la tabla de Proveedores */
-#tblProveedor thead.table-light{
-  --bs-table-bg: #ffc107;
-  --bs-table-color: #fff;
+// Asegura base URL para rutas absolutas
+$base = $base ?? ($this->config['app']['base_url'] ?? '');
+?>
+<style>#tblProveedor thead.table-light {
+  --bs-table-bg: ##ffc107; /* azul Bootstrap por defecto */
+  --bs-table-color: #ffc107;
   --bs-table-border-color: rgba(255,255,255,.25);
   background: #ffc107 !important;
   color: #fff !important;
   background-image: none !important;
 }
-#tblProveedor thead.table-light th{ color:#fff !important; }
+#tblProveedor thead.table-light th { color: #fff !important; }
 </style>
 
 <section class="card shadow-sm ui-pro border-0 rounded-4">
@@ -57,82 +56,105 @@ $base = $this->config['app']['base_url'] ?? '';
         <tbody></tbody>
       </table>
     </div>
-
-    <div class="d-flex align-items-center justify-content-between mt-3">
-      <div class="d-flex align-items-center gap-2">
-        <label class="text-muted small me-1">Mostrar</label>
-        <select id="perPageProveedor" class="form-select form-select-sm" style="width:80px">
-          <option value="5">5</option>
-          <option value="10" selected>10</option>
-          <option value="20">20</option>
-          <option value="50">50</option>
-        </select>
-        <span id="totalProveedores" class="text-muted small ms-2"></span>
+          <div class="d-flex align-items-center justify-content-between mt-3">
+        <div class="d-flex align-items-center gap-2">
+          <label class="text-muted small me-1">Mostrar</label>
+          <select id="perPage" class="form-select form-select-sm" style="width:80px">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+          <span id="totalProveedores" class="text-muted small ms-2"></span>
+        </div>
+        <nav aria-label="Paginación">
+          <ul id="paginador" class="pagination pagination-sm mb-0"></ul>
+        </nav>
       </div>
-      <nav aria-label="Paginación">
-        <ul id="paginadorProveedor" class="pagination pagination-sm mb-0"></ul>
-      </nav>
     </div>
   </div>
+  </div>
+
 </section>
 
-<!-- Modal Proveedor -->
+<!-- Modal Proveedores -->
 <div class="modal fade" id="modalProveedor" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-  <div class="modal-dialog modal-xl">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Nuevo Proveedor</h5>
+        <h5 class="modal-title" id="modalTitleProveedor">Nuevo Proveedor</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
+
       <div class="modal-body">
-        <form id="frmProveedor" class="needs-validation" novalidate>
+        <form id="frmProveedor" class="needs-validation" method="POST" action="/Hieribal2/controllers/AdminProveedores.php" novalidate>
+          <input type="hidden" name="action" id="proveedorAction" value="create">
           <input type="hidden" name="id" id="idProveedor">
+  
+
 
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Empresa</label>
-              <input type="text" class="form-control" name="empresa" id="empresa" required>
-              <div class="invalid-feedback">Ingresa el nombre de la empresa.</div>
+              <input type="text" class="form-control" name="empresa" id="empresa" required maxlength="100">
+              <div class="invalid-feedback">Empresa inválida.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">NIT</label>
-              <input type="text" class="form-control" name="nit" id="nit" required>
-              <div class="invalid-feedback">Ingresa un NIT válido.</div>
+              <input type="text" class="form-control" name="nit" id="nit" required maxlength="20">
+              <div class="invalid-feedback">NIT inválido.</div>
             </div>
+
             <div class="col-md-6">
-              <label class="form-label">Contacto</label>
-              <input type="text" class="form-control" name="contacto" id="contacto">
+              <label class="form-label">Nombre Contacto</label>
+              <input type="text" class="form-control" name="nombre_contacto" id="nombre_contacto" required maxlength="100">
+              <div class="invalid-feedback">Nombre de contacto inválido.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Teléfono</label>
-              <input type="text" class="form-control" name="telefono" id="telefono">
+              <input type="text" class="form-control" name="telefono" id="telefono" maxlength="20">
+              <div class="invalid-feedback">Teléfono inválido.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Email</label>
-              <input type="email" class="form-control" name="email" id="email">
-              <div class="invalid-feedback">Ingresa un email válido.</div>
+              <input type="email" class="form-control" name="email" id="email" required maxlength="100">
+              <div class="invalid-feedback">Email inválido.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Dirección</label>
-              <input type="text" class="form-control" name="direccion" id="direccion">
+              <input type="text" class="form-control" name="direccion" id="direccion" maxlength="150">
+              <div class="invalid-feedback">Dirección inválida.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Ciudad</label>
-              <input type="text" class="form-control" name="ciudad" id="ciudad">
+              <input type="text" class="form-control" name="ciudad" id="ciudad" maxlength="100">
+              <div class="invalid-feedback">Ciudad inválida.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Condiciones de Pago</label>
-              <input type="text" class="form-control" name="condiciones_pago" id="condiciones_pago">
+              <input type="text" class="form-control" name="condiciones_pago" id="condiciones_pago" maxlength="100">
+              <div class="invalid-feedback">Condiciones de pago inválidas.</div>
             </div>
+
             <div class="col-md-6">
-              <label class="form-label">Creado</label>
-              <input type="date" class="form-control" name="creado" id="creado">
+              <label class="form-label">Estado</label>
+              <select class="form-select" name="estado" id="estado" required>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
+              <div class="invalid-feedback">Selecciona un estado.</div>
             </div>
           </div>
 
           <div class="modal-footer border-0 pt-3">
             <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-warning">
+            <button type="submit" class="btn btn-success">
               <i class="bi bi-check2-circle me-1"></i> Guardar
             </button>
           </div>
@@ -143,21 +165,11 @@ $base = $this->config['app']['base_url'] ?? '';
 </div>
 
 <script>
-  // Endpoint base
-  window.PROVEEDOR_API = '<?= $base ?>/controllers/AdminProveedor.php';
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('btnNuevoProveedor');
-    if (btn){
-      btn.addEventListener('click', () => {
-        const el = document.getElementById('modalProveedor');
-        if (el && window.bootstrap){
-          new bootstrap.Modal(el).show();
-        }
-      });
-    }
+  document.getElementById('btnNuevoProveedor').addEventListener('click', function () {
+    const modal = new bootstrap.Modal(document.getElementById('modalProveedor'));
+    modal.show();
   });
-</script>
 
-<!-- JS específico de la página -->
-<script src="<?= $base ?>/assets/js/admin_proveedor.js?v=2"></script>
+  window.PROVEEDOR_API = '/controllers/AdminProveedores.php';
+</script>
+<script src="/Hieribal2/public/assets/js/admin_proveedores.js?v=1" defer></script>

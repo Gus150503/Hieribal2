@@ -1,138 +1,214 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const modalProducto = new bootstrap.Modal(document.getElementById("modalProducto"));
-  const frmProducto = document.getElementById("frmProducto");
-  const btnNuevo = document.getElementById("btnNuevoProducto"); // botón "Nuevo Producto"
-  const tabla = document.getElementById("tablaProductos"); // tu tabla de productos
+  const API = window.PRODUCTO_API || "/controllers/AdminProducto.php";
+  const tbl = document.querySelector("#tblProducto tbody");
+  const modalEl = document.getElementById("modalProducto");
+  const frm = document.getElementById("frmProducto");
+  const btnNuevo = document.getElementById("btnNuevoProducto");
+  const modal = new bootstrap.Modal(modalEl);
+  const perPageSel = document.getElementById("perPage");
+  const qInput = document.getElementById("qProducto");
+  const btnBuscar = document.getElementById("btnBuscarProducto");
+  const paginador = document.getElementById("paginador");
+  const totalEl = document.getElementById("totalProducto");
 
-  // === NUEVO PRODUCTO ===
-  if (btnNuevo) {
-    btnNuevo.addEventListener("click", () => {
-      frmProducto.reset();
-      document.getElementById("idProducto").value = "";
-      document.querySelector("#modalProducto .modal-title").textContent = "Nuevo Producto";
-      modalProducto.show();
-    });
-  }
+  let currentPage = 1;
+  let perPage = parseInt(perPageSel.value, 10);
+  let q = "";
 
-  // === EDITAR PRODUCTO ===
-  tabla.addEventListener("click", async (e) => {
-    if (e.target.classList.contains("btn-editar")) {
-      const id = e.target.dataset.id;
-      try {
-        const res = await fetch(`/controllers/AdminProducto.php?action=get&id=${id}`);
-        const data = await res.json();
-        if (!data.data) throw new Error("Producto no encontrado");
+  /* -------------------- Helpers -------------------- */
+  const fetchJSON = async (url, opts = {}) => {
+    const res = await fetch(url, opts);
+    if (!res.ok) throw new Error("Error HTTP " + res.status);
+    return await res.json();
+  };
 
-        const p = data.data;
-        document.getElementById("idProducto").value = p.id;
-        document.getElementById("nombre").value = p.nombre;
-        document.getElementById("categoria").value = p.categoria;
-        document.getElementById("marca").value = p.marca;
-        document.getElementById("presentacion").value = p.presentacion;
-        document.getElementById("unidad").value = p.unidad;
-        document.getElementById("descripcion").value = p.descripcion;
-        document.getElementById("lote").value = p.lote;
-        document.getElementById("fvencimiento").value = p.f_vencimiento || "";
-        document.getElementById("precio_compra").value = p.precio_compra;
-        document.getElementById("precio_venta").value = p.precio_venta;
-        document.getElementById("iva").value = p.iva;
-        document.getElementById("codigo_sku").value = p.codigo_sku;
-        document.getElementById("ubicacion").value = p.ubicacion;
-        document.getElementById("estado").value = p.estado;
+  const loadProductos = async () => {
+    try {
+      const url = `${API}?action=list&q=${encodeURIComponent(q)}&page=${currentPage}&per=${perPage}`;
+      const data = await fetchJSON(url);
 
-        document.querySelector("#modalProducto .modal-title").textContent = "Editar Producto";
-        modalProducto.show();
-      } catch (err) {
-        alert("Error cargando producto: " + err.message);
+      tbl.innerHTML = "";
+      if (data.items && data.items.length > 0) {
+        data.items.forEach((p) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${p.id}</td>
+            <td>${p.nombre}</td>
+            <td>${p.categoria || ""}</td>
+            <td>${p.marca || ""}</td>
+            <td>${p.presentacion || ""}</td>
+            <td>${p.unidad || ""}</td>
+            <td>${p.descripcion || ""}</td>
+            <td>${p.lote || ""}</td>
+            <td>${p.f_vencimiento || ""}</td>
+            <td>${p.precio_compra ?? 0}</td>
+            <td>${p.precio_venta ?? 0}</td>
+            <td>${p.iva ?? 0}</td>
+            <td>${p.codigo_sku || ""}</td>
+            <td>${p.ubicacion || ""}</td>
+            <td>
+              <span class="badge ${p.estado === "activo" ? "bg-success" : "bg-secondary"}">
+                ${p.estado}
+              </span>
+            </td>
+            <td class="text-end">
+              <button class="btn btn-sm btn-primary me-1 btn-edit" data-id="${p.id}">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-sm btn-danger me-1 btn-delete" data-id="${p.id}">
+                <i class="bi bi-trash"></i>
+              </button>
+              <button class="btn btn-sm btn-warning btn-toggle" data-id="${p.id}">
+                <i class="bi bi-power"></i>
+              </button>
+            </td>
+          `;
+          tbl.appendChild(tr);
+        });
+      } else {
+        tbl.innerHTML = `<tr><td colspan="16" class="text-center text-muted">No se encontraron productos</td></tr>`;
       }
+
+      totalEl.textContent = `Total: ${data.total || 0}`;
+      renderPaginator(data.totalPages || 1);
+    } catch (err) {
+      console.error(err);
+      tbl.innerHTML = `<tr><td colspan="16" class="text-danger text-center">Error cargando productos</td></tr>`;
     }
+  };
+
+  const renderPaginator = (totalPages) => {
+    paginador.innerHTML = "";
+    for (let i = 1; i <= totalPages; i++) {
+      const li = document.createElement("li");
+      li.className = "page-item " + (i === currentPage ? "active" : "");
+      li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+      li.addEventListener("click", (e) => {
+        e.preventDefault();
+        currentPage = i;
+        loadProductos();
+      });
+      paginador.appendChild(li);
+    }
+  };
+
+  const resetForm = () => {
+    frm.reset();
+    frm.classList.remove("was-validated");
+    document.getElementById("productoAction").value = "create";
+    document.getElementById("idProducto").value = "";
+    document.getElementById("modalTitleProducto").textContent = "Nuevo Producto";
+  };
+
+  /* -------------------- Eventos -------------------- */
+  btnNuevo.addEventListener("click", () => {
+    resetForm();
+    modal.show();
   });
 
-  // === GUARDAR PRODUCTO ===
-  frmProducto.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = new FormData(frmProducto);
-    const id = formData.get("id");
+  btnBuscar.addEventListener("click", () => {
+    q = qInput.value.trim();
+    currentPage = 1;
+    loadProductos();
+  });
 
-    const action = id ? "update" : "create";
+  perPageSel.addEventListener("change", () => {
+    perPage = parseInt(perPageSel.value, 10);
+    currentPage = 1;
+    loadProductos();
+  });
+
+  // Guardar producto
+  frm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    frm.classList.add("was-validated");
+    if (!frm.checkValidity()) return;
+
+    const formData = new FormData(frm);
+    const action = formData.get("action");
 
     try {
-      const res = await fetch(`/controllers/AdminProducto.php?action=${action}`, {
+      const res = await fetch(API, {
         method: "POST",
         body: formData,
       });
-      const data = await res.json();
-
-      if (!data.ok) throw new Error(data.msg || "Error en el servidor");
-
-      modalProducto.hide();
-      frmProducto.reset();
-      cargarProductos(); // recarga la tabla
+      const json = await res.json();
+      if (json.ok) {
+        modal.hide();
+        loadProductos();
+      } else {
+        alert("Error: " + (json.msg || "No se pudo guardar"));
+      }
     } catch (err) {
-      alert("Error: " + err.message);
+      console.error(err);
+      alert("Error de red");
     }
   });
 
-  // === ELIMINAR PRODUCTO ===
-  tabla.addEventListener("click", async (e) => {
-    if (e.target.classList.contains("btn-eliminar")) {
-      const id = e.target.dataset.id;
-      if (!confirm("¿Eliminar este producto?")) return;
-
+  // Editar producto
+  tbl.addEventListener("click", async (e) => {
+    if (e.target.closest(".btn-edit")) {
+      const id = e.target.closest(".btn-edit").dataset.id;
       try {
-        const formData = new FormData();
-        formData.append("id", id);
-
-        const res = await fetch(`/controllers/AdminProducto.php?action=delete`, {
-          method: "POST",
-          body: formData,
-        });
-        const data = await res.json();
-
-        if (!data.ok) throw new Error(data.msg || "Error al eliminar");
-
-        cargarProductos();
+        const res = await fetch(`${API}?action=get&id=${id}`);
+        const json = await res.json();
+        if (json.data) {
+          resetForm();
+          Object.entries(json.data).forEach(([k, v]) => {
+            const el = frm.querySelector(`[name="${k}"]`);
+            if (el) el.value = v ?? "";
+          });
+          document.getElementById("productoAction").value = "update";
+          document.getElementById("idProducto").value = id;
+          document.getElementById("modalTitleProducto").textContent = "Editar Producto";
+          modal.show();
+        }
       } catch (err) {
-        alert("Error: " + err.message);
+        console.error(err);
+        alert("No se pudo cargar el producto");
       }
     }
   });
 
-  // === LISTAR PRODUCTOS ===
-  async function cargarProductos() {
-    try {
-      const res = await fetch(`/controllers/AdminProducto.php?action=list`);
-      const data = await res.json();
-
-      if (!data.items) return;
-
-      const tbody = tabla.querySelector("tbody");
-      tbody.innerHTML = "";
-      data.items.forEach((p) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${p.id}</td>
-          <td>${p.nombre}</td>
-          <td>${p.categoria}</td>
-          <td>${p.marca}</td>
-          <td>${p.precio_venta}</td>
-          <td>${p.estado}</td>
-          <td>
-            <button class="btn btn-sm btn-warning btn-editar" data-id="${p.id}">
-              <i class="bi bi-pencil"></i>
-            </button>
-            <button class="btn btn-sm btn-danger btn-eliminar" data-id="${p.id}">
-              <i class="bi bi-trash"></i>
-            </button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    } catch (err) {
-      console.error("Error cargando productos:", err);
+  // Eliminar producto
+  tbl.addEventListener("click", async (e) => {
+    if (e.target.closest(".btn-delete")) {
+      const id = e.target.closest(".btn-delete").dataset.id;
+      if (!confirm("¿Eliminar este producto?")) return;
+      const fd = new FormData();
+      fd.append("action", "delete");
+      fd.append("id", id);
+      try {
+        const res = await fetch(API, { method: "POST", body: fd });
+        const json = await res.json();
+        if (json.ok) loadProductos();
+        else alert("Error: " + (json.msg || "No se pudo eliminar"));
+      } catch (err) {
+        console.error(err);
+        alert("Error de red");
+      }
     }
-  }
+  });
 
-  // Carga inicial
-  cargarProductos();
+  // Toggle estado
+  tbl.addEventListener("click", async (e) => {
+    if (e.target.closest(".btn-toggle")) {
+      const id = e.target.closest(".btn-toggle").dataset.id;
+      const fd = new FormData();
+      fd.append("action", "toggle");
+      fd.append("id", id);
+      try {
+        const res = await fetch(API, { method: "POST", body: fd });
+        const json = await res.json();
+        if (json.ok) loadProductos();
+      } catch (err) {
+        console.error(err);
+        alert("Error de red");
+      }
+    }
+  });
+
+  /* -------------------- Inicial -------------------- */
+  loadProductos();
 });

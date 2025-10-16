@@ -1,20 +1,18 @@
-<?php
-// views/admin/productos/index.php
-// Esta vista se inyecta dentro de plantilla.php (que ya carga Bootstrap, Icons y sidebar)
-$base = $this->config['app']['base_url'] ?? '';
-?>
+<?php $partial = !empty($_GET['partial']); ?>
+<?php if (!$partial) include __DIR__ . '/../_shell_start.php'; ?>
 
-<style>
-/* Encabezado azul para la tabla de Productos */
-#tblProducto thead.table-light{
-  --bs-table-bg: #0d6efd;
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>#tblProducto thead.table-light {
+  --bs-table-bg: #0d6efd; /* azul Bootstrap por defecto */
   --bs-table-color: #fff;
   --bs-table-border-color: rgba(255,255,255,.25);
   background: #0d6efd !important;
   color: #fff !important;
   background-image: none !important;
 }
-#tblProducto thead.table-light th{ color:#fff !important; }
+#tblProducto thead.table-light th { color: #fff !important; }
 </style>
 
 <section class="card shadow-sm ui-pro border-0 rounded-4">
@@ -29,14 +27,12 @@ $base = $this->config['app']['base_url'] ?? '';
       </button>
     </div>
 
-    <!-- Buscador -->
     <div class="input-group mb-3" style="max-width:520px;">
       <span class="input-group-text"><i class="bi bi-search"></i></span>
       <input id="qProducto" type="search" class="form-control" placeholder="Buscar por nombre, marca o categoría…">
       <button id="btnBuscarProducto" class="btn btn-outline-primary">Buscar</button>
     </div>
 
-    <!-- Tabla -->
     <div class="table-responsive">
       <table id="tblProducto" class="table table-sm align-middle table-hover">
         <thead class="table-light position-sticky" style="top:0; z-index:1;">
@@ -62,113 +58,133 @@ $base = $this->config['app']['base_url'] ?? '';
         <tbody></tbody>
       </table>
     </div>
-
     <div class="d-flex align-items-center justify-content-between mt-3">
-      <div class="d-flex align-items-center gap-2">
-        <label class="text-muted small me-1">Mostrar</label>
-        <select id="perPageProducto" class="form-select form-select-sm" style="width:80px">
-          <option value="5">5</option>
-          <option value="10" selected>10</option>
-          <option value="20">20</option>
-          <option value="50">50</option>
-        </select>
-        <span id="totalProducto" class="text-muted small ms-2"></span>
+        <div class="d-flex align-items-center gap-2">
+          <label class="text-muted small me-1">Mostrar</label>
+          <select id="perPage" class="form-select form-select-sm" style="width:80px">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+          <span id="totalProducto" class="text-muted small ms-2"></span>
+        </div>
+        <nav aria-label="Paginación">
+          <ul id="paginador" class="pagination pagination-sm mb-0"></ul>
+        </nav>
       </div>
-      <nav aria-label="Paginación">
-        <ul id="paginadorProducto" class="pagination pagination-sm mb-0"></ul>
-      </nav>
     </div>
   </div>
+  </div>
+      
 </section>
 
-<!-- Modal Producto -->
+<!-- Modal Productos jj-->
 <div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-  <div class="modal-dialog modal-xl">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Nuevo Producto</h5>
+        <h5 class="modal-title" id="modalTitleProducto">Nuevo Producto</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
 
       <div class="modal-body">
-        <form id="frmProducto"
-              method="POST"
-              action="<?= $base ?>/?r=admin_producto/api"
-              enctype="multipart/form-data"
-              class="needs-validation"
-              novalidate>
-          <input type="hidden" name="action" value="create" id="productoAction">
+        <form id="frmProducto" class="needs-validation" method="POST" action="/Hieribal2/controllers/AdminProducto.php" novalidate>
+          <input type="hidden" name="action" id="productoAction" value="create">
           <input type="hidden" name="id" id="idProducto">
-
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Nombre</label>
-              <input type="text" class="form-control" name="nombre" id="nombre" required>
+              <input type="text" class="form-control" name="nombre" id="nombre" required maxlength="100">
+              <div class="invalid-feedback">Nombre inválido.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Categoría</label>
-              <input type="text" class="form-control" name="categoria" id="categoria" required>
+              <input type="text" class="form-control" name="categoria" id="categoria" required maxlength="100">
+              <div class="invalid-feedback">Categoría inválida.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Marca</label>
-              <input type="text" class="form-control" name="marca" id="marca">
+              <input type="text" class="form-control" name="marca" id="marca" maxlength="100">
+              <div class="invalid-feedback">Marca inválida.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Presentación</label>
-              <input type="text" class="form-control" name="presentacion" id="presentacion">
+              <input type="text" class="form-control" name="presentacion" id="presentacion" maxlength="100">
+              <div class="invalid-feedback">Presentación inválida.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Unidad</label>
-              <input type="text" class="form-control" name="unidad" id="unidad">
+              <input type="text" class="form-control" name="unidad" id="unidad" maxlength="50">
+              <div class="invalid-feedback">Unidad inválida.</div>
             </div>
-            <div class="col-md-6">
+
+            <div class="col-md-12">
               <label class="form-label">Descripción</label>
-              <textarea class="form-control" name="descripcion" id="descripcion"></textarea>
+              <textarea class="form-control" name="descripcion" id="descripcion" maxlength="255"></textarea>
+              <div class="invalid-feedback">Descripción inválida.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Lote</label>
-              <input type="text" class="form-control" name="lote" id="lote">
+              <input type="text" class="form-control" name="lote" id="lote" maxlength="50">
+              <div class="invalid-feedback">Lote inválido.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">F. Vencimiento</label>
-              <input type="date" class="form-control" name="fvencimiento" id="fvencimiento">
+             <input type="date" class="form-control" name="f_vencimiento" id="fvencimiento">
+              <div class="invalid-feedback">Fecha inválida.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Precio Compra</label>
-              <input type="number" class="form-control" name="precio_compra" id="precio_compra" min="0" step="0.01">
+              <input type="number" class="form-control" name="precio_compra" id="precio_compra" required step="0.01" min="0">
+              <div class="invalid-feedback">Precio de compra inválido.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Precio Venta</label>
-              <input type="number" class="form-control" name="precio_venta" id="precio_venta" min="0" step="0.01">
+              <input type="number" class="form-control" name="precio_venta" id="precio_venta" required step="0.01" min="0">
+              <div class="invalid-feedback">Precio de venta inválido.</div>
             </div>
-            <div class="col-md-6">
+
+            <div class="col-md-4">
               <label class="form-label">IVA (%)</label>
-              <input type="number" class="form-control" name="iva" id="iva" min="0" max="100" step="0.01">
+              <input type="number" class="form-control" name="iva" id="iva" step="0.01" min="0">
+              <div class="invalid-feedback">IVA inválido.</div>
             </div>
-            <div class="col-md-6">
-              <label class="form-label">Código SKU</label>
-              <input type="text" class="form-control" name="codigo_sku" id="codigo_sku">
+
+            <div class="col-md-4">
+              <label class="form-label">SKU</label>
+              <input type="text" class="form-control" name="codigo_sku" id="sku" maxlength="50">
+              <div class="invalid-feedback">SKU inválido.</div>
             </div>
-            <div class="col-md-6">
+
+            <div class="col-md-4">
               <label class="form-label">Ubicación</label>
-              <input type="text" class="form-control" name="ubicacion" id="ubicacion">
+              <input type="text" class="form-control" name="ubicacion" id="ubicacion" maxlength="100">
+              <div class="invalid-feedback">Ubicación inválida.</div>
             </div>
-            <div class="col-md-6">
-              <label class="form-label">Imagen</label>
-              <input type="file" name="imagen" id="imagen" class="form-control" accept="image/*">
-            </div>
+
             <div class="col-md-6">
               <label class="form-label">Estado</label>
-              <select class="form-select" name="estado" id="estado">
+              <select class="form-select" name="estado" id="estado" required>
                 <option value="activo">Activo</option>
                 <option value="inactivo">Inactivo</option>
               </select>
+              <div class="invalid-feedback">Selecciona un estado.</div>
             </div>
           </div>
 
           <div class="modal-footer border-0 pt-3">
             <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-primary">
+            
+            <button type="submit" class="btn btn-success">
               <i class="bi bi-check2-circle me-1"></i> Guardar
             </button>
           </div>
@@ -179,20 +195,11 @@ $base = $this->config['app']['base_url'] ?? '';
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // Abrir modal
-  const btn = document.getElementById('btnNuevoProducto');
-  if (btn){
-    btn.addEventListener('click', () => {
-      const modal = new bootstrap.Modal(document.getElementById('modalProducto'));
-      modal.show();
-    });
-  }
+  document.getElementById('btnNuevoProducto').addEventListener('click', function () {
+    const modal = new bootstrap.Modal(document.getElementById('modalProducto'));
+    modal.show();
+  });
 
-  // API base (ajusta si tu ruta difiere)
-  window.PRODUCTO_API = '<?= $base ?>/controllers/AdminProducto.php';
-});
+  window.PRODUCTO_API = '/controllers/AdminProducto.php';
 </script>
-
-<!-- JS propio de la página -->
-<script src="<?= $base ?>/assets/js/admin_producto.js?v=2"></script>
+<script src="/Hieribal2/public/assets/js/admin_productos.js?v=1" defer></script>
