@@ -73,6 +73,9 @@
       </div>
       <div>
         <div class="commitment-card">
+
+    
+
           <h3>Compromiso</h3>
           <p>Nuestro lema es ser comprometidos de una manera eficiente con nuestros clientes.</p>
         </div>

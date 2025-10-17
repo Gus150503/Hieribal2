@@ -1,13 +1,18 @@
-<?php $partial = !empty($_GET['partial']); ?>
-<?php if (!$partial) include __DIR__ . '/../_shell_start.php'; ?>
+<?php
+// views/admin/usuarios/verificacion.php (o el nombre que uses)
+// Se renderiza dentro de plantilla.php (que ya carga Bootstrap y sidebar)
+$base = $this->config['app']['base_url'] ?? '';
+$t = $titulo ?? 'Verificación de correo';
+$m = $msg ?? 'Resultado no disponible';
+?>
 
-<section class="card">
-  <h1><?= htmlspecialchars($titulo ?? 'Verificación de correo') ?></h1>
-  <p><?= htmlspecialchars($msg ?? 'Resultado no disponible') ?></p>
+<section class="card shadow-sm ui-pro border-0 rounded-4">
+  <div class="card-body">
+    <h1 class="h4 mb-2"><?= htmlspecialchars($t) ?></h1>
+    <p class="mb-3"><?= htmlspecialchars($m) ?></p>
 
-  <div style="margin-top:12px;">
-    <a class="btn btn-primary" href="<?= $this->config['app']['base_url'] ?>/?r=admin_usuarios">Volver a Usuarios</a>
+    <a class="btn btn-primary" href="<?= $base ?>/?r=admin_usuarios">
+      Volver a Usuarios
+    </a>
   </div>
 </section>
-
-<?php if (!$partial) include __DIR__ . '/../_shell_end.php'; ?>

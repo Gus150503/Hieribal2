@@ -1,18 +1,21 @@
-<?php $partial = !empty($_GET['partial']); ?>
-<?php if (!$partial) include __DIR__ . '/../_shell_start.php'; ?>
+<?php
+// views/admin/productos/index.php
+// Esta vista se renderiza dentro de plantilla.php (con sidebar y <main>)
+// No incluir _shell_start/_shell_end ni Bootstrap aquí (la plantilla ya los carga).
+$base = $this->config['app']['base_url'] ?? '';
+?>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
-<style>#tblProducto thead.table-light {
-  --bs-table-bg: #0d6efd; /* azul Bootstrap por defecto */
-  --bs-table-color: #fff;
-  --bs-table-border-color: rgba(255,255,255,.25);
-  background: #0d6efd !important;
-  color: #fff !important;
-  background-image: none !important;
-}
-#tblProducto thead.table-light th { color: #fff !important; }
+<style>
+  /* Encabezado azul para la tabla de Productos */
+  #tblProducto thead.table-light {
+    --bs-table-bg: #0d6efd; /* azul Bootstrap por defecto */
+    --bs-table-color: #fff;
+    --bs-table-border-color: rgba(255,255,255,.25);
+    background: #0d6efd !important;
+    color: #fff !important;
+    background-image: none !important;
+  }
+  #tblProducto thead.table-light th { color: #fff !important; }
 </style>
 
 <section class="card shadow-sm ui-pro border-0 rounded-4">
@@ -27,12 +30,14 @@
       </button>
     </div>
 
+    <!-- Buscador -->
     <div class="input-group mb-3" style="max-width:520px;">
       <span class="input-group-text"><i class="bi bi-search"></i></span>
       <input id="qProducto" type="search" class="form-control" placeholder="Buscar por nombre, marca o categoría…">
       <button id="btnBuscarProducto" class="btn btn-outline-primary">Buscar</button>
     </div>
 
+    <!-- Tabla -->
     <div class="table-responsive">
       <table id="tblProducto" class="table table-sm align-middle table-hover">
         <thead class="table-light position-sticky" style="top:0; z-index:1;">
@@ -58,28 +63,26 @@
         <tbody></tbody>
       </table>
     </div>
+
     <div class="d-flex align-items-center justify-content-between mt-3">
-        <div class="d-flex align-items-center gap-2">
-          <label class="text-muted small me-1">Mostrar</label>
-          <select id="perPage" class="form-select form-select-sm" style="width:80px">
-            <option value="5">5</option>
-            <option value="10" selected>10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-          </select>
-          <span id="totalProducto" class="text-muted small ms-2"></span>
-        </div>
-        <nav aria-label="Paginación">
-          <ul id="paginador" class="pagination pagination-sm mb-0"></ul>
-        </nav>
+      <div class="d-flex align-items-center gap-2">
+        <label class="text-muted small me-1">Mostrar</label>
+        <select id="perPage" class="form-select form-select-sm" style="width:80px">
+          <option value="5">5</option>
+          <option value="10" selected>10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+        </select>
+        <span id="totalProducto" class="text-muted small ms-2"></span>
       </div>
+      <nav aria-label="Paginación">
+        <ul id="paginador" class="pagination pagination-sm mb-0"></ul>
+      </nav>
     </div>
   </div>
-  </div>
-      
 </section>
 
-<!-- Modal Productos jj-->
+<!-- Modal Productos -->
 <div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -89,9 +92,10 @@
       </div>
 
       <div class="modal-body">
-        <form id="frmProducto" class="needs-validation" method="POST" action="/Hieribal2/controllers/AdminProducto.php" novalidate>
+        <form id="frmProducto" class="needs-validation" method="POST" action="<?= $base ?>/controllers/AdminProducto.php" novalidate>
           <input type="hidden" name="action" id="productoAction" value="create">
           <input type="hidden" name="id" id="idProducto">
+
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Nombre</label>
@@ -137,7 +141,7 @@
 
             <div class="col-md-6">
               <label class="form-label">F. Vencimiento</label>
-             <input type="date" class="form-control" name="f_vencimiento" id="fvencimiento">
+              <input type="date" class="form-control" name="f_vencimiento" id="fvencimiento">
               <div class="invalid-feedback">Fecha inválida.</div>
             </div>
 
@@ -183,7 +187,6 @@
 
           <div class="modal-footer border-0 pt-3">
             <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-            
             <button type="submit" class="btn btn-success">
               <i class="bi bi-check2-circle me-1"></i> Guardar
             </button>
@@ -195,11 +198,20 @@
 </div>
 
 <script>
-  document.getElementById('btnNuevoProducto').addEventListener('click', function () {
-    const modal = new bootstrap.Modal(document.getElementById('modalProducto'));
-    modal.show();
-  });
+document.addEventListener('DOMContentLoaded', () => {
+  // Abrir modal "Nuevo Producto"
+  const btnNuevoProducto = document.getElementById('btnNuevoProducto');
+  if (btnNuevoProducto) {
+    btnNuevoProducto.addEventListener('click', () => {
+      const modal = new bootstrap.Modal(document.getElementById('modalProducto'));
+      modal.show();
+    });
+  }
 
-  window.PRODUCTO_API = '/controllers/AdminProducto.php';
+  // Endpoint API para fetch/AJAX
+  window.PRODUCTO_API = '<?= $base ?>/controllers/AdminProducto.php';
+});
 </script>
-<script src="/Hieribal2/public/assets/js/admin_productos.js?v=1" defer></script>
+
+<!-- JS propio de la página (solo uno) -->
+<script src="<?= $base ?>/assets/js/admin_productos.js?v=1"></script>
