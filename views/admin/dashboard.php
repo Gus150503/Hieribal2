@@ -15,18 +15,18 @@ $normFoto = function(array $row): string {
 <div class="dash-container"><!-- ancho máx y márgenes del contenido -->
 
   <!-- Cabecera -->
-  <header class="page-head mb-4">
-    <h1 class="dash-title h2 mb-1">
+  <header class="page-head">
+    <h1 class="dash-title">
       Bienvenido, <?= htmlspecialchars($admin['nombre'] ?? '') ?>
       (<?= htmlspecialchars($admin['rol'] ?? '') ?>)
     </h1>
-    <p class="dash-sub text-muted">Accede a tus módulos desde el menú lateral.</p>
+    <p class="dash-sub">Accede a tus módulos desde el menú lateral.</p>
   </header>
 
   <!-- ===== GRID principal (KPIs izquierda + 4 héroes) ===== -->
-  <section class="hero-grid d-grid gap-4 mb-5">
+  <section class="hero-grid"><!-- clases utilitarias removidas -->
     <!-- KPI stack -->
-    <aside class="kpi-list d-grid gap-2">
+    <aside class="kpi-list"><!-- utilidades removidas -->
       <article class="kpi-tile kpi-red">
         <div class="kpi-name">👥 Total Empleados</div>
         <div class="kpi-num"><?= (int)($totalEmpleados ?? 0) ?></div>
@@ -49,7 +49,6 @@ $normFoto = function(array $row): string {
     <article class="hero panel">
       <h5 class="hero-title">🌟 Inventario destacado</h5>
       <div class="slider slider--hero" data-slider data-autoplay="4000">
-        <button class="slider-btn prev" data-prev>&lsaquo;</button>
         <div class="slider-track" data-track>
           <?php if (!empty($invDestacados)): foreach ($invDestacados as $p): $foto = $normFoto($p); ?>
             <div class="hero-card">
@@ -63,15 +62,13 @@ $normFoto = function(array $row): string {
             <div class="hero-card hero-empty">Sin datos</div>
           <?php endif; ?>
         </div>
-        <button class="slider-btn next" data-next>&rsaquo;</button>
       </div>
     </article>
 
     <!-- Héroe 2: Más vendidos -->
-    <article class="hero panel hero-red">
+    <article class="hero panel">
       <h5 class="hero-title">🏆 Más vendidos</h5>
       <div class="slider slider--hero" data-slider data-autoplay="4000">
-        <button class="slider-btn prev" data-prev>&lsaquo;</button>
         <div class="slider-track" data-track>
           <?php if (!empty($topVendidos)): foreach ($topVendidos as $p): $foto = $normFoto($p); ?>
             <div class="hero-card">
@@ -85,7 +82,6 @@ $normFoto = function(array $row): string {
             <div class="hero-card hero-empty">Sin datos</div>
           <?php endif; ?>
         </div>
-        <button class="slider-btn next" data-next>&rsaquo;</button>
       </div>
     </article>
 
@@ -93,7 +89,6 @@ $normFoto = function(array $row): string {
     <article class="hero panel">
       <h5 class="hero-title">🚨 Productos agotados</h5>
       <div class="slider slider--hero" data-slider data-autoplay="4000">
-        <button class="slider-btn prev" data-prev>&lsaquo;</button>
         <div class="slider-track" data-track>
           <?php if (!empty($agotados)): foreach ($agotados as $p): $foto = $normFoto($p); ?>
             <div class="hero-card">
@@ -107,15 +102,13 @@ $normFoto = function(array $row): string {
             <div class="hero-card hero-empty">Sin datos</div>
           <?php endif; ?>
         </div>
-        <button class="slider-btn next" data-next>&rsaquo;</button>
       </div>
     </article>
 
     <!-- Héroe 4: 1 año en la empresa -->
-    <article class="hero panel hero-red">
+    <article class="hero panel">
       <h5 class="hero-title">🎉 1 año en la empresa</h5>
       <div class="slider slider--hero" data-slider data-autoplay="4000">
-        <button class="slider-btn prev" data-prev>&lsaquo;</button>
         <div class="slider-track" data-track>
           <?php if (!empty($aniversario1Año)): foreach ($aniversario1Año as $e): $foto = $normFoto($e); ?>
             <div class="hero-card">
@@ -129,24 +122,23 @@ $normFoto = function(array $row): string {
             <div class="hero-card hero-empty">Sin datos</div>
           <?php endif; ?>
         </div>
-        <button class="slider-btn next" data-next>&rsaquo;</button>
       </div>
     </article>
   </section><!-- /hero-grid -->
 
   <!-- ===== CHARTS ===== -->
-  <section class="charts-grid d-grid gap-4">
+  <section class="charts-grid"><!-- utilidades removidas -->
     <div class="panel">
       <h5>🟡 Productos por acabarse</h5>
-      <div class="chart-card" style="height:260px"><canvas id="barLowStock"></canvas></div>
+      <div class="chart-card"><canvas id="barLowStock"></canvas></div>
     </div>
     <div class="panel">
       <h5>🧾 Productos por pedir</h5>
-      <div class="chart-card" style="height:260px"><canvas id="barToOrder"></canvas></div>
+      <div class="chart-card"><canvas id="barToOrder"></canvas></div>
     </div>
     <div class="panel">
       <h5>👑 Clientes que más compran</h5>
-      <div class="chart-card" style="height:260px"><canvas id="barTopClients"></canvas></div>
+      <div class="chart-card"><canvas id="barTopClients"></canvas></div>
     </div>
   </section>
 
@@ -164,17 +156,16 @@ $normFoto = function(array $row): string {
 <!-- JS local del dashboard: sliders + charts -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  /* ===== Sliders simples ===== */
+  /* ===== Sliders simples (autoplay, sin flechas) ===== */
   document.querySelectorAll('[data-slider]').forEach(slider => {
     const track = slider.querySelector('[data-track]');
-    const prev  = slider.querySelector('[data-prev]');
-    const next  = slider.querySelector('[data-next]');
     if (!track) return;
 
     const delay = +slider.getAttribute('data-autoplay') || 4000;
     let idx = 0, timer;
 
     const go = (i) => {
+      if (!track.children.length) return;
       idx = Math.max(0, Math.min(i, track.children.length - 1));
       const w = track.clientWidth; // 100% por vista
       track.scrollTo({ left: idx * w, behavior: 'smooth' });
@@ -183,11 +174,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const start = () => { stop(); timer = setInterval(step, delay); };
     const stop  = () => { if (timer) clearInterval(timer); };
 
-    prev?.addEventListener('click', e => { e.preventDefault(); stop(); go(idx - 1); });
-    next?.addEventListener('click', e => { e.preventDefault(); stop(); go(idx + 1); });
     slider.addEventListener('mouseenter', stop);
     slider.addEventListener('mouseleave', start);
-
     start();
   });
 
