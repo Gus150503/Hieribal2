@@ -195,6 +195,24 @@ switch ($r) {
         (new AdminProveedores($config))->index();
         break;
 
+        /* ====== Módulos de Inventario/Productos/Proveedores ====== */
+case 'admin_inventario':
+    (new AdminInventario($config))->index();
+    break;
+
+case 'admin_inventario_api':                // <-- FALTABA ESTA RUTA
+    (new AdminInventario($config))->api();
+    break;
+
+case 'admin_productos':
+    (new AdminProducto($config))->index();  // OJO: clase singular
+    break;
+
+case 'admin_proveedores':
+    (new AdminProveedores($config))->index();
+    break;
+
+
     /* ====== 404 ====== */
     default:
         http_response_code(404);
