@@ -1,4 +1,5 @@
 <?php
+
 namespace Controllers;
 
 use Core\Controller;
@@ -13,7 +14,7 @@ final class HomeController extends Controller
             'home/index',
             [
                 // Carga CSS específico de la portada
-                'extra_css' => [ $base . '/assets/css/home.css' ],
+                'extra_css' => [$base . '/assets/css/home.css'],
                 // Si algún día necesitas JS propio de la home:
                 // 'extra_js'  => [ $base . '/assets/js/home.js' ],
             ],
@@ -30,7 +31,7 @@ final class HomeController extends Controller
         }
 
         $this->render(
-            'home/Carrito',
+
             [
                 'cliente' => $_SESSION['cliente'] ?? null,
             ],
