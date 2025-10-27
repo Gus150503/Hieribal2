@@ -7,7 +7,7 @@
   <title>Mi Hieribal - Tienda</title>
   
   <!-- CSS -->
-  <link rel="stylesheet" href="<?= $base ?>/assets/css/dashboard.css">
+  <link rel="stylesheet" href="<?= $base ?>/assets/css/carrito.css">
 </head>
 <body>
 

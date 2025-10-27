@@ -1,17 +1,21 @@
-/* ==== Sidebar ==== */
+/* ================== Base ================== */
 .sidebar {
   width: 240px;
-  transition: width .3s ease;
   background: #6FBC43;
   min-height: 100vh;
   border-right: 1px solid #e5e7eb;
+  position: sticky;          /* desktop */
+  top: 0;                    /* desktop */
+  z-index: 1001;             /* por encima del backdrop */
+  transition: width .3s ease, transform .3s ease;
 }
 
 .sidebar-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   padding: .75rem .85rem;
+  position: relative;        /* para posicionar el pin dentro */
 }
 
 .sidebar-header .brand {
@@ -25,15 +29,11 @@
 }
 
 .menu {
-  list-style: none;
-  margin: 0;
-  padding: .5rem;
+    list-style: none;
+    margin-top: 60px;
+    padding: .9rem;
 }
-
-.menu li {
-  margin: 2px 0;
-}
-
+.menu li { margin: 2px 0; }
 .menu a {
   display: flex;
   align-items: center;
@@ -43,57 +43,165 @@
   color: #111827;
   text-decoration: none;
 }
+.menu a:hover { background: #f3f4f6; }
+.menu .label { transition: opacity .2s ease; }
+.menu i { font-size: 1.05rem; line-height: 1; }
 
-.menu a:hover {
-  background: #f3f4f6;
+/* ================== Desktop: colapsado ================== */
+.sidebar-collapsed .sidebar { width: 72px; }
+.sidebar-collapsed .menu .label { display: none; }
+.sidebar-collapsed .sidebar-header img {
+  height: 40px !important;
+  display: block;
+  margin: 0 auto;
 }
 
-.menu .label {
-  transition: opacity .2s ease;
+/* ================== Botones ================== */
+/* Hamburguesa básica (la del header del sidebar) */
+.hamburger{
+  display: inline-flex;
+  border: 0;
+  background: transparent;
+  padding: .4rem;
+  margin-right: .25rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+.hamburger span{
+  display: block;
+  width: 22px;
+  height: 3px;
+  margin: 4px 0;
+  background: #fff;           /* contraste con el verde */
+  border-radius: 2px;
+  transition: all .3s ease;
 }
 
-/* ==== Estado colapsado ==== */
-.sidebar-collapsed .sidebar {
-  width: 72px;
-}
-
-.sidebar-collapsed .menu .label {
-  display: none;
-}
-
-.sidebar-collapsed .sidebar-header .brand-text {
-  display: none;
-}
-
-.sidebar-collapsed .pin-btn i {
-  transform: rotate(180deg);
-}
-
-/* ==== Botón pin bonito ==== */
-.pin-btn {
-  position: absolute;       /* flotante dentro del sidebar */
-  top: 10px;                /* margen desde arriba */
-  left: 50%;                /* centrado horizontal */
-  transform: translateX(-50%);
-  
+/* PIN dentro del header del sidebar (siempre visible en desktop) */
+.sidebar-header .pin-btn{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  left: auto;
+  transform: none;
   border: none;
-  background: #ffffff;
+  background: #fff;
   color: #6FBC43;
   cursor: pointer;
   border-radius: 50%;
   width: 36px;
   height: 36px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 1.2rem;
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   transition: all .3s ease;
-  z-index: 1000;            /* encima de todo */
+  z-index: 2;                 /* por encima del logo */
 }
-
-.pin-btn:hover {
+.sidebar-header .pin-btn:hover{
   background: #6FBC43;
   color: #fff;
-  transform: translateX(-50%) rotate(15deg); /* mantiene centrado con el giro */
+}
+.sidebar-collapsed .pin-btn i { transform: rotate(180deg); }
+
+/* Botón cerrar (X) — se muestra solo en móvil (ver media queries) */
+.sidebar-close{
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: #fff;
+  color: #6FBC43;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  line-height: 36px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+  cursor: pointer;
+}
+
+/* ================== Backdrop (móvil) ================== */
+.sidebar-backdrop{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.35);
+  z-index: 1000;              /* debajo del sidebar */
+}
+body.sidebar-open .sidebar-backdrop{ display:block; }
+.sidebar-backdrop[hidden]{ display:none !important; }
+
+/* ================== Móvil: off-canvas ================== */
+@media (max-width: 991px){
+  .sidebar{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100dvh;
+    transform: translateX(-100%);   /* oculto por defecto */
+    will-change: transform;
+  }
+  body.sidebar-open .sidebar{ transform: translateX(0); }
+
+  /* En móvil: mostrar hamburguesa y “×” dentro del sidebar; ocultar pin */
+  .sidebar-header .hamburger{ display: inline-flex !important; }
+  .sidebar-close{ display: inline-flex !important; }
+  #pinBtn{ display: none !important; }
+}
+
+/* ================== Desktop: solo pin ================== */
+@media (min-width: 992px){
+  .sidebar-header .hamburger,
+  .sidebar-close{ display: none !important; }
+}
+
+/* ================== Hamburguesa flotante (móvil, fuera del sidebar) ================== */
+.mobile-hamburger{
+  display: none;   /* desktop: oculto */
+}
+
+@media (max-width: 991px){
+  .mobile-hamburger{
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1102;                     /* por encima del sidebar (1001) y backdrop (1000) */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .45rem;
+    border: 0;
+    background: #ffffff;
+    border-radius: 9999px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    cursor: pointer;
+  }
+  /* Cuando el menú está abierto, ocultamos el botón flotante */
+  body.sidebar-open .mobile-hamburger{ display: none !important; }
+}
+/* === Ocultar logo SOLO al colapsar o cerrar sidebar === */
+
+/* 🧩 Desktop: cuando el body tiene clase .sidebar-collapsed */
+@media (min-width: 992px) {
+  body.sidebar-collapsed .sidebar-header .brand img {
+    display: none !important;
+  }
+}
+
+/* 📱 Móvil: cuando el sidebar está CERRADO (escondido fuera del canvas) */
+@media (max-width: 991px) {
+  /* Logo visible por defecto en móvil */
+  .sidebar-header .brand img {
+    display: block !important;
+  }
+
+  /* Pero se oculta SOLO cuando el menú está cerrado */
+  body:not(.sidebar-open) .sidebar .brand img {
+    display: none !important;
+  }
 }
