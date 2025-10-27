@@ -35,53 +35,84 @@ $can = function (string $perm) use ($rol, $ACL): bool {
 };
 ?>
 
-<!-- ⚠️ ESTE PARCIAL NO DEBE CARGAR CSS/JS NI CREAR <aside> -->
-<div class="sidebar-header">
+<!-- ⚠️ Este parcial NO crea <aside> ni importa CSS/JS -->
+<header class="sidebar-header">
+  <!-- Hamburguesa (móvil/off-canvas; en desktop actúa como colapsar) -->
+  <button id="sidebarToggle"
+          class="hamburger"
+          aria-label="Abrir menú"
+          aria-expanded="false"
+          aria-controls="adminSidebar">
+    <span></span><span></span><span></span>
+  </button>
+
   <div class="brand">
     <img src="<?= htmlspecialchars($base, ENT_QUOTES) ?>/assets/img/logo.png" alt="Logo" />
   </div>
-</div>
 
-<ul class="menu">
-  <?php if ($can('dashboard')): ?>
-    <li class="<?= $active('dashboard') ?>">
-      <a href="?r=admin/dashboard"><i class="bi bi-house-door"></i><span class="label">Inicio</span></a>
+  <!-- Pin (desktop: colapsa/expande) -->
+  <button id="pinBtn" class="pin-btn" type="button" title="Colapsar" aria-label="Colapsar menú">
+    <i class="bi bi-chevron-double-left"></i>
+  </button>
+
+  <!-- Cerrar (solo móvil; cierra off-canvas) -->
+  <button type="button" class="sidebar-close" aria-label="Cerrar menú">&times;</button>
+</header>
+
+<nav class="sidebar-nav" role="navigation" aria-label="Menú principal">
+  <ul class="menu">
+    <?php if ($can('dashboard')): ?>
+      <li class="<?= $active('dashboard') ?>">
+        <a href="?r=admin/dashboard" aria-current="<?= $sec==='dashboard'?'page':'false' ?>">
+          <i class="bi bi-house-door"></i><span class="label">Inicio</span>
+        </a>
+      </li>
+    <?php endif; ?>
+
+    <?php if ($can('inventario')): ?>
+      <li class="<?= $active('inventario') ?>">
+        <a href="?r=admin/inventario" aria-current="<?= $sec==='inventario'?'page':'false' ?>">
+          <i class="bi bi-box-seam"></i><span class="label">Inventario</span>
+        </a>
+      </li>
+    <?php endif; ?>
+
+    <?php if ($can('productos')): ?>
+      <li class="<?= $active('productos') ?>">
+        <a href="?r=admin/productos" aria-current="<?= $sec==='productos'?'page':'false' ?>">
+          <i class="bi bi-bag"></i><span class="label">Productos</span>
+        </a>
+      </li>
+    <?php endif; ?>
+
+    <?php if ($can('proveedores')): ?>
+      <li class="<?= $active('proveedores') ?>">
+        <a href="?r=admin/proveedores" aria-current="<?= $sec==='proveedores'?'page':'false' ?>">
+          <i class="bi bi-truck"></i><span class="label">Proveedores</span>
+        </a>
+      </li>
+    <?php endif; ?>
+
+    <?php if ($can('usuarios')): ?>
+      <li class="<?= $active('usuarios') ?>">
+        <a href="?r=admin/usuarios" aria-current="<?= $sec==='usuarios'?'page':'false' ?>">
+          <i class="bi bi-people"></i><span class="label">Usuarios</span>
+        </a>
+      </li>
+    <?php endif; ?>
+
+    <?php if ($can('configuracion')): ?>
+      <li class="<?= $active('configuracion') ?>">
+        <a href="?r=admin/configuracion" aria-current="<?= $sec==='configuracion'?'page':'false' ?>">
+          <i class="bi bi-gear"></i><span class="label">Configuración</span>
+        </a>
+      </li>
+    <?php endif; ?>
+
+    <li>
+      <a href="?r=admin_logout" data-no-spa rel="nofollow">
+        <i class="bi bi-box-arrow-right"></i><span class="label">Salir</span>
+      </a>
     </li>
-  <?php endif; ?>
-
-  <?php if ($can('inventario')): ?>
-    <li class="<?= $active('inventario') ?>">
-      <a href="?r=admin/inventario"><i class="bi bi-box-seam"></i><span class="label">Inventario</span></a>
-    </li>
-  <?php endif; ?>
-
-  <?php if ($can('productos')): ?>
-    <li class="<?= $active('productos') ?>">
-      <a href="?r=admin/productos"><i class="bi bi-bag"></i><span class="label">Productos</span></a>
-    </li>
-  <?php endif; ?>
-
-  <?php if ($can('proveedores')): ?>
-    <li class="<?= $active('proveedores') ?>">
-      <a href="?r=admin/proveedores"><i class="bi bi-truck"></i><span class="label">Proveedores</span></a>
-    </li>
-  <?php endif; ?>
-
-  <?php if ($can('usuarios')): ?>
-    <li class="<?= $active('usuarios') ?>">
-      <a href="?r=admin/usuarios"><i class="bi bi-people"></i><span class="label">Usuarios</span></a>
-    </li>
-  <?php endif; ?>
-
-  <?php if ($can('configuracion')): ?>
-    <li class="<?= $active('configuracion') ?>">
-      <a href="?r=admin/configuracion"><i class="bi bi-gear"></i><span class="label">Configuración</span></a>
-    </li>
-  <?php endif; ?>
-
-  <li>
-    <a href="?r=admin_logout" data-no-spa rel="nofollow">
-      <i class="bi bi-box-arrow-right"></i><span class="label">Salir</span>
-    </a>
-  </li>
-</ul>
+  </ul>
+</nav>

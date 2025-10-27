@@ -1,7 +1,6 @@
 <?php
 // views/admin/inventario/index.php
-// ← Esta vista se renderiza dentro de plantilla.php (con sidebar y <main>)
-//    No incluir _shell_start/_shell_end ni Bootstrap aquí (ya los carga la plantilla).
+// Esta vista se renderiza dentro de plantilla.php (sidebar + bootstrap ya están allí)
 $base = $this->config['app']['base_url'] ?? '';
 ?>
 
@@ -43,9 +42,7 @@ $base = $this->config['app']['base_url'] ?? '';
             <th class="text-end">Acciones</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Aquí se cargarán los datos -->
-        </tbody>
+        <tbody></tbody>
       </table>
 
       <div class="d-flex align-items-center justify-content-between mt-3">
@@ -69,16 +66,15 @@ $base = $this->config['app']['base_url'] ?? '';
 
 <!-- Modal Inventario -->
 <div class="modal fade" id="modalInventario" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalTitle">Nuevo Inventario</h5>
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 rounded-4 shadow">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-semibold" id="modalTitle">Nuevo inventario</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
 
-      <div class="modal-body">
-        <form id="frmInventario" class="needs-validation" method="POST" action="<?= $base ?>/controllers/AdminInventario.php" novalidate>
-          <input type="hidden" name="action" id="inventarioAction" value="create">
+      <div class="modal-body pt-3">
+        <form id="frmInventario" class="needs-validation" novalidate>
           <input type="hidden" name="id" id="idInventario">
 
           <div class="row g-3">
@@ -91,7 +87,7 @@ $base = $this->config['app']['base_url'] ?? '';
             <div class="col-md-6">
               <label class="form-label">Código Interno</label>
               <input type="text" class="form-control" name="codigo_interno" id="codigo_interno" required maxlength="50">
-              <div class="invalid-feedback">Código inválido.</div>
+              <div class="invalid-feedback">Código inválido (mín. 3).</div>
             </div>
 
             <div class="col-md-4">
@@ -143,6 +139,7 @@ $base = $this->config['app']['base_url'] ?? '';
           </div>
         </form>
       </div>
+
     </div>
   </div>
 </div>
@@ -161,20 +158,20 @@ $base = $this->config['app']['base_url'] ?? '';
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // Conectar botón con modal (Bootstrap debe estar cargado por la plantilla)
-  const btnNuevo = document.getElementById('btnNuevo');
-  if (btnNuevo){
-    btnNuevo.addEventListener('click', () => {
-      const modal = new bootstrap.Modal(document.getElementById('modalInventario'));
-      modal.show();
-    });
-  }
+  // Endpoint base para el módulo Inventario (router)
+  window.INVENTARIO_API = '<?= $base ?>/?r=admin_inventario_api';
 
-  // Definir API (ajusta si tu ruta es distinta)
-  window.INVENTARIO_API = '<?= $base ?>/controllers/AdminInventario.php';
-});
+  document.addEventListener('DOMContentLoaded', () => {
+    // Abrir modal "Nuevo"
+    const btn = document.getElementById('btnNuevo');
+    if (btn && window.bootstrap) {
+      btn.addEventListener('click', () => {
+        const el = document.getElementById('modalInventario');
+        if (el) new bootstrap.Modal(el).show();
+      });
+    }
+  });
 </script>
 
-<!-- JS propio de la página (solo uno) -->
-<script src="<?= $base ?>/assets/js/admin_inventario.js?v=2"></script>
+<!-- JS propio de la página -->
+<script src="<?= $base ?>/assets/js/admin_inventario.js?v=2" defer></script>

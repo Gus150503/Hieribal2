@@ -1,21 +1,16 @@
 <?php
 // views/admin/proveedores/index.php
-// Esta vista se renderiza dentro de plantilla.php (con sidebar y <main>)
-// No incluir _shell_start/_shell_end ni Bootstrap aquí (la plantilla ya los carga).
 $base = $this->config['app']['base_url'] ?? '';
 ?>
-
 <style>
-  /* Encabezado amarillo para la tabla de Proveedores */
-  #tblProveedor thead.table-light {
-    --bs-table-bg: #ffc107;           /* amarillo Bootstrap */
-    --bs-table-color: #fff;
+  /* Encabezado amarillo */
+  #tblProveedor thead.table-light{
+    --bs-table-bg: #ffc107;
+    --bs-table-color:#fff;
     --bs-table-border-color: rgba(255,255,255,.25);
-    background: #ffc107 !important;
-    color: #fff !important;
-    background-image: none !important;
+    background:#ffc107!important; color:#fff!important; background-image:none!important;
   }
-  #tblProveedor thead.table-light th { color:#fff !important; }
+  #tblProveedor thead.table-light th{ color:#fff!important; }
 </style>
 
 <section class="card shadow-sm ui-pro border-0 rounded-4">
@@ -30,14 +25,12 @@ $base = $this->config['app']['base_url'] ?? '';
       </button>
     </div>
 
-    <!-- Buscador -->
     <div class="input-group mb-3" style="max-width:520px;">
       <span class="input-group-text"><i class="bi bi-search"></i></span>
-      <input id="qProveedor" type="search" class="form-control" placeholder="Buscar por empresa o contacto…">
+      <input id="qProveedor" type="search" class="form-control" placeholder="Buscar por empresa, contacto, NIT o ciudad…">
       <button id="btnBuscarProveedor" class="btn btn-outline-warning">Buscar</button>
     </div>
 
-    <!-- Tabla -->
     <div class="table-responsive">
       <table id="tblProveedor" class="table table-sm align-middle table-hover">
         <thead class="table-light position-sticky" style="top:0; z-index:1;">
@@ -51,33 +44,33 @@ $base = $this->config['app']['base_url'] ?? '';
             <th>Dirección</th>
             <th>Ciudad</th>
             <th>Condiciones de Pago</th>
+            <th>Estado</th>           <!-- 👈 NUEVA COLUMNA -->
             <th>Creado</th>
             <th class="text-end">Acciones</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
-    </div>
-
-    <div class="d-flex align-items-center justify-content-between mt-3">
-      <div class="d-flex align-items-center gap-2">
-        <label class="text-muted small me-1">Mostrar</label>
-        <select id="perPage" class="form-select form-select-sm" style="width:80px">
-          <option value="5">5</option>
-          <option value="10" selected>10</option>
-          <option value="20">20</option>
-          <option value="50">50</option>
-        </select>
-        <span id="totalProveedores" class="text-muted small ms-2"></span>
+      <div class="d-flex align-items-center justify-content-between mt-3">
+        <div class="d-flex align-items-center gap-2">
+          <label class="text-muted small me-1">Mostrar</label>
+          <select id="perPage" class="form-select form-select-sm" style="width:80px">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+          <span id="totalProveedores" class="text-muted small ms-2"></span>
+        </div>
+        <nav aria-label="Paginación">
+          <ul id="paginador" class="pagination pagination-sm mb-0"></ul>
+        </nav>
       </div>
-      <nav aria-label="Paginación">
-        <ul id="paginador" class="pagination pagination-sm mb-0"></ul>
-      </nav>
     </div>
   </div>
 </section>
 
-<!-- Modal Proveedores -->
+<!-- Modal -->
 <div class="modal fade" id="modalProveedor" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -87,8 +80,7 @@ $base = $this->config['app']['base_url'] ?? '';
       </div>
 
       <div class="modal-body">
-        <form id="frmProveedor" class="needs-validation" method="POST" action="<?= $base ?>/controllers/AdminProveedores.php" novalidate>
-          <input type="hidden" name="action" id="proveedorAction" value="create">
+        <form id="frmProveedor" class="needs-validation" novalidate>
           <input type="hidden" name="id" id="idProveedor">
 
           <div class="row g-3">
@@ -165,19 +157,19 @@ $base = $this->config['app']['base_url'] ?? '';
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // Abrir modal "Nuevo Proveedor"
-  const btnNuevoProveedor = document.getElementById('btnNuevoProveedor');
-  if (btnNuevoProveedor) {
-    btnNuevoProveedor.addEventListener('click', () => {
-      const modal = new bootstrap.Modal(document.getElementById('modalProveedor'));
-      modal.show();
-    });
-  }
+  // Rutas API por router
+  window.PROVEEDOR_API = '<?= $base ?>/public/?r=admin_proveedores_api';
 
-  // Endpoint API para fetch/AJAX
-  window.PROVEEDOR_API = '<?= $base ?>/controllers/AdminProveedores.php';
+  // Abrir modal "Nuevo"
+  document.getElementById('btnNuevoProveedor')?.addEventListener('click', () => {
+    const f = document.getElementById('frmProveedor');
+    f.reset();
+    f.classList.remove('was-validated');
+    document.getElementById('idProveedor').value = '';
+    document.getElementById('modalTitleProveedor').textContent = 'Nuevo Proveedor';
+    new bootstrap.Modal(document.getElementById('modalProveedor'), {backdrop:'static'}).show();
+  });
 });
 </script>
 
-<!-- JS propio de la página (solo uno) -->
-<script src="<?= $base ?>/assets/js/admin_proveedores.js?v=1"></script>
+<script src="<?= $base ?>/assets/js/admin_proveedores.js?v=4" defer></script>

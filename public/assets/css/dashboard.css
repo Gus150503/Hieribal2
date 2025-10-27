@@ -1,313 +1,644 @@
 /* =========================================================
-   DISEÑO DEL DASHBOARD (acoplado a tu CSS actual)
+   DASHBOARD — compacto, alineado y consistente
    ========================================================= */
 
-/* Contenedor y encabezado */
-body.admin-layout .dash-container{max-width:1200px;margin:0 1.5rem;}
-body.admin-layout .page-head{margin-bottom:1.25rem}
-body.admin-layout .dash-title{font-weight:800;color:#1f2937}
-body.admin-layout .dash-sub{margin:0;color:#6b7280}
+/* ------------ Contenedor y encabezado ------------ */
+body.admin-layout .dash-container{
+  max-width:1360px;
+  margin-left:0;                 /* pegado al sidebar */
+  margin-right:auto;
+  padding:0 12px 0 8px;          /* leve respiro a la izquierda */
+}
+body.admin-layout .page-head{ margin-bottom:12px; }
+body.admin-layout .dash-title{ font-weight:800; color:#1f2937; font-size:1.9rem; line-height:1.2; margin-top: 10px; }
+body.admin-layout .dash-sub{ margin:0; color:#6b7280; }
 
-/* Grid principal: KPIs a la izquierda + paneles a la derecha */
-body.admin-layout .hero-grid{
-  display:grid !important;
-  grid-template-columns:minmax(260px,320px) minmax(0,1fr) !important;
-  gap:1rem; align-items:start !important;
-}
-@media (max-width:768px){
-  body.admin-layout .hero-grid{grid-template-columns:1fr !important}
-}
-
-/* ===== KPIs (columna izquierda) ===== */
-body.admin-layout .kpi-list{display:grid;gap:1rem}
-body.admin-layout .kpi-tile{
-  border-radius:16px; padding:1rem 1.25rem; color:#fff;
-  box-shadow:0 10px 30px rgba(17,24,39,.1); border:0
-}
-body.admin-layout .kpi-tile .kpi-name{
-  font-weight:700; display:flex; gap:.5rem; align-items:center; opacity:.95; margin:0 0 .25rem
-}
-body.admin-layout .kpi-tile .kpi-num{font-size:2.2rem; line-height:1; font-weight:800; letter-spacing:.4px}
-
-/* Paleta KPI */
-body.admin-layout .kpi-red   {background:#e03f4a;}
-body.admin-layout .kpi-amber {background:#f3a106;}
-body.admin-layout .kpi-green {background:#2fb36e;}
-body.admin-layout .kpi-cyan  {background:#73c7d8;}
-
-/* ===== Paneles/Héroes (tarjetas grandes) ===== */
-:root{--navy-900:#1f2937;--navy-800:#273247;--crimson:#d13b46;--crimson-700:#bd2f3a}
-body.admin-layout .panel{
-  background:#fff;border:1px solid rgba(17,24,39,.08);
-  box-shadow:0 10px 30px rgba(17,24,39,.1);
-  border-radius:16px;padding:1.25rem 1.25rem 1rem
-}
-body.admin-layout .hero.panel{color:#fff;border:0;overflow:hidden;position:relative}
-body.admin-layout .hero-title{color:#fff;font-weight:800;margin:.25rem 0 1rem}
-
-/* Degradados para héroes (así se ve como el ejemplo) */
-body.admin-layout .hero--navy{
-  background:radial-gradient(1200px 500px at 80% 10%, #2e3a53 0%, var(--navy-900) 60%, var(--navy-800) 100%);
-}
-body.admin-layout .hero--crimson{
-  background:linear-gradient(135deg, var(--crimson) 0%, var(--crimson-700) 100%);
-}
-
-/* Slider dentro de héroes */
-body.admin-layout .slider{position:relative}
-body.admin-layout .slider-track{
-  display:grid;grid-auto-flow:column;grid-auto-columns:minmax(260px,1fr);
-  gap:1rem;overflow:hidden;scroll-behavior:smooth
-}
-body.admin-layout .slider-btn{
-  position:absolute;top:50%;transform:translateY(-50%);
-  width:36px;height:36px;border-radius:999px;border:0;background:#fff;
-  box-shadow:0 8px 22px rgba(17,24,39,.15);display:grid;place-items:center;cursor:pointer
-}
-body.admin-layout .slider-btn.prev{left:.5rem} .slider-btn.next{right:.5rem}
-body.admin-layout .slider-btn:hover{transform:translateY(-50%) scale(1.05)}
-
-/* Tarjeta de persona/producto en héroe */
-body.admin-layout .hero-card{
-  display:grid;grid-template-columns:76px 1fr;align-items:center;gap:.9rem;
-  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
-  border-radius:14px;padding:.9rem;min-height:110px;color:#fff
-}
-body.admin-layout .hero-card.hero-empty{display:flex;justify-content:center;color:rgba(255,255,255,.9)}
-body.admin-layout .hero-avatar{
-  width:76px;height:76px;border-radius:999px;border:3px solid rgba(255,255,255,.9);
-  box-shadow:0 6px 16px rgba(0,0,0,.2);object-fit:cover
-}
-body.admin-layout .hero-name{font-weight:800;color:#fff;margin-bottom:.15rem}
-body.admin-layout .hero-sub{font-size:.92rem;color:rgba(255,255,255,.92)}
-
-/* ===== Gráficas en cards ===== */
-body.admin-layout .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
-@media (max-width:1200px){ body.admin-layout .charts-grid{grid-template-columns:1fr} }
-body.admin-layout .chart-card{position:relative;height:320px;border-radius:12px;background:#fff}
-body.admin-layout .chart-empty{
-  position:absolute;inset:0;display:grid;place-items:center;color:#6b7280
-}
-body.admin-layout .panel h5{font-weight:800;color:#273247;display:flex;gap:.5rem;align-items:center}
-
-/* ===== Fijar layout del shell (por si algo lo pisa) ===== */
+/* ------------ Shell / Sidebar ------------ */
 body.admin-layout .admin-wrap{
-  display:grid !important;grid-template-columns:260px minmax(0,1fr) !important;
-  align-items:start !important;align-content:start !important;min-height:100vh
+  display:grid; gap:0;           /* sin gutter entre sidebar y contenido */
+  grid-template-columns:260px minmax(0,1fr);
+  align-items:start; min-height:100vh;
 }
-body.admin-layout #adminSidebar{width:260px !important;background:var(--verde-principal);color:#fff;overflow-y:auto}
 @media (min-width:992px){
-  body.admin-layout.sidebar-collapsed .admin-wrap{grid-template-columns:72px minmax(0,1fr) !important}
-  body.admin-layout.sidebar-collapsed #adminSidebar{width:72px !important}
-}
-
-
-/* ==== FIX: forzar 2 columnas en la fila de KPIs + Héroes ==== */
-body.admin-layout .hero-grid{
-  display: grid !important;
-  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr) !important;
-  align-items: stretch;
-}
-
-/* que nada “salte” o expanda la columna */
-body.admin-layout .hero-grid > *{
-  min-width: 0;
-}
-
-/* NO cambies a 1 columna hasta pantallas realmente chicas */
-@media (max-width: 768px){
-  body.admin-layout .hero-grid{
-    grid-template-columns: 1fr !important;
+  body.admin-layout.sidebar-collapsed .admin-wrap{
+    grid-template-columns:72px minmax(0,1fr);
   }
 }
-
-/* opcional: que la columna izquierda (KPIs) no se haga más ancha de 320 */
-body.admin-layout .kpi-list{ width: 100%; }
-
-/* por si algún CSS le pone width:100% al hero y se “rompe” la grilla */
-body.admin-layout .hero.panel{ width: auto; }
-
-
-/* ===== FIX: que el contenido no se vaya al fondo ===== */
-body.admin-layout .admin-wrap{
-  display: grid !important;
-  grid-template-columns: 260px minmax(0,1fr) !important;
-  /* Fuerza alineación arriba por si algún CSS global puso end/center */
-  align-items: start !important;
-  align-content: start !important;
-}
-
-body.admin-layout .content{
-  /* por si algún CSS la convirtió en flex/grid y la alineó al final */
-  display: block !important;
-  margin-top: 0 !important;
-  padding-top: 1rem !important;
-  min-height: auto !important;
-}
-
-/* por si el primer bloque tuviera margin-top grande (mt-5 etc.) */
-body.admin-layout .content > *:first-child{
-  margin-top: 0 !important;
-}
-
-/* el backdrop no debe reservar espacio en desktop */
-body.admin-layout #sidebarBackdrop{
-  position: fixed; inset: 0;
-  pointer-events: none;
-  opacity: 0;
-}
-
-/* asegura que la fila de KPIs+Héroes sea 2 columnas en desktop */
-body.admin-layout .hero-grid{
-  display: grid !important;
-  grid-template-columns: minmax(260px, 320px) minmax(0,1fr) !important;
-  align-items: start !important;
-}
-@media (max-width: 768px){
-  body.admin-layout .hero-grid{
-    grid-template-columns: 1fr !important;
-  }
-}
-/* ====== 1) Sidebar: color original fijo ====== */
-body.admin-layout #adminSidebar{
-  /* tu verde histórico */
-  background: #58b04f !important;
-  color: #fff;
-}
+body.admin-layout #adminSidebar{ background:#58b04f; color:#fff; }
 body.admin-layout #adminSidebar a{ color:#fff; }
-body.admin-layout #adminSidebar a:hover{ color:#ffffff; opacity:.95; }
+body.admin-layout #adminSidebar a:hover{ opacity:.95; }
 body.admin-layout #adminSidebar .active > a,
 body.admin-layout #adminSidebar a.active{ font-weight:700; }
+body.admin-layout .content{ display:block; padding-left:8px; padding-top:12px; }
 
-/* ====== 2) Tablas (Bootstrap/DataTables) visibles y limpias ====== */
+/* =========================================================
+   GRID PRINCIPAL (Col1 KPIs | Col2-3 Paneles)
+   ========================================================= */
+body.admin-layout .hero-grid{
+  display:grid;
+  grid-template-columns:minmax(240px,280px) 1fr 1fr;  /* KPIs + 2 columnas iguales */
+  gap:14px; align-items:start;
+}
+body.admin-layout .hero-grid > *{ min-width:0; }      /* evita desbordes */
+
+/* ----- KPIs izquierda (altura/padding parejos) ----- */
+body.admin-layout .kpi-list{
+  grid-column:1; grid-row:1 / span 2;                 /* ocupa 2 filas */
+  display:grid; gap:10px;
+}
+body.admin-layout .kpi-tile{
+  min-height:66px; padding:8px 12px;
+  border-radius:10px; color:#fff; border:0;
+  box-shadow:0 6px 18px rgba(17,24,39,.08);
+  display:flex; flex-direction:column; justify-content:center;
+}
+body.admin-layout .kpi-tile .kpi-name{
+  margin:0 0 2px; font-weight:700; display:flex; gap:.5rem; align-items:center;
+}
+body.admin-layout .kpi-tile .kpi-num{ font-size:1.45rem; line-height:1; font-weight:800; letter-spacing:.2px; }
+/* Paleta KPI */
+body.admin-layout .kpi-red{ background:#e03f4a; }
+body.admin-layout .kpi-amber{ background:#f3a106; }
+body.admin-layout .kpi-green{ background:#2fb36e; }
+body.admin-layout .kpi-cyan{ background:#73c7d8; }
+
+/* ----- Paneles / Héroes (derecha) ----- */
+body.admin-layout .panel{
+  background:#fff; border:1px solid rgba(17,24,39,.08);
+  border-radius:12px; padding:12px;
+  box-shadow:0 8px 22px rgba(17,24,39,.08);
+}
+body.admin-layout .panel h5{
+  margin:0 0 8px; font-weight:800; color:#273247; display:flex; gap:.5rem; align-items:center;
+}
+
+body.admin-layout .hero.panel{
+  border:0; overflow:hidden; position:relative;
+  min-height:120px;                                 /* altura uniforme */
+  display:flex; flex-direction:column; justify-content:center;
+  color:#0f172a;
+}
+body.admin-layout .hero-title{ margin:0 0 8px; font-weight:800; color:#0f172a; }
+
+/* Variantes oscuras (si las usas) */
+body.admin-layout .hero--navy{
+  color:#fff; background:radial-gradient(1200px 500px at 80% 10%, #2e3a53 0%, #1f2937 60%, #273247 100%);
+}
+body.admin-layout .hero--crimson{
+  color:#fff; background:linear-gradient(135deg, #d13b46 0%, #bd2f3a 100%);
+}
+body.admin-layout .hero--navy .hero-title,
+body.admin-layout .hero--crimson .hero-title{ color:#fff; }
+
+/* ----- Tarjeta interna del héroe (centrada y limpia) ----- */
+body.admin-layout .hero-card{
+  background:transparent !important; border:none !important; box-shadow:none !important;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; gap:.4rem; padding:.6rem 0; min-height:110px; color:inherit;
+}
+body.admin-layout .hero-avatar{
+  width:86px; height:86px; border-radius:50%;
+  border:2px solid rgba(0,0,0,.05);
+  object-fit:contain; box-shadow:0 3px 10px rgba(0,0,0,.10);
+}
+body.admin-layout .hero-name{ font-weight:700; color:#1f2937; margin:.1rem 0 0; }
+body.admin-layout .hero-sub{ color:#6b7280; font-size:.9rem; margin:0; }
+
+/* =========================================================
+   SLIDER (1 tarjeta por vista, sin flechas)
+   ========================================================= */
+body.admin-layout .slider{ position:relative; }
+body.admin-layout .slider-track{
+  display:flex; overflow:hidden; scroll-behavior:smooth;
+}
+body.admin-layout .slider-track > *{
+  flex:0 0 100%; max-width:100%;     /* 1 slide ocupa todo el panel */
+}
+body.admin-layout .slider-btn{ display:none !important; } /* ocultas siempre */
+
+/* =========================================================
+   GRÁFICAS — compactas y alineadas
+   ========================================================= */
+body.admin-layout .charts-grid{
+  display:grid; gap:14px; margin-top:14px; clear:both;
+  grid-template-columns:1fr 1fr 1fr;             /* 3 por fila en desktop */
+}
+body.admin-layout .chart-card{
+  position:relative; height:200px; padding:10px;
+  border-radius:10px; background:#fff;
+}
+body.admin-layout .chart-empty{ position:absolute; inset:0; display:grid; place-items:center; color:#6b7280; }
+
+/* Breakpoints (2 columnas en medianos, 1 en móviles) */
+@media (max-width:1280px){
+  body.admin-layout .charts-grid{ grid-template-columns:1fr 1fr; }
+}
+@media (max-width:768px){
+  body.admin-layout .charts-grid{ grid-template-columns:1fr; }
+}
+
+/* =========================================================
+   Responsive de la grilla principal
+   ========================================================= */
+@media (max-width:1200px){
+  body.admin-layout .hero-grid{
+    grid-template-columns:minmax(240px,280px) 1fr; /* KPIs + 1 columna de paneles */
+  }
+  body.admin-layout .kpi-list{ grid-row:auto; }
+  body.admin-layout .hero.panel{ grid-column:2; }
+}
+@media (max-width:768px){
+  body.admin-layout .hero-grid{ grid-template-columns:1fr; }
+  body.admin-layout .hero.panel{ grid-column:1; }
+}
+
+/* =========================================================
+   Tablas / DataTables (si las usas)
+   ========================================================= */
 :root{
-  --tbl-head-bg: #1a73e8;   /* azul suave para el encabezado */
-  --tbl-head-ink:#ffffff;
-  --tbl-row-ink:#1f2937;    /* gris 800 */
-  --tbl-bd:#e5e7eb;         /* gris claro bordes */
-  --tbl-row-alt:#f9fafb;    /* cebra */
+  --tbl-head-bg:#1a73e8; --tbl-head-ink:#ffffff;
+  --tbl-row-ink:#1f2937; --tbl-bd:#e5e7eb; --tbl-row-alt:#f9fafb;
 }
-
-/* Contenedor responsive */
-body.admin-layout .table-responsive{
-  overflow-x:auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Mesa base */
-body.admin-layout table.table{
-  background:#fff;
-  color:var(--tbl-row-ink);
-  border-color:var(--tbl-bd);
-}
-body.admin-layout .table > :not(caption) > * > *{
-  background-color:transparent;   /* respeta cebra */
-  box-shadow:none;
-}
-
-/* Encabezado */
+body.admin-layout .table-responsive{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+body.admin-layout table.table{ background:#fff; color:var(--tbl-row-ink); border-color:var(--tbl-bd); }
+body.admin-layout .table > :not(caption) > * > *{ background-color:transparent; box-shadow:none; }
 body.admin-layout .table thead th{
-  background:var(--tbl-head-bg) !important;
-  color:var(--tbl-head-ink) !important;
-  border:0 !important;
-  font-weight:700;
-  vertical-align:middle;
+  background:var(--tbl-head-bg) !important; color:var(--tbl-head-ink) !important;
+  border:0 !important; font-weight:700; vertical-align:middle;
 }
 body.admin-layout .table thead tr{ border:0 !important; }
-
-/* Filas */
-body.admin-layout .table tbody td{
-  color:var(--tbl-row-ink);
-  vertical-align:middle;
-  border-color:var(--tbl-bd);
-}
-body.admin-layout .table-striped > tbody > tr:nth-of-type(odd){
-  --bs-table-accent-bg: var(--tbl-row-alt);
-}
-body.admin-layout .table tbody tr:hover{
-  background:#eef2ff;              /* hover tenue */
-}
-
-/* Paginación DataTables */
-body.admin-layout .dataTables_wrapper .dataTables_length select{
-  width:auto; display:inline-block;
-}
-body.admin-layout .dataTables_wrapper .dataTables_filter input{
-  border:1px solid var(--tbl-bd);
-  border-radius:10px; padding:.35rem .6rem;
-}
-body.admin-layout .dataTables_wrapper .dataTables_paginate{
-  margin-top:.5rem;
-}
+body.admin-layout .table tbody td{ color:var(--tbl-row-ink); vertical-align:middle; border-color:var(--tbl-bd); }
+body.admin-layout .table-striped > tbody > tr:nth-of-type(odd){ --bs-table-accent-bg:var(--tbl-row-alt); }
+body.admin-layout .table tbody tr:hover{ background:#eef2ff; }
+body.admin-layout .dataTables_wrapper .dataTables_length select{ width:auto; display:inline-block; }
+body.admin-layout .dataTables_wrapper .dataTables_filter input{ border:1px solid var(--tbl-bd); border-radius:10px; padding:.35rem .6rem; }
+body.admin-layout .dataTables_wrapper .dataTables_paginate{ margin-top:.5rem; }
 body.admin-layout .dataTables_wrapper .dataTables_paginate .paginate_button{
-  border:1px solid var(--tbl-bd) !important;
-  padding:.25rem .55rem !important;
-  border-radius:8px !important;
-  margin:0 .15rem !important;
-  background:#fff !important;
-  color:#1f2937 !important;
+  border:1px solid var(--tbl-bd) !important; padding:.25rem .55rem !important;
+  border-radius:8px !important; margin:0 .15rem !important; background:#fff !important; color:#1f2937 !important;
 }
 body.admin-layout .dataTables_wrapper .dataTables_paginate .paginate_button.current{
-  background:var(--tbl-head-bg) !important;
-  color:#fff !important;
-  border-color:var(--tbl-head-bg) !important;
+  background:var(--tbl-head-bg) !important; color:#fff !important; border-color:var(--tbl-head-bg) !important;
+}
+/* ===== HOTFIX DASHBOARD (forzar layout y tamaños) ===== */
+
+/* Pegar contenido al sidebar y evitar centrado */
+html body.admin-layout .content{padding-left:8px !important; max-width:none !important;}
+html body.admin-layout .dash-container{
+  max-width:100% !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
+  padding-left:8px !important;
+  padding-right:12px !important;
 }
 
-/* Botones de acción en header de tabla (ej. “Nuevo”) */
-body.admin-layout .panel .btn,
-body.admin-layout .content .btn{
-  border-radius:10px;
-}
-
-/* Que nada de layout empuje a las tablas hacia abajo */
-body.admin-layout .content{ display:block !important; }
-
-/* ====== LAYOUT: KPIs izquierda + 2 columnas de héroes a la derecha ====== */
-body.admin-layout .hero-grid{
+/* Fila principal: KPIs + 2 paneles iguales */
+html body.admin-layout .hero-grid{
   display:grid !important;
-  grid-template-columns: minmax(260px,320px) repeat(2, minmax(0,1fr)) !important; /* 1 col KPIs + 2 cols héroes */
-  gap: 1rem !important;
-  align-items: start !important;
+  grid-template-columns: 280px minmax(0,1fr) minmax(0,1fr) !important;
+  gap:14px !important;
+  align-items:start !important;
+}
+html body.admin-layout .hero-grid > *{min-width:0 !important;}
+
+/* KPIs consistentes */
+html body.admin-layout .kpi-list{
+  grid-column:1 !important;
+  grid-row:1 / span 2 !important;
+  display:grid !important;
+  gap:10px !important;
+}
+html body.admin-layout .kpi-tile{
+  min-height:66px !important;
+  padding:8px 12px !important;
+  border-radius:10px !important;
+  display:flex !important; flex-direction:column !important; justify-content:center !important;
 }
 
-/* La columna de KPIs ocupa todas las filas de la grilla */
-body.admin-layout .kpi-list{
-  grid-column: 1 !important;
-  grid-row: 1 / span 10 !important;  /* “alto” suficiente para cubrir 2 filas de héroes */
-  display: grid;
-  gap: 1rem;
-  min-width: 0;
+/* Paneles de la derecha con misma altura */
+html body.admin-layout .panel{
+  border-radius:12px !important;
+  padding:12px !important;
+  box-shadow:0 8px 22px rgba(17,24,39,.08) !important;
+}
+html body.admin-layout .hero.panel{
+  min-height:120px !important;
+  display:flex !important; flex-direction:column !important; justify-content:center !important;
 }
 
-/* Todos los paneles de héroe van a las columnas 2-3 (derecha), auto-flow los distribuye 2 por fila */
-body.admin-layout .hero.panel{
-  grid-column: auto !important; /* permite ocupar columnas 2 y 3 en orden */
-  width: auto !important;       /* por si algún estilo anterior lo hacía 100% */
-  min-width: 0;
+/* Carrusel: 1 tarjeta centrada, sin flechas */
+html body.admin-layout .slider-btn{display:none !important;}
+html body.admin-layout .slider-track{display:flex !important; overflow:hidden !important; scroll-behavior:smooth !important;}
+html body.admin-layout .slider-track > *{flex:0 0 100% !important; max-width:100% !important;}
+html body.admin-layout .hero-card{
+  background:transparent !important; border:none !important; box-shadow:none !important;
+  display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:center !important;
+  text-align:center !important; gap:.4rem !important; min-height:110px !important; padding:.6rem 0 !important;
+}
+html body.admin-layout .hero-avatar{width:86px !important; height:86px !important; object-fit:contain !important; border-radius:50% !important;}
+
+/* Gráficas: 3 por fila y más bajas */
+html body.admin-layout .charts-grid{
+  display:grid !important;
+  grid-template-columns: repeat(3, minmax(0,1fr)) !important;
+  gap:14px !important;
+  margin-top:90px !important;
+  clear:both !important;
+}
+html body.admin-layout .chart-card{
+  height:200px !important;           /* Pisa cualquier inline anterior */
+  padding:10px !important;
+  border-radius:10px !important;
+  background:#fff !important;
+}
+@media (max-width:1280px){
+  html body.admin-layout .charts-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;}
+}
+@media (max-width:768px){
+  html body.admin-layout .charts-grid{grid-template-columns:1fr !important;}
+}
+/* ===== Igualar altura de paneles héroe ===== */
+html body.admin-layout .hero-grid .hero.panel{
+  min-height: 190px !important;   /* todos del mismo alto */
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
 }
 
-/* En pantallas pequeñas: una sola columna */
+html body.admin-layout .hero.panel .slider-track{
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+html body.admin-layout .hero-card{
+  min-height: 150px !important;
+}
+
+@media (max-width: 1200px){
+  html body.admin-layout .hero-grid .hero.panel{
+    min-height: 160px !important;
+  }
+}
+/* ==== CARRUSEL: 1 tarjeta por vista ==== */
+html body.admin-layout .slider-track{
+  display:flex !important;
+  overflow:hidden !important;
+  scroll-behavior:smooth;
+  justify-content:flex-start !important;  /* no centrar la fila */
+  align-items:stretch !important;
+}
+
+html body.admin-layout .slider-track > *{
+  flex: 0 0 100% !important;   /* <-- cada slide ocupa el 100% del panel */
+  max-width: 100% !important;
+}
+
+/* Mantén la tarjeta centrada dentro del slide */
+html body.admin-layout .hero-card{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  background:transparent !important;
+  border:none !important;
+  box-shadow:none !important;
+  padding:.6rem 0 !important;
+  min-height:120px !important;
+}
+
+html body.admin-layout .hero-avatar{
+  width:86px; height:86px; border-radius:50%;
+  object-fit:contain; border:2px solid rgba(0,0,0,.05);
+  box-shadow:0 3px 10px rgba(0,0,0,.1);
+}
+/* ==== FIX ESPECÍFICO: carrusel de "Productos agotados" (3er héroe) ==== */
+/* 1) Forzar el track a flex (anula el grid viejo) */
+body.admin-layout .hero-grid > .hero.panel:nth-of-type(3) .slider-track{
+  display: flex !important;
+  overflow: hidden !important;
+  scroll-behavior: smooth;
+  grid-auto-flow: unset !important;
+  grid-auto-columns: unset !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+}
+
+/* 2) Una tarjeta por vista (ocupa 100% del ancho del panel) */
+body.admin-layout .hero-grid > .hero.panel:nth-of-type(3) .slider-track > *{
+  flex: 0 0 100% !important;
+  max-width: 100% !important;
+}
+
+/* 3) Centrado limpio del contenido de la tarjeta */
+body.admin-layout .hero-grid > .hero.panel:nth-of-type(3) .hero-card{
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  gap: .4rem !important;
+  padding: .6rem 0 !important;
+  min-height: 110px !important;
+}
+
+body.admin-layout .hero-grid > .hero.panel:nth-of-type(3) .hero-avatar{
+  width: 86px; height: 86px; border-radius: 50%;
+  object-fit: contain; border: 2px solid rgba(0,0,0,.05);
+  box-shadow: 0 3px 10px rgba(0,0,0,.1);
+}
+/* =========================================================
+   MOBILE-FIRST OVERRIDES (colócalo al final de tu CSS)
+   ========================================================= */
+
+/* ====== <= 992px: preparar sidebar off-canvas ====== */
 @media (max-width: 992px){
-  body.admin-layout .hero-grid{
+  /* Contenido a ancho completo */
+  html body.admin-layout .dash-container{
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 8px 12px !important;
+  }
+
+  /* Sidebar como panel deslizable */
+  #adminSidebar{
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    width: 260px;
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+    z-index: 1040;
+  }
+  /* Mostrar cuando el body tenga la clase que activas con el botón */
+  body.sidebar-open #adminSidebar{ transform: translateX(0); }
+
+  /* Fondo oscurecido detrás del sidebar (si usas un backdrop) */
+  #sidebarBackdrop{
+    position: fixed; inset: 0; 
+    background: rgba(0,0,0,.35);
+    opacity: 0; pointer-events: none;
+    transition: opacity .2s ease;
+    z-index: 1030;
+  }
+  body.sidebar-open #sidebarBackdrop{ opacity: 1; pointer-events: auto; }
+
+  /* Ocultar logo grande del sidebar en móvil */
+  #adminSidebar .sidebar-header img{ display: none !important; }
+}
+
+/* ====== <= 768px: layout compacto, legible y táctil ====== */
+@media (max-width: 768px){
+  /* Títulos y espaciados */
+  html body.admin-layout .page-head{ margin-bottom: 10px !important; }
+  html body.admin-layout .dash-title{
+    font-size: 1.45rem !important; line-height: 1.25 !important;
+    margin-top: 6px !important;
+  }
+  html body.admin-layout .dash-sub{ font-size: .95rem !important; }
+
+  /* Grid principal: todo apilado */
+  html body.admin-layout .hero-grid{
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* KPIs en 2 columnas (mejor densidad) */
+  html body.admin-layout .kpi-list{
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+    gap: 10px !important;
+    grid-row: auto !important; grid-column: 1 !important;
+  }
+  /* Si prefieres 1 columna, cambia repeat(2,...) por 1fr */
+  html body.admin-layout .kpi-tile{
+    min-height: 64px !important;
+    padding: 10px 12px !important;
+    border-radius: 12px !important;
+  }
+  html body.admin-layout .kpi-tile .kpi-name{ font-size: .95rem !important; }
+  html body.admin-layout .kpi-tile .kpi-num{ font-size: 1.4rem !important; }
+
+  /* Paneles héroe: tarjetas iguales y sin exceso de sombra */
+  html body.admin-layout .panel{
+    padding: 12px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 14px rgba(17,24,39,.08) !important;
+  }
+  html body.admin-layout .hero.panel{
+    min-height: 140px !important;
+    height: auto !important;
+  }
+  html body.admin-layout .panel h5{ font-size: 1.05rem !important; }
+
+  /* Carrusel: 1 tarjeta por vista, centrada */
+  html body.admin-layout .slider-track{
+    display: flex !important;
+    overflow: hidden !important;
+    scroll-behavior: smooth !important;
+  }
+  html body.admin-layout .slider-track > *{
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+  html body.admin-layout .slider-btn{ display: none !important; }
+  html body.admin-layout .hero-card{
+    min-height: 120px !important;
+    padding: .5rem 0 !important;
+    gap: .35rem !important;
+  }
+  html body.admin-layout .hero-avatar{
+    width: 74px !important; height: 74px !important;
+  }
+
+  /* Gráficas: una por fila, más bajas */
+  html body.admin-layout .charts-grid{
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    margin-top: 10px !important;
+  }
+  html body.admin-layout .chart-card{
+    height: 180px !important;
+    padding: 10px !important;
+    border-radius: 12px !important;
+  }
+
+  /* Tablas: scroll horizontal suave y celdas compactas */
+  html body.admin-layout .table-responsive{
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    border-radius: 10px !important;
+  }
+  html body.admin-layout table.table{
+    font-size: .92rem !important;
+  }
+  html body.admin-layout .dataTables_wrapper .dataTables_filter input{
+    width: 100% !important; box-sizing: border-box;
+  }
+
+  /* Margen inferior general para respirar al final de la página */
+  html body.admin-layout .content{ padding-bottom: 64px !important; }
+}
+
+/* ====== <= 480px: ultra-compacto (pantallas pequeñas) ====== */
+@media (max-width: 480px){
+  html body.admin-layout .dash-title{ font-size: 1.3rem !important; }
+  html body.admin-layout .kpi-list{ grid-template-columns: 1fr 1fr !important; }
+  html body.admin-layout .kpi-tile{
+    min-height: 58px !important; padding: 8px 10px !important;
+  }
+  html body.admin-layout .kpi-tile .kpi-num{ font-size: 1.25rem !important; }
+  html body.admin-layout .hero.panel{ min-height: 130px !important; }
+  html body.admin-layout .hero-avatar{ width: 66px !important; height: 66px !important; }
+  html body.admin-layout .chart-card{ height: 160px !important; }
+}
+
+/* ====== Sidebar colapsado en desktop: oculta el logo del header ====== */
+@media (min-width: 992px){
+  body.sidebar-collapsed #adminSidebar .sidebar-header img{
+    display: none !important;
+  }
+}
+/* =========================================================
+   CENTRADO GLOBAL EN VISTA MÓVIL
+   ========================================================= */
+@media (max-width: 768px){
+  /* Contenedor general centrado */
+  html body.admin-layout .content{
+    display: flex !important;
+    justify-content: center !important;
+  }
+
+  html body.admin-layout .dash-container{
+    width: 100% !important;
+    max-width: 420px !important;    /* controla el ancho centrado */
+    margin: 0 auto !important;
+    text-align: center !important;
+  }
+
+  /* Alinear correctamente los KPIs */
+  html body.admin-layout .kpi-list{
+    justify-content: center !important;
+    align-items: center !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(150px, 1fr)) !important;
+    gap: 10px !important;
+    margin: 0 auto !important;
+    max-width: 360px !important;
+  }
+
+  html body.admin-layout .kpi-tile{
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 160px !important;
+  }
+
+  /* Paneles centrados (Inventario, Más vendidos, etc.) */
+  html body.admin-layout .panel{
+    margin: 0 auto 12px auto !important;
+    width: 100% !important;
+    max-width: 380px !important;
+    text-align: center !important;
+  }
+
+  /* Imagen y textos centrados */
+  html body.admin-layout .hero-card,
+  html body.admin-layout .hero.panel{
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  html body.admin-layout .hero-avatar{
+    display: block !important;
+    margin: 0 auto 6px auto !important;
+  }
+
+  /* Centrar encabezado */
+  html body.admin-layout .page-head,
+  html body.admin-layout .dash-title,
+  html body.admin-layout .dash-sub{
+    text-align: center !important;
+  }
+}
+
+/* Pantallas muy pequeñas (<=480px): una columna centrada */
+@media (max-width: 480px){
+  html body.admin-layout .kpi-list{
+    grid-template-columns: 1fr !important;
+    max-width: 300px !important;
+  }
+}
+/* =========================================================
+   MOBILE COLUMN (centrada y con ancho controlado)
+   ========================================================= */
+@media (max-width: 768px){
+  /* 0) Seguridad: no desbordar */
+  html, body{ overflow-x:hidden !important; }
+  img, canvas, video{ max-width:100% !important; height:auto !important; }
+
+  /* 1) Columna central */
+  :root{ --mobile-max: 420px; }               /* ajústalo: 360–440px */
+  html body.admin-layout .content{
+    width: 100% !important;
+    max-width: var(--mobile-max) !important;  /* límite de ancho */
+    margin: 0 auto !important;                /* centrado real */
+    padding: 0 14px !important;               /* respiración lateral */
+    box-sizing: border-box !important;
+  }
+  html body.admin-layout .dash-container{
+    width: 100% !important;
+    max-width: var(--mobile-max) !important;
+    margin: 0 auto !important;
+    padding: 0 !important;                     /* evita doble padding */
+  }
+
+  /* 2) Admin grid en 1 columna (sin reservar sidebar) */
+  html body.admin-layout .admin-wrap{
     grid-template-columns: 1fr !important;
   }
-  body.admin-layout .kpi-list{
-    grid-column: 1 !important;
-    grid-row: auto !important;
+
+  /* 3) Grid superior apilado */
+  html body.admin-layout .hero-grid{
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
   }
-  body.admin-layout .hero.panel{
-    grid-column: 1 !important;
+
+  /* 4) KPIs en 2 columnas fluidas dentro del ancho límite */
+  html body.admin-layout .kpi-list{
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+    gap: 12px !important;
+    width: 100% !important;
   }
+  html body.admin-layout .kpi-tile{
+    width: auto !important;
+    margin: 0 !important;
+    min-height: 60px !important;
+    padding: 10px 12px !important;
+  }
+
+  /* 5) Paneles (Inventario / Más vendidos / Gráficas) a 100%
+        pero contenidos por la columna central */
+  html body.admin-layout .panel{
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 12px 0 !important;
+  }
+
+  /* 6) Tooltips/legends que puedan salirse */
+  .chartjs-tooltip, .apexcharts-tooltip{ max-width: 95vw !important; }
 }
 
-/* Asegura que la sección de charts quede debajo de la grilla de héroes (por si algún float/flex la afecta) */
-body.admin-layout .charts-grid{
-  display:grid !important;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.2rem;
-  clear: both;      /* cinturón y tirantes: evita que se “suba” */
-  margin-top: -16rem; /* respirito visual */
-}
-@media (max-width: 1200px){
-  body.admin-layout .charts-grid{ grid-template-columns: 1fr; }
+/* Ultra pequeño (iPhone SE, etc.) */
+@media (max-width: 400px){
+  :root{ --mobile-max: 360px; }               /* estrecha un poco más */
+  html body.admin-layout .content{ padding: 0 12px !important; }
+  html body.admin-layout .kpi-list{ gap: 10px !important; }
+  html body.admin-layout .kpi-tile{ padding: 9px 10px !important; }
 }

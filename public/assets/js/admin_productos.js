@@ -1,214 +1,188 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const API = window.PRODUCTO_API || "/controllers/AdminProducto.php";
-  const tbl = document.querySelector("#tblProducto tbody");
-  const modalEl = document.getElementById("modalProducto");
-  const frm = document.getElementById("frmProducto");
-  const btnNuevo = document.getElementById("btnNuevoProducto");
-  const modal = new bootstrap.Modal(modalEl);
-  const perPageSel = document.getElementById("perPage");
-  const qInput = document.getElementById("qProducto");
-  const btnBuscar = document.getElementById("btnBuscarProducto");
-  const paginador = document.getElementById("paginador");
-  const totalEl = document.getElementById("totalProducto");
+(function () {
+  if (window.__PRODUCTOS_JS_BOUND__) return;
+  window.__PRODUCTOS_JS_BOUND__ = true;
 
-  let currentPage = 1;
-  let perPage = parseInt(perPageSel.value, 10);
-  let q = "";
+  'use strict';
 
-  /* -------------------- Helpers -------------------- */
-  const fetchJSON = async (url, opts = {}) => {
-    const res = await fetch(url, opts);
-    if (!res.ok) throw new Error("Error HTTP " + res.status);
-    return await res.json();
-  };
+  const API = window.PRODUCTO_API || '?r=admin_productos_api';
 
-  const loadProductos = async () => {
+  const state = { page: 1, per: 10, total: 0, q: '' };
+  let __SEQ__ = 0;
+
+  const $  = (s) => document.querySelector(s);
+  const tbl = $('#tblProductos tbody');
+
+  function toast(msg, variant='info'){
+    const map = { success:'#198754', danger:'#dc3545', info:'#0d6efd', warning:'#ffc107' };
+    const el=document.createElement('div'); el.textContent=msg;
+    Object.assign(el.style, {background:map[variant]||'#333', color:'#fff', padding:'10px 14px',
+      borderRadius:'8px', position:'fixed', right:'16px', bottom:'16px', zIndex:9999, boxShadow:'0 4px 14px rgba(0,0,0,.2)'});
+    document.body.appendChild(el); setTimeout(()=>el.remove(),2400);
+  }
+
+  function escapeHtml(s){ return (s??'').toString().replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+  function fmtMoney(n){ const v=Number(n||0); return isNaN(v)?'0.00':v.toFixed(2); }
+  function fmtNumber(n){ const v=Number(n||0); return isNaN(v)?'0':v.toString(); }
+
+  async function listar(page=1){
+    state.page = page;
+    const q = encodeURIComponent(state.q);
+    const seq = ++__SEQ__;
+    tbl.innerHTML = `<tr><td colspan="12" class="text-center py-3">
+      <div class="spinner-border spinner-border-sm me-2"></div> Cargando…
+    </td></tr>`;
+
     try {
-      const url = `${API}?action=list&q=${encodeURIComponent(q)}&page=${currentPage}&per=${perPage}`;
-      const data = await fetchJSON(url);
-
-      tbl.innerHTML = "";
-      if (data.items && data.items.length > 0) {
-        data.items.forEach((p) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${p.id}</td>
-            <td>${p.nombre}</td>
-            <td>${p.categoria || ""}</td>
-            <td>${p.marca || ""}</td>
-            <td>${p.presentacion || ""}</td>
-            <td>${p.unidad || ""}</td>
-            <td>${p.descripcion || ""}</td>
-            <td>${p.lote || ""}</td>
-            <td>${p.f_vencimiento || ""}</td>
-            <td>${p.precio_compra ?? 0}</td>
-            <td>${p.precio_venta ?? 0}</td>
-            <td>${p.iva ?? 0}</td>
-            <td>${p.codigo_sku || ""}</td>
-            <td>${p.ubicacion || ""}</td>
-            <td>
-              <span class="badge ${p.estado === "activo" ? "bg-success" : "bg-secondary"}">
-                ${p.estado}
-              </span>
-            </td>
-            <td class="text-end">
-              <button class="btn btn-sm btn-primary me-1 btn-edit" data-id="${p.id}">
-                <i class="bi bi-pencil"></i>
-              </button>
-              <button class="btn btn-sm btn-danger me-1 btn-delete" data-id="${p.id}">
-                <i class="bi bi-trash"></i>
-              </button>
-              <button class="btn btn-sm btn-warning btn-toggle" data-id="${p.id}">
-                <i class="bi bi-power"></i>
-              </button>
-            </td>
-          `;
-          tbl.appendChild(tr);
-        });
-      } else {
-        tbl.innerHTML = `<tr><td colspan="16" class="text-center text-muted">No se encontraron productos</td></tr>`;
-      }
-
-      totalEl.textContent = `Total: ${data.total || 0}`;
-      renderPaginator(data.totalPages || 1);
+      const res = await fetch(`${API}&action=list&q=${q}&page=${state.page}&per=${state.per}`);
+      const j = await res.json();
+      if (seq !== __SEQ__) return;
+      const items = j.items || j.data || [];
+      state.total = j.total || items.length;
+      renderTabla(items);
+      renderPager();
+      const tot = $('#totalProductos'); if (tot) tot.textContent = `${state.total} registro(s)`;
     } catch (err) {
       console.error(err);
-      tbl.innerHTML = `<tr><td colspan="16" class="text-danger text-center">Error cargando productos</td></tr>`;
+      tbl.innerHTML = `<tr><td colspan="12" class="text-center text-danger py-3">Error cargando datos</td></tr>`;
     }
-  };
+  }
 
-  const renderPaginator = (totalPages) => {
-    paginador.innerHTML = "";
-    for (let i = 1; i <= totalPages; i++) {
-      const li = document.createElement("li");
-      li.className = "page-item " + (i === currentPage ? "active" : "");
-      li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-      li.addEventListener("click", (e) => {
-        e.preventDefault();
-        currentPage = i;
-        loadProductos();
-      });
-      paginador.appendChild(li);
+  function renderTabla(items){
+    if (!items.length) {
+      tbl.innerHTML = `<tr><td colspan="12" class="text-center text-muted py-3">Sin resultados</td></tr>`;
+      return;
     }
-  };
+    tbl.innerHTML = '';
+    for (const p of items) {
+      const tr = document.createElement('tr');
+      tr.dataset.id = p.id;
+      const activo = String(p.estado || '').toLowerCase() === 'activo';
+      tr.innerHTML = `
+        <td>${p.id}</td>
+        <td class="fw-semibold">${escapeHtml(p.nombre)}</td>
+        <td>${escapeHtml(p.codigo_sku ?? '')}</td>
+        <td>${escapeHtml(p.marca ?? '')}</td>
+        <td>${escapeHtml(p.categoria ?? '')}</td>
+        <td>${fmtNumber(p.stock_actual)}</td>
+        <td>${fmtNumber(p.stock_minimo)}</td>
+        <td>${fmtMoney(p.precio_compra)}</td>
+        <td>${fmtMoney(p.precio_venta)}</td>
+        <td>${fmtNumber(p.iva)}%</td>
+        <td>${activo
+              ? '<span class="badge bg-success-subtle text-success border">Activo</span>'
+              : '<span class="badge bg-secondary-subtle text-secondary border">Inactivo</span>'}</td>
+        <td class="text-end">
+          <div class="btn-group btn-group-sm">
+            <button class="btn btn-outline-primary" data-edit="${p.id}" title="Editar">
+              <i class="bi bi-pencil-square"></i>
+            </button>
+            <button class="btn btn-outline-danger" data-del="${p.id}" title="Eliminar">
+              <i class="bi bi-trash"></i>
+            </button>
+            <button class="btn btn-outline-secondary" data-toggle="${p.id}" title="${activo?'Desactivar':'Activar'}">
+              <i class="bi ${activo?'bi-toggle-on':'bi-toggle-off'}"></i>
+            </button>
+          </div>
+        </td>`;
+      tbl.appendChild(tr);
+    }
+  }
 
-  const resetForm = () => {
-    frm.reset();
-    frm.classList.remove("was-validated");
-    document.getElementById("productoAction").value = "create";
-    document.getElementById("idProducto").value = "";
-    document.getElementById("modalTitleProducto").textContent = "Nuevo Producto";
-  };
+  function renderPager(){
+    const ul = $('#paginadorProd'); if(!ul) return;
+    const pages = Math.max(1, Math.ceil(state.total / state.per));
+    let html = '';
+    const prev = state.page<=1?' disabled':'';
+    const next = state.page>=pages?' disabled':'';
+    html += `<li class="page-item${prev}"><button class="page-link" data-page="${state.page-1}">&laquo;</button></li>`;
+    const win=2; let s=Math.max(1,state.page-win), e=Math.min(pages,state.page+win);
+    if (s>1){ html += `<li class="page-item"><button class="page-link" data-page="1">1</button></li>${s>2?'<li class="page-item disabled"><span class="page-link">…</span></li>':''}`; }
+    for(let p=s;p<=e;p++) html += `<li class="page-item ${p===state.page?'active':''}"><button class="page-link" data-page="${p}">${p}</button></li>`;
+    if (e<pages){ if(e<pages-1) html += `<li class="page-item disabled"><span class="page-link">…</span></li>`; html += `<li class="page-item"><button class="page-link" data-page="${pages}">${pages}</button></li>`; }
+    html += `<li class="page-item${next}"><button class="page-link" data-page="${state.page+1}">&raquo;</button></li>`;
+    ul.innerHTML = html;
+  }
 
-  /* -------------------- Eventos -------------------- */
-  btnNuevo.addEventListener("click", () => {
-    resetForm();
-    modal.show();
+  $('#paginadorProd')?.addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-page]'); if(!btn) return;
+    const p = parseInt(btn.dataset.page,10); if(p && p!==state.page) listar(p);
   });
 
-  btnBuscar.addEventListener("click", () => {
-    q = qInput.value.trim();
-    currentPage = 1;
-    loadProductos();
+  $('#perPageProd')?.addEventListener('change', e=>{ state.per=parseInt(e.target.value,10)||10; listar(1); });
+  $('#btnBuscarProd')?.addEventListener('click', ()=>{ state.q=$('#qProd').value.trim(); listar(1); });
+  $('#qProd')?.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); state.q=e.target.value.trim(); listar(1);} });
+
+  // Modal
+  const modalEl = $('#modalProducto');
+  const frm = $('#frmProducto');
+  let bsModal = null;
+  if (modalEl && window.bootstrap) bsModal = new bootstrap.Modal(modalEl, { backdrop:'static' });
+
+  $('#btnNuevoProd')?.addEventListener('click', ()=>{
+    frm.reset(); frm.classList.remove('was-validated');
+    $('#idProducto').value='';
+    $('#modalProdTitle').textContent='Nuevo producto';
+    bsModal?.show();
   });
 
-  perPageSel.addEventListener("change", () => {
-    perPage = parseInt(perPageSel.value, 10);
-    currentPage = 1;
-    loadProductos();
+  // Acciones de fila
+  tbl.addEventListener('click', async (e)=>{
+    const btn = e.target.closest('button'); if(!btn) return;
+    const id = btn.dataset.edit || btn.dataset.del || btn.dataset.toggle;
+    if (!id) return;
+
+    // Editar
+    if (btn.dataset.edit){
+      try{
+        const r = await fetch(`${API}&action=get&id=${id}`);
+        const j = await r.json();
+        const d = j.data;
+        if (!d) return toast('Producto no encontrado','warning');
+        for (const [k,v] of Object.entries(d)){ if (frm[k]) frm[k].value = v ?? ''; }
+        $('#modalProdTitle').textContent='Editar producto';
+        bsModal?.show();
+      }catch{ toast('Error al cargar','danger'); }
+    }
+
+    // Eliminar
+    if (btn.dataset.del){
+      if (!confirm('¿Eliminar este producto?')) return;
+      const fd=new FormData(); fd.append('id', id);
+      const r = await fetch(`${API}&action=delete`, { method:'POST', body:fd });
+      const j = await r.json();
+      if (j.ok){ toast('Producto eliminado','success'); listar(state.page); }
+      else toast(j.msg || 'Error al eliminar','danger');
+    }
+
+    // Toggle
+    if (btn.dataset.toggle){
+      const fd=new FormData(); fd.append('id', id);
+      const r = await fetch(`${API}&action=toggle`, { method:'POST', body:fd });
+      const j = await r.json();
+      if (j.ok){ toast('Estado actualizado','success'); listar(state.page); }
+      else toast(j.msg || 'Error al cambiar estado','danger');
+    }
   });
 
-  // Guardar producto
-  frm.addEventListener("submit", async (e) => {
+  // Guardar
+  frm?.addEventListener('submit', async (e)=>{
     e.preventDefault();
-    e.stopPropagation();
-    frm.classList.add("was-validated");
-    if (!frm.checkValidity()) return;
+    if (!frm.checkValidity()){ frm.classList.add('was-validated'); return; }
 
-    const formData = new FormData(frm);
-    const action = formData.get("action");
+    const fd = new FormData(frm);
+    const id = fd.get('id');
+    const action = id ? 'update' : 'create';
 
-    try {
-      const res = await fetch(API, {
-        method: "POST",
-        body: formData,
-      });
-      const json = await res.json();
-      if (json.ok) {
-        modal.hide();
-        loadProductos();
-      } else {
-        alert("Error: " + (json.msg || "No se pudo guardar"));
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error de red");
-    }
+    try{
+      const r = await fetch(`${API}&action=${action}`, { method:'POST', body:fd });
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.msg || 'Error al guardar');
+      bsModal?.hide();
+      toast(id?'Producto actualizado':'Producto creado','success');
+      listar(id?state.page:1);
+    }catch(err){ toast(err.message,'danger'); }
   });
 
-  // Editar producto
-  tbl.addEventListener("click", async (e) => {
-    if (e.target.closest(".btn-edit")) {
-      const id = e.target.closest(".btn-edit").dataset.id;
-      try {
-        const res = await fetch(`${API}?action=get&id=${id}`);
-        const json = await res.json();
-        if (json.data) {
-          resetForm();
-          Object.entries(json.data).forEach(([k, v]) => {
-            const el = frm.querySelector(`[name="${k}"]`);
-            if (el) el.value = v ?? "";
-          });
-          document.getElementById("productoAction").value = "update";
-          document.getElementById("idProducto").value = id;
-          document.getElementById("modalTitleProducto").textContent = "Editar Producto";
-          modal.show();
-        }
-      } catch (err) {
-        console.error(err);
-        alert("No se pudo cargar el producto");
-      }
-    }
-  });
-
-  // Eliminar producto
-  tbl.addEventListener("click", async (e) => {
-    if (e.target.closest(".btn-delete")) {
-      const id = e.target.closest(".btn-delete").dataset.id;
-      if (!confirm("¿Eliminar este producto?")) return;
-      const fd = new FormData();
-      fd.append("action", "delete");
-      fd.append("id", id);
-      try {
-        const res = await fetch(API, { method: "POST", body: fd });
-        const json = await res.json();
-        if (json.ok) loadProductos();
-        else alert("Error: " + (json.msg || "No se pudo eliminar"));
-      } catch (err) {
-        console.error(err);
-        alert("Error de red");
-      }
-    }
-  });
-
-  // Toggle estado
-  tbl.addEventListener("click", async (e) => {
-    if (e.target.closest(".btn-toggle")) {
-      const id = e.target.closest(".btn-toggle").dataset.id;
-      const fd = new FormData();
-      fd.append("action", "toggle");
-      fd.append("id", id);
-      try {
-        const res = await fetch(API, { method: "POST", body: fd });
-        const json = await res.json();
-        if (json.ok) loadProductos();
-      } catch (err) {
-        console.error(err);
-        alert("Error de red");
-      }
-    }
-  });
-
-  /* -------------------- Inicial -------------------- */
-  loadProductos();
-});
+  // Init
+  listar(1);
+})();

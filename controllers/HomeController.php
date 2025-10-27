@@ -31,7 +31,7 @@ final class HomeController extends Controller
         }
 
         $this->render(
-            'home/carrito',
+
             [
                 'cliente' => $_SESSION['cliente'] ?? null,
             ],
