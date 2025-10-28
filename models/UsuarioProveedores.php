@@ -11,32 +11,48 @@ final class UsuarioProveedores
 {
     public function __construct(private PDO $db) {}
 
-    /** LISTAR */
+    /** LISTAR con búsqueda y paginación */
     public function listar(string $q, int $page, int $per): array
     {
+        $page = max(1, $page);
+        $per  = max(1, min(100, $per));
         $off  = ($page - 1) * $per;
         $like = "%{$q}%";
 
         try {
-            $sql = "SELECT *
+            // NOTA: En MySQL con emulate_prepares=false, usa LIMIT ?, ?
+            $sql = "SELECT id, empresa, nit, nombre_contacto, telefono, email,
+                           direccion, ciudad, condiciones_pago, estado, creado
                     FROM proveedores
-                    WHERE (empresa LIKE :q OR nit LIKE :q OR nombre_contacto LIKE :q OR ciudad LIKE :q)
+                    WHERE (empresa LIKE ?
+                       OR  nit LIKE ?
+                       OR  nombre_contacto LIKE ?
+                       OR  ciudad LIKE ?)
                     ORDER BY id DESC
-                    LIMIT :per OFFSET :off";
+                    LIMIT ?, ?";
             $st = $this->db->prepare($sql);
-            $st->bindValue(':q',   $like, PDO::PARAM_STR);
-            $st->bindValue(':per', $per,  PDO::PARAM_INT);
-            $st->bindValue(':off', $off,  PDO::PARAM_INT);
+            $st->bindValue(1, $like, PDO::PARAM_STR);
+            $st->bindValue(2, $like, PDO::PARAM_STR);
+            $st->bindValue(3, $like, PDO::PARAM_STR);
+            $st->bindValue(4, $like, PDO::PARAM_STR);
+            $st->bindValue(5, (int)$off, PDO::PARAM_INT);
+            $st->bindValue(6, (int)$per, PDO::PARAM_INT);
             $st->execute();
             $items = $st->fetchAll();
 
-            $st2 = $this->db->prepare(
-                "SELECT COUNT(*) FROM proveedores
-                 WHERE (empresa LIKE :q OR nit LIKE :q OR nombre_contacto LIKE :q OR ciudad LIKE :q)"
-            );
-            $st2->bindValue(':q', $like, PDO::PARAM_STR);
+            $sql2 = "SELECT COUNT(*)
+                     FROM proveedores
+                     WHERE (empresa LIKE ?
+                        OR  nit LIKE ?
+                        OR  nombre_contacto LIKE ?
+                        OR  ciudad LIKE ?)";
+            $st2 = $this->db->prepare($sql2);
+            $st2->bindValue(1, $like, PDO::PARAM_STR);
+            $st2->bindValue(2, $like, PDO::PARAM_STR);
+            $st2->bindValue(3, $like, PDO::PARAM_STR);
+            $st2->bindValue(4, $like, PDO::PARAM_STR);
             $st2->execute();
-            $total = (int) $st2->fetchColumn();
+            $total = (int)$st2->fetchColumn();
 
             return ['items' => $items, 'page' => $page, 'per' => $per, 'total' => $total];
         } catch (PDOException $e) {
@@ -48,7 +64,12 @@ final class UsuarioProveedores
     public function obtener(int $id): ?array
     {
         try {
-            $st = $this->db->prepare("SELECT * FROM proveedores WHERE id = :id");
+            $st = $this->db->prepare(
+                "SELECT id, empresa, nit, nombre_contacto, telefono, email,
+                        direccion, ciudad, condiciones_pago, estado, creado
+                 FROM proveedores
+                 WHERE id = :id"
+            );
             $st->execute([':id' => $id]);
             $row = $st->fetch();
             return $row ?: null;
@@ -62,9 +83,11 @@ final class UsuarioProveedores
     {
         try {
             $sql = "INSERT INTO proveedores
-                    (empresa,nit,nombre_contacto,telefono,email,direccion,ciudad,condiciones_pago,estado,creado)
+                    (empresa, nit, nombre_contacto, telefono, email, direccion,
+                     ciudad, condiciones_pago, estado, creado)
                     VALUES
-                    (:empresa,:nit,:nombre_contacto,:telefono,:email,:direccion,:ciudad,:condiciones_pago,:estado,NOW())";
+                    (:empresa, :nit, :nombre_contacto, :telefono, :email, :direccion,
+                     :ciudad, :condiciones_pago, :estado, NOW())";
             $st = $this->db->prepare($sql);
             $st->execute([
                 ':empresa'          => $d['empresa'],
@@ -77,9 +100,10 @@ final class UsuarioProveedores
                 ':condiciones_pago' => $d['condiciones_pago'],
                 ':estado'           => $d['estado'] ?? 'activo',
             ]);
-            return (int) $this->db->lastInsertId();
+            return (int)$this->db->lastInsertId();
         } catch (PDOException $e) {
-            throw $e; // 23000 = duplicados (NIT, etc.) -> lo mapea tu controller
+            // 23000 = duplicados -> lo traduce el controller
+            throw $e;
         }
     }
 
@@ -137,7 +161,6 @@ final class UsuarioProveedores
             if (!$p) throw new Exception('Proveedor no encontrado');
 
             $nuevo = (strcasecmp($p['estado'] ?? '', 'activo') === 0) ? 'inactivo' : 'activo';
-
             $up = $this->db->prepare("UPDATE proveedores SET estado = :e WHERE id = :id");
             $up->execute([':e' => $nuevo, ':id' => $id]);
 
