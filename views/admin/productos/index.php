@@ -26,15 +26,21 @@ $base = $this->config['app']['base_url'] ?? '';
           <tr>
             <th>ID</th>
             <th>Nombre</th>
-            <th>SKU</th>
+	          <th>Categoría</th>
             <th>Marca</th>
-            <th>Categoría</th>
-            <th>Stock</th>
-            <th>Stock Mín.</th>
-            <th>P. Compra</th>
-            <th>P. Venta</th>
+            <th>Presentacion</th>
+            <th>Stock Actual</th>
+            <th>Stock Mínimo </th>
+            <th>Descripcion</th>
+	          <th>Lote </th>
+            <th>Fecha de Vencimiento</th>
+            <th>Precio Compra</th>
+            <th>Precio Venta</th>
             <th>IVA</th>
+            <th>Cod. Barras</th>
+            <th>Ubicacion</th>
             <th>Estado</th>
+            <th>Imagen</th>
             <th class="text-end">Acciones</th>
           </tr>
         </thead>
@@ -79,30 +85,14 @@ $base = $this->config['app']['base_url'] ?? '';
               <input class="form-control" name="nombre" id="nombre" required maxlength="255">
               <div class="invalid-feedback">Nombre requerido.</div>
             </div>
-
-            <div class="col-md-3">
-              <label class="form-label">SKU</label>
-              <input class="form-control" name="codigo_sku" id="codigo_sku" maxlength="64">
-            </div>
-
-            <div class="col-md-3">
-              <label class="form-label">Estado</label>
-              <select class="form-select" name="estado" id="estado" required>
-                <option value="activo">Activo</option>
-                <option value="inactivo">Inactivo</option>
-              </select>
-            </div>
-
             <div class="col-md-4">
               <label class="form-label">Categoría</label>
               <input class="form-control" name="categoria" id="categoria" maxlength="100">
             </div>
-
             <div class="col-md-4">
               <label class="form-label">Marca</label>
               <input class="form-control" name="marca" id="marca" maxlength="100">
             </div>
-
             <div class="col-md-4">
               <label class="form-label">Presentación</label>
               <input class="form-control" name="presentacion" id="presentacion" maxlength="100">
@@ -118,19 +108,9 @@ $base = $this->config['app']['base_url'] ?? '';
               <input type="number" class="form-control" name="stock_minimo" id="stock_minimo" min="0" value="0" required>
             </div>
 
-            <div class="col-md-3">
-              <label class="form-label">P. Compra</label>
-              <input type="number" step="0.01" class="form-control" name="precio_compra" id="precio_compra" min="0" value="0">
-            </div>
-
-            <div class="col-md-3">
-              <label class="form-label">P. Venta</label>
-              <input type="number" step="0.01" class="form-control" name="precio_venta" id="precio_venta" min="0" value="0">
-            </div>
-
-            <div class="col-md-3">
-              <label class="form-label">IVA (%)</label>
-              <input type="number" step="0.01" class="form-control" name="iva" id="iva" min="0" value="0">
+            <div class="col-12">
+              <label class="form-label">Descripción</label>
+              <textarea class="form-control" name="descripcion" id="descripcion" rows="2" maxlength="1000"></textarea>
             </div>
 
             <div class="col-md-3">
@@ -139,22 +119,40 @@ $base = $this->config['app']['base_url'] ?? '';
             </div>
 
             <div class="col-md-3">
-              <label class="form-label">F. Vencimiento</label>
+              <label class="form-label">Fecha Vencimiento</label>
               <input type="date" class="form-control" name="f_vencimiento" id="f_vencimiento">
             </div>
+            <div class="col-md-3">
+              <label class="form-label">Precio Compra</label>
+              <input type="number" step="0.01" class="form-control" name="precio_compra" id="precio_compra" min="0" value="0">
+            </div>
 
+            <div class="col-md-3">
+              <label class="form-label">Precio Venta</label>
+              <input type="number" step="0.01" class="form-control" name="precio_venta" id="precio_venta" min="0" value="0">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">IVA (%)</label>
+              <input type="number" step="0.01" class="form-control" name="iva" id="iva" min="0" value="0">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Cod. Barras</label>
+              <input class="form-control" name="codigo_sku" id="codigo_sku" maxlength="64">
+            </div>
+            
             <div class="col-md-3">
               <label class="form-label">Ubicación</label>
               <input class="form-control" name="ubicacion" id="ubicacion" maxlength="100">
             </div>
-
-            <div class="col-12">
-              <label class="form-label">Descripción</label>
-              <textarea class="form-control" name="descripcion" id="descripcion" rows="2" maxlength="1000"></textarea>
+            <div class="col-md-3">
+              <label class="form-label">Estado</label>
+              <select class="form-select" name="estado" id="estado" required>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
             </div>
-
             <div class="col-12">
-              <label class="form-label">URL Imagen</label>
+              <label class="form-label">Imagen</label>
               <input class="form-control" name="imagen" id="imagen" maxlength="255">
             </div>
           </div>
@@ -171,6 +169,27 @@ $base = $this->config['app']['base_url'] ?? '';
     </div>
   </div>
 </div>
+<!-- Modal: Ver Detalle de Producto -->
+<div class="modal fade" id="modalVerProducto" tabindex="-1" aria-labelledby="modalVerProductoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title" id="modalVerProductoLabel">Detalles del Producto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <h5 id="verNombre"></h5>
+        <p><strong>Precio:</strong> <span id="verPrecio"></span></p>
+        <p><strong>Stock:</strong> <span id="verStock"></span></p>
+        <p><strong>Descripción:</strong></p>
+        <div id="verDescripcion" class="border rounded p-2 bg-light" style="white-space: pre-wrap;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <style>
   #tblProductos thead.table-light{
@@ -182,6 +201,36 @@ $base = $this->config['app']['base_url'] ?? '';
     background-image: none !important;
   }
   #tblProductos thead.table-light th{ color:#fff !important; }
+  #tblProductos {
+  width: 100%;
+  min-width: 1500px; /* Aumenta el ancho mínimo para que no se corte */
+}
+#tblProductos th, #tblProductos td {
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.btn-info.btn-sm {
+  background-color: #17a2b8;
+  border: none;
+}
+.btn-info.btn-sm:hover {
+  background-color: #138496;
+}
+
+/* ---- Mejor visualización de la tabla ---- */
+#tblProductos th,
+#tblProductos td {
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+#tblProductos td.descripcion {
+  white-space: normal;          /* Permite salto de línea */
+  max-width: 250px;             /* Ancho máximo */
+  overflow-wrap: break-word;    /* Rompe palabras largas */
+  text-align: left;             /* Alinea texto */
+}
+
 </style>
 
 <script>

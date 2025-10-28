@@ -47,46 +47,58 @@
     }
   }
 
-  function renderTabla(items){
-    if (!items.length) {
-      tbl.innerHTML = `<tr><td colspan="12" class="text-center text-muted py-3">Sin resultados</td></tr>`;
-      return;
-    }
-    tbl.innerHTML = '';
-    for (const p of items) {
-      const tr = document.createElement('tr');
-      tr.dataset.id = p.id;
-      const activo = String(p.estado || '').toLowerCase() === 'activo';
-      tr.innerHTML = `
-        <td>${p.id}</td>
-        <td class="fw-semibold">${escapeHtml(p.nombre)}</td>
-        <td>${escapeHtml(p.codigo_sku ?? '')}</td>
-        <td>${escapeHtml(p.marca ?? '')}</td>
-        <td>${escapeHtml(p.categoria ?? '')}</td>
-        <td>${fmtNumber(p.stock_actual)}</td>
-        <td>${fmtNumber(p.stock_minimo)}</td>
-        <td>${fmtMoney(p.precio_compra)}</td>
-        <td>${fmtMoney(p.precio_venta)}</td>
-        <td>${fmtNumber(p.iva)}%</td>
-        <td>${activo
-              ? '<span class="badge bg-success-subtle text-success border">Activo</span>'
-              : '<span class="badge bg-secondary-subtle text-secondary border">Inactivo</span>'}</td>
-        <td class="text-end">
-          <div class="btn-group btn-group-sm">
-            <button class="btn btn-outline-primary" data-edit="${p.id}" title="Editar">
-              <i class="bi bi-pencil-square"></i>
-            </button>
-            <button class="btn btn-outline-danger" data-del="${p.id}" title="Eliminar">
-              <i class="bi bi-trash"></i>
-            </button>
-            <button class="btn btn-outline-secondary" data-toggle="${p.id}" title="${activo?'Desactivar':'Activar'}">
-              <i class="bi ${activo?'bi-toggle-on':'bi-toggle-off'}"></i>
-            </button>
-          </div>
-        </td>`;
-      tbl.appendChild(tr);
-    }
+  function renderTabla(items) {
+  if (!items.length) {
+    tbl.innerHTML = `<tr><td colspan="18" class="text-center text-muted py-3">Sin resultados</td></tr>`;
+    return;
   }
+
+  tbl.innerHTML = '';
+  for (const p of items) {
+    const tr = document.createElement('tr');
+    tr.dataset.id = p.id;
+    const activo = String(p.estado || '').toLowerCase() === 'activo';
+
+    tr.innerHTML = `
+      <td>${p.id}</td>
+      <td class="fw-semibold">${escapeHtml(p.nombre)}</td>
+      <td>${escapeHtml(p.categoria ?? '')}</td>
+      <td>${escapeHtml(p.marca ?? '')}</td>
+      <td>${escapeHtml(p.presentacion ?? '')}</td>
+      <td>${fmtNumber(p.stock_actual)}</td>
+      <td>${fmtNumber(p.stock_minimo)}</td>
+      <td>${escapeHtml(p.descripcion ?? '')}</td>
+      <td>${escapeHtml(p.lote ?? '')}</td>
+      <td>${escapeHtml(p.fecha_vencimiento ?? '')}</td>
+      <td>${fmtMoney(p.precio_compra)}</td>
+      <td>${fmtMoney(p.precio_venta)}</td>
+      <td>${fmtNumber(p.iva)}%</td>
+      <td>${escapeHtml(p.codigo_barras ?? '')}</td>
+      <td>${escapeHtml(p.ubicacion ?? '')}</td>
+      <td>${activo
+        ? '<span class="badge bg-success-subtle text-success border">Activo</span>'
+        : '<span class="badge bg-secondary-subtle text-secondary border">Inactivo</span>'}</td>
+      <td>${
+        p.imagen
+          ? `<img src="${p.imagen}" alt="Imagen" style="width:45px;height:45px;object-fit:cover;border-radius:6px;">`
+          : `<span class="text-muted">Sin imagen</span>`
+      }</td>
+      <td class="text-end">
+        <div class="btn-group btn-group-sm">
+          <button class="btn btn-outline-primary" data-edit="${p.id}" title="Editar">
+            <i class="bi bi-pencil-square"></i>
+          </button>
+          <button class="btn btn-outline-danger" data-del="${p.id}" title="Eliminar">
+            <i class="bi bi-trash"></i>
+          </button>
+          <button class="btn btn-outline-secondary" data-toggle="${p.id}" title="${activo ? 'Desactivar' : 'Activar'}">
+            <i class="bi ${activo ? 'bi-toggle-on' : 'bi-toggle-off'}"></i>
+          </button>
+        </div>
+      </td>`;
+    tbl.appendChild(tr);
+  }
+}
 
   function renderPager(){
     const ul = $('#paginadorProd'); if(!ul) return;
