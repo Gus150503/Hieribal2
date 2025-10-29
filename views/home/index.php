@@ -51,7 +51,8 @@
         integral.
       </p>
       <div class="text-section-buttons">
-        <a href="https://wa.me/573212322978?text=Hola%2C%20me%20gustaría%20más%20información%20sobre%20sus%20productos"
+        <a href="https://api.whatsapp.com/send?phone=573212322978&text=Hola,%20me%20gustaría%20más%20información%20sobre%20sus%20productos"
+          target="_blank"
           class="btn btn-contactanos">Contáctanos</a>
         <button class="btn btn-mas-nosotros"
           onclick="document.getElementById('nosotros').scrollIntoView({ behavior: 'smooth' })">
@@ -60,7 +61,6 @@
       </div>
     </section>
   </main>
-
   <!-- NOSOTROS -->
   <section id="nosotros" class="nosotros-section">
     <div class="nosotros-about-section">
