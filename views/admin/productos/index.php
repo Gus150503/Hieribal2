@@ -91,7 +91,8 @@ $base = $this->config['app']['base_url'] ?? '';
             </div>
             <div class="col-md-4">
               <label class="form-label">Marca</label>
-              <input class="form-control" name="marca" id="marca" maxlength="100">
+              <input class="form-control" name="marca" id="marca" required maxlength="100">
+              <div class="invalid-feedback">Marca requerida.</div>
             </div>
             <div class="col-md-4">
               <label class="form-label">Presentación</label>
@@ -124,12 +125,14 @@ $base = $this->config['app']['base_url'] ?? '';
             </div>
             <div class="col-md-3">
               <label class="form-label">Precio Compra</label>
-              <input type="number" step="0.01" class="form-control" name="precio_compra" id="precio_compra" min="0" value="0">
+              <input type="number" step="0.01" class="form-control" name="precio_compra" id="precio_compra" min="0.01" value="0" required>
+              <div class="invalid-feedback">Precio Compra requerido.</div>
             </div>
 
             <div class="col-md-3">
               <label class="form-label">Precio Venta</label>
-              <input type="number" step="0.01" class="form-control" name="precio_venta" id="precio_venta" min="0" value="0">
+              <input type="number" step="0.01" class="form-control" name="precio_venta" id="precio_venta" min="0.01" value="0" required>
+              <div class="invalid-feedback">Precio Venta requerido.</div>
             </div>
             <div class="col-md-3">
               <label class="form-label">IVA (%)</label>
@@ -151,9 +154,45 @@ $base = $this->config['app']['base_url'] ?? '';
                 <option value="inactivo">Inactivo</option>
               </select>
             </div>
+            
+            <!-- Sección de Imagen Mejorada -->
             <div class="col-12">
-              <label class="form-label">Imagen</label>
-              <input class="form-control" name="imagen" id="imagen" maxlength="255">
+              <label class="form-label d-block">Imagen del Producto (Opcional)</label>
+              
+              <div class="btn-group mb-3" role="group">
+                <input type="radio" class="btn-check" name="tipoImagen" id="tipoURL" value="url" checked>
+                <label class="btn btn-outline-success" for="tipoURL">
+                  <i class="bi bi-link-45deg me-1"></i> URL
+                </label>
+                
+                <input type="radio" class="btn-check" name="tipoImagen" id="tipoArchivo" value="archivo">
+                <label class="btn btn-outline-success" for="tipoArchivo">
+                  <i class="bi bi-upload me-1"></i> Subir Archivo
+                </label>
+              </div>
+
+              <!-- Input URL -->
+              <div id="seccionURL">
+                <input type="text" class="form-control" name="imagen" id="imagen" placeholder="https://ejemplo.com/imagen.jpg" maxlength="500">
+                <small class="text-muted">Pega la URL de una imagen de internet</small>
+              </div>
+
+              <!-- Input Archivo -->
+              <div id="seccionArchivo" style="display:none;">
+                <input type="file" class="form-control" id="archivoImagen" accept="image/*">
+                <small class="text-muted">Formatos: JPG, PNG, GIF (Máx. 2MB)</small>
+              </div>
+
+              <!-- Preview de la imagen -->
+              <div id="previewImagen" class="mt-3" style="display:none;">
+                <label class="form-label text-muted small">Vista previa:</label>
+                <div class="border rounded p-2 bg-light d-flex align-items-center justify-content-center" style="height:150px;">
+                  <img id="imgPreview" src="" alt="Preview" style="max-height:140px; max-width:100%; object-fit:contain; border-radius:8px;">
+                </div>
+                <button type="button" id="btnLimpiarImagen" class="btn btn-sm btn-outline-danger mt-2">
+                  <i class="bi bi-x-circle me-1"></i> Quitar imagen
+                </button>
+              </div>
             </div>
           </div>
 
@@ -192,6 +231,7 @@ $base = $this->config['app']['base_url'] ?? '';
 </div>
 
 <style>
+  
   #tblProductos thead.table-light{
     --bs-table-bg: var(--brand, #198754);
     --bs-table-color: #fff;
@@ -231,6 +271,37 @@ $base = $this->config['app']['base_url'] ?? '';
   text-align: left;             /* Alinea texto */
 }
 
+/* Estilos para imágenes en el listado */
+.producto-img {
+  width: 55px;
+  height: 55px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 2px solid #e9ecef;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.producto-img:hover {
+  transform: scale(1.8);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  z-index: 10;
+  cursor: pointer;
+}
+
+.producto-img-placeholder {
+  width: 55px;
+  height: 55px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #adb5bd;
+  font-size: 24px;
+  border: 2px dashed #dee2e6;
+}
+
 </style>
 
 <script>
@@ -246,4 +317,4 @@ $base = $this->config['app']['base_url'] ?? '';
   });
 </script>
 
-<script src="<?= $base ?>/assets/js/admin_productos.js?v=2" defer></script>
+<script src="<?= $base ?>/assets/js/admin_productos.js?v=3" defer></script>
