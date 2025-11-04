@@ -1,19 +1,16 @@
 <?php
-$partial = !empty($_GET['partial']);
-if (!$partial) include __DIR__ . '/../_shell_start.php';
-
-// Asegura base URL para rutas absolutas
-$base = $base ?? ($this->config['app']['base_url'] ?? '');
+// views/admin/proveedores/index.php
+$base = $this->config['app']['base_url'] ?? '';
 ?>
-<style>#tblProveedor thead.table-light {
-  --bs-table-bg: ##ffc107; /* azul Bootstrap por defecto */
-  --bs-table-color: #ffc107;
-  --bs-table-border-color: rgba(255,255,255,.25);
-  background: #ffc107 !important;
-  color: #fff !important;
-  background-image: none !important;
-}
-#tblProveedor thead.table-light th { color: #fff !important; }
+<style>
+  /* Encabezado amarillo */
+  #tblProveedor thead.table-light{
+    --bs-table-bg: #ffc107;
+    --bs-table-color:#fff;
+    --bs-table-border-color: rgba(255,255,255,.25);
+    background:#ffc107!important; color:#fff!important; background-image:none!important;
+  }
+  #tblProveedor thead.table-light th{ color:#fff!important; }
 </style>
 
 <section class="card shadow-sm ui-pro border-0 rounded-4">
@@ -28,14 +25,12 @@ $base = $base ?? ($this->config['app']['base_url'] ?? '');
       </button>
     </div>
 
-    <!-- Buscador -->
     <div class="input-group mb-3" style="max-width:520px;">
       <span class="input-group-text"><i class="bi bi-search"></i></span>
-      <input id="qProveedor" type="search" class="form-control" placeholder="Buscar por empresa o contacto…">
+      <input id="qProveedor" type="search" class="form-control" placeholder="Buscar por empresa, contacto, NIT o ciudad…">
       <button id="btnBuscarProveedor" class="btn btn-outline-warning">Buscar</button>
     </div>
 
-    <!-- Tabla -->
     <div class="table-responsive">
       <table id="tblProveedor" class="table table-sm align-middle table-hover">
         <thead class="table-light position-sticky" style="top:0; z-index:1;">
@@ -49,14 +44,14 @@ $base = $base ?? ($this->config['app']['base_url'] ?? '');
             <th>Dirección</th>
             <th>Ciudad</th>
             <th>Condiciones de Pago</th>
+            <th>Estado</th>           <!-- 👈 NUEVA COLUMNA -->
             <th>Creado</th>
             <th class="text-end">Acciones</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
-    </div>
-          <div class="d-flex align-items-center justify-content-between mt-3">
+      <div class="d-flex align-items-center justify-content-between mt-3">
         <div class="d-flex align-items-center gap-2">
           <label class="text-muted small me-1">Mostrar</label>
           <select id="perPage" class="form-select form-select-sm" style="width:80px">
@@ -73,18 +68,17 @@ $base = $base ?? ($this->config['app']['base_url'] ?? '');
       </div>
     </div>
   </div>
-  </div>
-
 </section>
 
-<!-- Modal Proveedor -->
+<!-- Modal -->
 <div class="modal fade" id="modalProveedor" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-  <div class="modal-dialog modal-xl">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Nuevo Proveedor</h5>
+        <h5 class="modal-title" id="modalTitleProveedor">Nuevo Proveedor</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
+
       <div class="modal-body">
         <form id="frmProveedor" class="needs-validation" novalidate>
           <input type="hidden" name="id" id="idProveedor">
@@ -92,73 +86,90 @@ $base = $base ?? ($this->config['app']['base_url'] ?? '');
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Empresa</label>
-              <input type="text" class="form-control" name="empresa" id="empresa" required>
-              <div class="invalid-feedback">Ingresa el nombre de la empresa.</div>
+              <input type="text" class="form-control" name="empresa" id="empresa" required maxlength="100">
+              <div class="invalid-feedback">Empresa inválida.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">NIT</label>
-              <input type="text" class="form-control" name="nit" id="nit" required>
-              <div class="invalid-feedback">Ingresa un NIT válido.</div>
+              <input type="text" class="form-control" name="nit" id="nit" required maxlength="20">
+              <div class="invalid-feedback">NIT inválido.</div>
             </div>
+
             <div class="col-md-6">
-              <label class="form-label">Contacto</label>
-              <input type="text" class="form-control" name="contacto" id="contacto">
+              <label class="form-label">Nombre Contacto</label>
+              <input type="text" class="form-control" name="nombre_contacto" id="nombre_contacto" required maxlength="100">
+              <div class="invalid-feedback">Nombre de contacto inválido.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Teléfono</label>
-              <input type="text" class="form-control" name="telefono" id="telefono">
+              <input type="text" class="form-control" name="telefono" id="telefono" maxlength="20">
+              <div class="invalid-feedback">Teléfono inválido.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Email</label>
-              <input type="email" class="form-control" name="email" id="email">
-              <div class="invalid-feedback">Ingresa un email válido.</div>
+              <input type="email" class="form-control" name="email" id="email" required maxlength="100">
+              <div class="invalid-feedback">Email inválido.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Dirección</label>
-              <input type="text" class="form-control" name="direccion" id="direccion">
+              <input type="text" class="form-control" name="direccion" id="direccion" maxlength="150">
+              <div class="invalid-feedback">Dirección inválida.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Ciudad</label>
-              <input type="text" class="form-control" name="ciudad" id="ciudad">
+              <input type="text" class="form-control" name="ciudad" id="ciudad" maxlength="100">
+              <div class="invalid-feedback">Ciudad inválida.</div>
             </div>
+
             <div class="col-md-6">
               <label class="form-label">Condiciones de Pago</label>
-              <input type="text" class="form-control" name="condiciones_pago" id="condiciones_pago">
+              <input type="text" class="form-control" name="condiciones_pago" id="condiciones_pago" maxlength="100">
+              <div class="invalid-feedback">Condiciones de pago inválidas.</div>
             </div>
+
             <div class="col-md-6">
-              <label class="form-label">Creado</label>
-              <input type="date" class="form-control" name="creado" id="creado">
+              <label class="form-label">Estado</label>
+              <select class="form-select" name="estado" id="estado" required>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
+              <div class="invalid-feedback">Selecciona un estado.</div>
             </div>
           </div>
 
           <div class="modal-footer border-0 pt-3">
             <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-warning">
+            <button type="submit" class="btn btn-success">
               <i class="bi bi-check2-circle me-1"></i> Guardar
             </button>
           </div>
         </form>
       </div>
+
     </div>
   </div>
 </div>
 
 <script>
-  // Endpoint base (evita hardcodear /public)
-  window.PROVEEDOR_API = "<?= $base ?>/controllers/AdminProveedor.php";
+document.addEventListener('DOMContentLoaded', () => {
+  // Rutas API por router
+  window.PROVEEDOR_API = '<?= $base ?>/public/?r=admin_proveedores_api';
 
-  document.addEventListener('DOMContentLoaded', function () {
-    const btn = document.getElementById('btnNuevoProveedor');
-    if (btn) {
-      btn.addEventListener('click', function () {
-        const el = document.getElementById('modalProveedor');
-        if (el && window.bootstrap) new bootstrap.Modal(el).show();
-      });
-    }
+  // Abrir modal "Nuevo"
+  document.getElementById('btnNuevoProveedor')?.addEventListener('click', () => {
+    const f = document.getElementById('frmProveedor');
+    f.reset();
+    f.classList.remove('was-validated');
+    document.getElementById('idProveedor').value = '';
+    document.getElementById('modalTitleProveedor').textContent = 'Nuevo Proveedor';
+    new bootstrap.Modal(document.getElementById('modalProveedor'), {backdrop:'static'}).show();
   });
+});
 </script>
 
-<!-- JS específico de la página -->
-<script src="<?= $base ?>/assets/js/admin_proveedor.js?v=1" defer></script>
-
-<?php if (!$partial) include __DIR__ . '/../_shell_end.php'; ?>
+<script src="<?= $base ?>/assets/js/admin_proveedores.js?v=4" defer></script>

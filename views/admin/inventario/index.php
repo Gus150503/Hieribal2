@@ -1,10 +1,8 @@
-<?php $partial = !empty($_GET['partial']); ?>
-<?php if (!$partial) include __DIR__ . '/../_shell_start.php'; ?>
-<!-- Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<!-- Bootstrap Icons -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<?php
+// views/admin/inventario/index.php
+// Esta vista se renderiza dentro de plantilla.php (sidebar + bootstrap ya están allí)
+$base = $this->config['app']['base_url'] ?? '';
+?>
 
 <section class="card shadow-sm ui-pro border-0 rounded-4">
   <div class="card-body">
@@ -44,9 +42,7 @@
             <th class="text-end">Acciones</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Aquí se cargarán los datos -->
-        </tbody>
+        <tbody></tbody>
       </table>
 
       <div class="d-flex align-items-center justify-content-between mt-3">
@@ -70,16 +66,16 @@
 
 <!-- Modal Inventario -->
 <div class="modal fade" id="modalInventario" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalTitle">Nuevo Inventario</h5>
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 rounded-4 shadow">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-semibold" id="modalTitle">Nuevo inventario</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
 
-      <div class="modal-body">
+      <div class="modal-body pt-3">
         <form id="frmInventario" class="needs-validation" novalidate>
-          <input type="hidden" name="id" id="id">
+          <input type="hidden" name="id" id="idInventario">
 
           <div class="row g-3">
             <div class="col-md-6">
@@ -91,7 +87,7 @@
             <div class="col-md-6">
               <label class="form-label">Código Interno</label>
               <input type="text" class="form-control" name="codigo_interno" id="codigo_interno" required maxlength="50">
-              <div class="invalid-feedback">Código inválido.</div>
+              <div class="invalid-feedback">Código inválido (mín. 3).</div>
             </div>
 
             <div class="col-md-4">
@@ -143,41 +139,39 @@
           </div>
         </form>
       </div>
+
     </div>
   </div>
 </div>
 
-<!-- Bootstrap Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <style>
   /* Encabezado verde para la tabla de Inventario */
   #tblInventario thead.table-light{
-    /* pisa a Bootstrap */
     --bs-table-bg: var(--brand, #198754);
     --bs-table-color: #fff;
     --bs-table-border-color: rgba(255,255,255,.25);
-
     background: var(--brand, #198754) !important;
     color: #fff !important;
     background-image: none !important;
   }
-  #tblInventario thead.table-light th{
-    color: #fff !important;
-  }
+  #tblInventario thead.table-light th{ color:#fff !important; }
 </style>
 
-
 <script>
-  // Conectar botón con modal
-  document.getElementById('btnNuevo').addEventListener('click', function () {
-    const modal = new bootstrap.Modal(document.getElementById('modalInventario'));
-    modal.show();
-  });
+  // Endpoint base para el módulo Inventario (router)
+  window.INVENTARIO_API = '<?= $base ?>/?r=admin_inventario_api';
 
-  // Definir API
-  window.INVENTARIO_API = '/controllers/AdminInventario.php';
+  document.addEventListener('DOMContentLoaded', () => {
+    // Abrir modal "Nuevo"
+    const btn = document.getElementById('btnNuevo');
+    if (btn && window.bootstrap) {
+      btn.addEventListener('click', () => {
+        const el = document.getElementById('modalInventario');
+        if (el) new bootstrap.Modal(el).show();
+      });
+    }
+  });
 </script>
 
-<script src="/public/assets/js/admin_inventario.js?v=1"></script>
-
-<?php if (!$partial) include __DIR__ . '/../_shell_end.php'; ?>
+<!-- JS propio de la página -->
+<script src="<?= $base ?>/assets/js/admin_inventario.js?v=2" defer></script>

@@ -14,6 +14,31 @@
 </head>
 <body>
 
+<?php
+if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+if (!empty($_SESSION['flash_public'])):
+  $f = $_SESSION['flash_public'];
+  unset($_SESSION['flash_public']);
+?>
+  <div id="alertaFlash" style="
+    margin: 20px auto;
+    max-width: 600px;
+    padding: 15px 20px;
+    border-radius: 10px;
+    background: <?= $f['type'] === 'success' ? '#d1e7dd' : '#f8d7da' ?>;
+    color: <?= $f['type'] === 'success' ? '#0f5132' : '#842029' ?>;
+    font-family: Poppins, sans-serif;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,.15);
+    transition: opacity .8s ease; /* <- importante para el fade */
+    opacity: 1;
+  ">
+    <?= htmlspecialchars($f['msg']) ?>
+  </div>
+<?php endif; ?>
+
+
+
   <!-- HERO / BIENVENIDA -->
   <section id="top" class="bienvenida">
     <div class="texto-bienvenida">
@@ -48,7 +73,8 @@
         En nuestra tienda, encontrarás más que simples productos; encontrarás un compromiso con tu bienestar integral.
       </p>
       <div class="text-section-buttons">
-        <a href="https://wa.me/573212322978?text=Hola%2C%20me%20gustaría%20más%20información%20sobre%20sus%20productos"
+        <a href="https://api.whatsapp.com/send?phone=573212322978&text=Hola,%20me%20gustaría%20más%20información%20sobre%20sus%20productos"
+          target="_blank"
           class="btn btn-contactanos">Contáctanos</a>
         <button class="btn btn-mas-nosotros"
                 onclick="document.getElementById('nosotros').scrollIntoView({ behavior: 'smooth' })">
@@ -57,7 +83,6 @@
       </div>
     </section>
   </main>
-
   <!-- NOSOTROS -->
   <section id="nosotros" class="nosotros-section">
     <div class="nosotros-about-section">
@@ -73,6 +98,9 @@
       </div>
       <div>
         <div class="commitment-card">
+
+    
+
           <h3>Compromiso</h3>
           <p>Nuestro lema es ser comprometidos de una manera eficiente con nuestros clientes.</p>
         </div>
@@ -90,6 +118,20 @@
       <button type="submit">Suscribirse</button>
     </div>
   </section>
+
+  
+<script>
+  // Desvanecer y eliminar el mensaje después de 5 segundos
+  window.addEventListener('DOMContentLoaded', () => {
+    const alerta = document.getElementById('alertaFlash');
+    if (alerta) {
+      setTimeout(() => {
+        alerta.style.opacity = '0';
+        setTimeout(() => alerta.remove(), 300); // espera animación antes de quitarlo
+      }, 4000); // 5 segundos visibles
+    }
+  });
+</script>
 
 </body>
 </html>

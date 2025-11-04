@@ -17,12 +17,9 @@ final class AdminProducto extends Controller
         parent::__construct($config);
 
         try {
-            // Obtén el PDO desde tu helper
-            $pdo = Database::get($config['db']);   // $config['db'] = ['dsn'=>..., 'user'=>..., 'pass'=>...]
-            // Inyecta el PDO al modelo correcto
+            $pdo = Database::get($config['db']);
             $this->Model = new UsuarioProducto($pdo);
         } catch (PDOException $e) {
-            // Si falla la conexión, corta con un mensaje controlado
             die('Error de conexión a la base de datos: ' . $e->getMessage());
         }
     }
@@ -75,7 +72,7 @@ final class AdminProducto extends Controller
             'page_title' => 'Productos',
             'esAdmin'    => true,
             'extra_css'  => [$base . '/assets/css/admin_productos.css?v=1'],
-            'extra_js'   => [$base . '/assets/js/admin_productos.js?v=1'],
+            'extra_js'   => [$base . '/assets/js/admin_productos.js?v=2'],
         ]);
     }
 
@@ -89,7 +86,6 @@ final class AdminProducto extends Controller
             $m      = $_SERVER['REQUEST_METHOD'] ?? 'GET';
             $action = $_REQUEST['action'] ?? '';
 
-            // LIST
             if ($m === 'GET' && $action === 'list') {
                 try {
                     $q    = trim((string)($_GET['q'] ?? ''));
@@ -101,7 +97,6 @@ final class AdminProducto extends Controller
                 return;
             }
 
-            // GET ONE
             if ($m === 'GET' && $action === 'get') {
                 try {
                     $id = (int)($_GET['id'] ?? 0);
@@ -112,7 +107,6 @@ final class AdminProducto extends Controller
                 return;
             }
 
-            // CREATE
             if ($m === 'POST' && $action === 'create') {
                 try {
                     $d  = $this->sanitize($_POST, true);
@@ -122,7 +116,6 @@ final class AdminProducto extends Controller
                 return;
             }
 
-            // UPDATE
             if ($m === 'POST' && $action === 'update') {
                 try {
                     $id = (int)($_POST['id'] ?? 0);
@@ -134,7 +127,6 @@ final class AdminProducto extends Controller
                 return;
             }
 
-            // DELETE
             if ($m === 'POST' && $action === 'delete') {
                 try {
                     $id = (int)($_POST['id'] ?? 0);
@@ -145,7 +137,6 @@ final class AdminProducto extends Controller
                 return;
             }
 
-            // TOGGLE estado
             if ($m === 'POST' && $action === 'toggle') {
                 try {
                     $id = (int)($_POST['id'] ?? 0);
@@ -162,29 +153,36 @@ final class AdminProducto extends Controller
         }
     }
 
-    /* ---------- Sanitización Productos ---------- */
+    /* ---------- Sanitización Productos (según tu esquema) ---------- */
     private function sanitize(array $in, bool $creating): array
     {
         $nombre = trim($in['nombre'] ?? '');
         if ($nombre === '' || strlen($nombre) > 255) throw new \Exception('Nombre inválido');
 
-        $categoria     = trim($in['categoria'] ?? '');
-        $marca         = trim($in['marca'] ?? '');
-        $presentacion  = trim($in['presentacion'] ?? '');
-        $unidad        = trim($in['unidad'] ?? '');
-        $descripcion   = trim($in['descripcion'] ?? '');
-        $lote          = trim($in['lote'] ?? '');
-        $f_vencimiento = trim($in['f_vencimiento'] ?? '');
-        $precio_compra = is_numeric($in['precio_compra'] ?? null) ? (float)$in['precio_compra'] : 0.0;
-        $precio_venta  = is_numeric($in['precio_venta'] ?? null) ? (float)$in['precio_venta']  : 0.0;
-        $iva           = is_numeric($in['iva'] ?? null)           ? (float)$in['iva']           : 0.0;
-        $codigo_sku    = trim($in['codigo_sku'] ?? '');
-        $ubicacion     = trim($in['ubicacion'] ?? '');
-        $imagen        = trim($in['imagen'] ?? '');
+        $categoria      = trim($in['categoria'] ?? '');
+        $marca          = trim($in['marca'] ?? '');
+        $presentacion   = trim($in['presentacion'] ?? '');
+        $stock_actual   = is_numeric($in['stock_actual'] ?? null) ? (int)$in['stock_actual'] : 0;
+        $stock_minimo   = is_numeric($in['stock_minimo'] ?? null) ? (int)$in['stock_minimo'] : 0;
+        $descripcion    = trim($in['descripcion'] ?? '');
+        $lote           = trim($in['lote'] ?? '');
+        $f_vencimiento  = trim($in['f_vencimiento'] ?? '');
+        $precio_compra  = is_numeric($in['precio_compra'] ?? null) ? (float)$in['precio_compra'] : 0.0;
+        $precio_venta   = is_numeric($in['precio_venta'] ?? null) ? (float)$in['precio_venta']  : 0.0;
+        $iva            = is_numeric($in['iva'] ?? null)           ? (float)$in['iva']          : 0.0;
+        $codigo_sku     = trim($in['codigo_sku'] ?? '');
+        $ubicacion      = trim($in['ubicacion'] ?? '');
+        $imagen         = trim($in['imagen'] ?? '');
+        $estadoIn       = strtolower(trim($in['estado'] ?? 'activo'));
+        $estado         = in_array($estadoIn, ['activo','inactivo'], true) ? $estadoIn : 'activo';
 
-        $estadoIn = strtolower(trim($in['estado'] ?? 'activo'));
-        $estado   = in_array($estadoIn, ['activo','inactivo'], true) ? $estadoIn : 'activo';
-
+        if ($stock_actual < 0 || $stock_minimo < 0) {
+            throw new \Exception('El stock no puede ser negativo');
+        }
+        if ($stock_minimo > $stock_actual && $stock_actual > 0) {
+            // permisivo, pero te aviso
+            // throw new \Exception('El stock mínimo no puede exceder el stock actual');
+        }
         if ($f_vencimiento !== '') {
             $ts = strtotime($f_vencimiento);
             if ($ts === false) throw new \Exception('Fecha de vencimiento inválida');
@@ -194,21 +192,22 @@ final class AdminProducto extends Controller
         }
 
         return [
-            'nombre'          => $nombre,
-            'categoria'       => $categoria,
-            'marca'           => $marca,
-            'presentacion'    => $presentacion,
-            'unidad'          => $unidad,
-            'descripcion'     => $descripcion,
-            'lote'            => $lote,
-            'f_vencimiento'   => $f_vencimiento,
-            'precio_compra'   => $precio_compra,
-            'precio_venta'    => $precio_venta,
-            'iva'             => $iva,
-            'codigo_sku'      => $codigo_sku,
-            'ubicacion'       => $ubicacion,
-            'estado'          => $estado,
-            'imagen'          => ($imagen !== '') ? $imagen : null,
+            'nombre'         => $nombre,
+            'categoria'      => $categoria,
+            'marca'          => $marca,
+            'presentacion'   => $presentacion,
+            'stock_actual'   => $stock_actual,
+            'stock_minimo'   => $stock_minimo,
+            'descripcion'    => $descripcion,
+            'lote'           => $lote,
+            'f_vencimiento'  => $f_vencimiento,
+            'precio_compra'  => $precio_compra,
+            'precio_venta'   => $precio_venta,
+            'iva'            => $iva,
+            'codigo_sku'     => $codigo_sku,
+            'ubicacion'      => $ubicacion,
+            'estado'         => $estado,
+            'imagen'         => ($imagen !== '') ? $imagen : null,
         ];
     }
 }
