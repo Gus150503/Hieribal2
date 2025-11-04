@@ -191,14 +191,60 @@ $base = $this->config['app']['base_url'] ?? '';
   window.USUARIO_API = '<?= $base ?>/controllers/AdminUsuario.php';
 
   document.addEventListener('DOMContentLoaded', () => {
-    // Abrir modal "Nuevo"
+    const modalEl = document.getElementById('modalUsuario');
+    const modal   = window.bootstrap ? new bootstrap.Modal(modalEl) : null;
+    const form    = document.getElementById('frmUsuario');
+    const titleEl = document.getElementById('modalTitle');
+
+    function setModeNuevo() {
+      // Limpia todo el estado de un posible "Editar" anterior
+      form.reset();
+      form.classList.remove('was-validated');
+      document.getElementById('id_usuario').value = '';
+      titleEl.textContent = 'Nuevo usuario';
+
+      // Valores por defecto (ajusta a tu gusto)
+      document.getElementById('rol').value = 'empleado';
+      document.getElementById('estado').value = 'activo';
+
+      // Si para crear quieres exigir password, déjalo required; para editar se desactiva
+      const pass = document.getElementById('password');
+      pass.value = '';
+      pass.required = true;
+    }
+
+    // Por si acaso: cuando se cierre el modal, que vuelva a "Nuevo"
+    if (modalEl && window.bootstrap) {
+      modalEl.addEventListener('hidden.bs.modal', setModeNuevo);
+    }
+
+    // Botón "Nuevo"
     const btn = document.getElementById('btnNuevoUsuario');
-    if (btn && window.bootstrap) {
+    if (btn && modal) {
       btn.addEventListener('click', () => {
-        const el = document.getElementById('modalUsuario');
-        if (el) new bootstrap.Modal(el).show();
+        setModeNuevo();
+        modal.show();
       });
     }
+
+    // (Sugerencia) Cuando abras el modal en modo editar desde tu admin_usuario.js,
+    // haz algo así:
+    window.openEditarUsuario = function(u) {
+      if (!modal) return;
+      form.classList.remove('was-validated');
+      titleEl.textContent = 'Editar usuario';
+      document.getElementById('id_usuario').value = u.id_usuario;
+      document.getElementById('usuario').value    = u.usuario ?? '';
+      document.getElementById('rol').value        = (u.rol ?? 'empleado').toLowerCase();
+      document.getElementById('estado').value     = (u.estado ?? 'activo').toLowerCase();
+      document.getElementById('nombres').value    = u.nombres ?? '';
+      document.getElementById('apellidos').value  = u.apellidos ?? '';
+      document.getElementById('correo').value     = u.correo ?? '';
+      const pass = document.getElementById('password');
+      pass.value = '';
+      pass.required = false; // en editar no obligues a cambiarla
+      modal.show();
+    };
   });
 </script>
 

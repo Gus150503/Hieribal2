@@ -207,21 +207,26 @@ final class AdminUsuariosController extends Controller
 
     public function verifyEmail(): void
     {
+        if (session_status() !== \PHP_SESSION_ACTIVE) session_start();
+
         $token = $_GET['token'] ?? '';
+        $ok    = false;
         try {
-            $ok  = $token ? $this->Usuario->setEmailVerifiedByToken($token) : false;
-            $msg = $ok ? 'Correo verificado correctamente.' : 'Token inválido o vencido.';
+            $ok = $token ? $this->Usuario->setEmailVerifiedByToken($token) : false;
         } catch (\Throwable $e) {
-            $msg = 'Ocurrió un error al verificar el correo.';
+            // ignora; ok=false
         }
 
-        $this->render('admin/usuarios/verify_result', [
-            'titulo'  => 'Verificación de correo',
-            'esAdmin' => true,
-            'msg'     => $msg
-        ]);
-    }
+        $_SESSION['flash_public'] = [
+            'type' => $ok ? 'success' : 'danger',
+            'msg'  => $ok ? 'Correo verificado correctamente. Ya puedes ingresar.'
+                        : 'Token inválido o vencido.',
+        ];
 
+        $base = rtrim($this->config['app']['base_url'] ?? '', '/');
+        header("Location: {$base}/?r=home"); // o ?r=login, según quieras
+        exit;
+}
     public function resendVerification(): void
     {
         $this->ensureAdmin();
