@@ -515,49 +515,72 @@ function uiToast(msg, variant='info', ms=3500){
   tbl.removeEventListener('click', onTableClick);
   tbl.addEventListener('click', onTableClick);
 
-  // ===== Validación y submit =====
-  const nameRe = /^[A-Za-zÁÉÍÓÚÑáéíóúñ ]{2,60}$/u;
-  const userRe = /^[A-Za-z0-9._-]{3,30}$/;
+// ===== Validación y submit =====
+const nameRe = /^[A-Za-zÁÉÍÓÚÑáéíóúñ ]{2,60}$/u;
+const userRe = /^[A-Za-z0-9._-]{3,30}$/;
 
-  function validate(data, isUpdate) {
-    if (!userRe.test(data.usuario || '')) return 'Usuario inválido (3-30, letras/números . _ -)';
-    if (!nameRe.test(data.nombres || '')) return 'Nombres inválidos (sólo letras/espacios, 2-60).';
-    if (!nameRe.test(data.apellidos || '')) return 'Apellidos inválidos (sólo letras/espacios, 2-60).';
-    if (!/.+@.+\..+/.test(data.correo || '')) return 'Correo inválido.';
-    if (!isUpdate && (!data.password || data.password.length < 6)) return 'Password mínimo 6 caracteres.';
-    return '';
-  }
+function validate(data, isUpdate) {
+  if (!userRe.test(data.usuario || '')) return 'Usuario inválido (3-30, letras/números . _ -).';
+  if (!nameRe.test(data.nombres || '')) return 'Nombres inválidos (sólo letras/espacios, 2-60).';
+  if (!nameRe.test(data.apellidos || '')) return 'Apellidos inválidos (sólo letras/espacios, 2-60).';
+  if (!/.+@.+\..+/.test(data.correo || '')) return 'Correo inválido.';
+  // Nota: tu modal dice mín. 8; aquí estaba 6. Unifico a 8 para crear.
+  if (!isUpdate && (!data.password || data.password.length < 8)) return 'Password mínimo 8 caracteres.';
+  return '';
+}
 
-  frm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const fd = new FormData(frm);
-    const id = +fd.get('id_usuario');
-    const isUpdate = id > 0;
+frm?.addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-    const plain = Object.fromEntries(fd.entries());
-    const err = validate(plain, isUpdate);
-    if (err) { uiToast(err, 'warning'); return; }
+  const fd = new FormData(frm);
+  const id = +fd.get('id_usuario');
+  const isUpdate = id > 0;
 
-    const btnSubmit = frm.querySelector('button[type="submit"]');
-    const prevHtml = btnSubmit.innerHTML;
-    btnSubmit.disabled = true;
-    btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando…';
+  const plain = Object.fromEntries(fd.entries());
+  const err = validate(plain, isUpdate);
+  if (err) { uiToast(err, 'warning'); return; }
 
-    try {
-      const action = isUpdate ? 'update' : 'create';
-      const res = await fetch(api(`action=${action}`), { method:'POST', body: fd });
-      const j = await resToJsonSafe(res);
-      if (!j.ok) throw new Error(j.msg || 'Error al guardar');
-      closeEditor();
-      uiToast(isUpdate ? 'Usuario actualizado.' : 'Usuario creado.', 'success');
-      listar(state.page);
-    } catch (er) {
-      uiToast(er.message || 'Error al guardar', 'danger');
-    } finally {
-      btnSubmit.disabled = false;
-      btnSubmit.innerHTML = prevHtml;
-    }
+  // >>> CONFIRMAR ANTES DE GUARDAR <<<
+  const msg = isUpdate
+    ? `¿Estás seguro de guardar estos cambios del usuario?\n\n` +
+      `Usuario: ${plain.usuario || '(sin usuario)'}\n` +
+      `Nombre: ${plain.nombres || ''} ${plain.apellidos || ''}\n` +
+      `Rol: ${plain.rol || ''} · Estado: ${plain.estado || ''}`
+    : `¿Estás seguro de crear este usuario?\n\n` +
+      `Usuario: ${plain.usuario || '(sin usuario)'}\n` +
+      `Nombre: ${plain.nombres || ''} ${plain.apellidos || ''}\n` +
+      `Rol: ${plain.rol || ''} · Estado: ${plain.estado || ''}`;
+
+  const ok = await uiConfirm({
+    title: isUpdate ? 'Confirmar guardar cambios' : 'Confirmar creación',
+    body: msg,
+    confirmText: isUpdate ? 'Sí, guardar' : 'Sí, crear',
+    variant: 'success'
   });
+  if (!ok) return;
+
+  const btnSubmit = frm.querySelector('button[type="submit"]');
+  const prevHtml = btnSubmit.innerHTML;
+  btnSubmit.disabled = true;
+  btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando…';
+
+  try {
+    const action = isUpdate ? 'update' : 'create';
+    const res = await fetch(api(`action=${action}`), { method:'POST', body: fd });
+    const j   = await resToJsonSafe(res);
+    if (!j.ok) throw new Error(j.msg || 'Error al guardar');
+
+    closeEditor();
+    uiToast(isUpdate ? 'Usuario actualizado.' : 'Usuario creado.', 'success');
+    listar(state.page);
+  } catch (er) {
+    uiToast(er.message || 'Error al guardar', 'danger');
+  } finally {
+    btnSubmit.disabled = false;
+    btnSubmit.innerHTML = prevHtml;
+  }
+});
+
 
   // ===== Init =====
   function boot(){
