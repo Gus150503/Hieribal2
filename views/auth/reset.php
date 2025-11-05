@@ -2,7 +2,8 @@
   <div class="login">
     <div class="left-panel">
       <img src="<?= $this->config['app']['base_url'] ?>/assets/img/logo.png" class="logo" alt="Logo">
-
+      <!-- 🔙 Botón Atrás -->
+      <a href="<?= $this->config['app']['base_url'] ?>" class="back-btn"> ← </a>
       <div class="form-content">
         <h2>Restablecer contraseña</h2>
         <p>Escribe tu nueva contraseña.</p>
