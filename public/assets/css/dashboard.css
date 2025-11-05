@@ -228,8 +228,14 @@ html body.admin-layout .hero.panel{
 
 /* Carrusel: 1 tarjeta centrada, sin flechas */
 html body.admin-layout .slider-btn{display:none !important;}
+/* deja que el JS ponga el ancho exacto */
+html body.admin-layout .slider-track > *{
+  flex: 0 0 auto !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
 html body.admin-layout .slider-track{display:flex !important; overflow:hidden !important; scroll-behavior:smooth !important;}
-html body.admin-layout .slider-track > *{flex:0 0 100% !important; max-width:100% !important;}
 html body.admin-layout .hero-card{
   background:transparent !important; border:none !important; box-shadow:none !important;
   display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:center !important;
@@ -265,11 +271,11 @@ html body.admin-layout .hero-grid .hero.panel{
   flex-direction: column !important;
   justify-content: center !important;
 }
-
 html body.admin-layout .hero.panel .slider-track{
   align-items: center !important;
-  justify-content: center !important;
+  justify-content: flex-start !important; /* <- clave */
 }
+
 
 html body.admin-layout .hero-card{
   min-height: 150px !important;
@@ -287,11 +293,6 @@ html body.admin-layout .slider-track{
   scroll-behavior:smooth;
   justify-content:flex-start !important;  /* no centrar la fila */
   align-items:stretch !important;
-}
-
-html body.admin-layout .slider-track > *{
-  flex: 0 0 100% !important;   /* <-- cada slide ocupa el 100% del panel */
-  max-width: 100% !important;
 }
 
 /* Mantén la tarjeta centrada dentro del slide */
@@ -443,9 +444,11 @@ body.admin-layout .hero-grid > .hero.panel:nth-of-type(3) .hero-avatar{
     scroll-behavior: smooth !important;
   }
   html body.admin-layout .slider-track > *{
-    flex: 0 0 100% !important;
-    max-width: 100% !important;
-  }
+  flex: 0 0 auto !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
   html body.admin-layout .slider-btn{ display: none !important; }
   html body.admin-layout .hero-card{
     min-height: 120px !important;
@@ -641,4 +644,26 @@ body.admin-layout .hero-grid > .hero.panel:nth-of-type(3) .hero-avatar{
   html body.admin-layout .content{ padding: 0 12px !important; }
   html body.admin-layout .kpi-list{ gap: 10px !important; }
   html body.admin-layout .kpi-tile{ padding: 9px 10px !important; }
+}
+
+/* Track sin huecos ni padding, y los slides ajustan por píxel */
+html body.admin-layout .hero.panel .slider-track{
+  display:flex !important;
+  gap:0 !important;
+  padding:0 !important;
+  overflow:hidden !important;
+}
+
+html body.admin-layout .hero.panel .slider-track > .hero-card{
+  margin:0 !important;
+  box-sizing:border-box !important;
+  flex:0 0 auto !important; /* el ancho lo fija el JS en px */
+}
+
+/* track limpio, sin gaps/padding que rompan el cálculo */
+html body.admin-layout .hero.panel .slider-track{
+  display:flex !important;
+  gap:0 !important;
+  padding:0 !important;
+  overflow:hidden !important;
 }

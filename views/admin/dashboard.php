@@ -156,28 +156,47 @@ $normFoto = function(array $row): string {
 <!-- JS local del dashboard: sliders + charts -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  /* ===== Sliders simples (autoplay, sin flechas) ===== */
-  document.querySelectorAll('[data-slider]').forEach(slider => {
-    const track = slider.querySelector('[data-track]');
-    if (!track) return;
+/* ===== Sliders (autoplay, 1 tarjeta por vista) ===== */
+document.querySelectorAll('[data-slider]').forEach(slider => {
+  const track = slider.querySelector('[data-track]');
+  if (!track) return;
 
-    const delay = +slider.getAttribute('data-autoplay') || 4000;
-    let idx = 0, timer;
+  const delay = +slider.getAttribute('data-autoplay') || 4000;
+  let idx = 0, timer = null;
 
-    const go = (i) => {
-      if (!track.children.length) return;
-      idx = Math.max(0, Math.min(i, track.children.length - 1));
-      const w = track.clientWidth; // 100% por vista
-      track.scrollTo({ left: idx * w, behavior: 'smooth' });
-    };
-    const step = () => go((idx + 1) % track.children.length);
-    const start = () => { stop(); timer = setInterval(step, delay); };
-    const stop  = () => { if (timer) clearInterval(timer); };
+  // Ancho EXACTO del viewport del slider (no del panel)
+  const vw = () => Math.floor(slider.getBoundingClientRect().width);
 
-    slider.addEventListener('mouseenter', stop);
-    slider.addEventListener('mouseleave', start);
-    start();
+  const setWidths = () => {
+    const w = vw();
+    track.querySelectorAll(':scope > *').forEach(el => {
+      el.style.minWidth  = w + 'px';
+      el.style.maxWidth  = w + 'px';
+      el.style.flexBasis = w + 'px';
+    });
+    track.scrollLeft = idx * w;
+  };
+
+  const go   = i => { const n = track.children.length; if (!n) return; idx = (i+n)%n;
+                      track.scrollTo({ left: idx * vw(), behavior: 'smooth' }); };
+  const step = () => go(idx + 1);
+  const stop = () => { if (timer) clearInterval(timer); };
+  const start= () => { stop(); timer = setInterval(step, delay); };
+
+  slider.addEventListener('mouseenter', stop);
+  slider.addEventListener('mouseleave', start);
+
+  // Recalcular cuando cambie el tamaño / fuentes / imágenes
+  new ResizeObserver(setWidths).observe(slider);
+  track.querySelectorAll('img').forEach(img => {
+    if (!img.complete) img.addEventListener('load', setWidths, { once:true });
   });
+
+  setWidths();
+  setTimeout(setWidths, 50); // ajuste fino por render de fuentes
+  start();
+});
+
 
   /* ===== Charts (Chart.js) ===== */
   if (typeof Chart !== 'undefined') {
