@@ -99,6 +99,15 @@ final class UsuarioInventario
         return $row ?: null;
     }
 
+//**Obtener Producto en inventario */
+
+    public function obtenerProductos()
+{
+    $query = $this->pdo->query("SELECT id, nombre FROM productos ORDER BY nombre ASC");
+    return $query->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
     /** Crear (mapea producto_id -> id_producto) */
     public function crear(array $d): int
     {

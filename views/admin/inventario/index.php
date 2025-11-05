@@ -1,9 +1,8 @@
+
 <?php
 // views/admin/inventario/index.php
-// Esta vista se renderiza dentro de plantilla.php (sidebar + bootstrap ya están allí)
 $base = $this->config['app']['base_url'] ?? '';
 ?>
-
 <section class="card shadow-sm ui-pro border-0 rounded-4">
   <div class="card-body">
     <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
@@ -78,11 +77,25 @@ $base = $this->config['app']['base_url'] ?? '';
           <input type="hidden" name="id" id="idInventario">
 
           <div class="row g-3">
+            
+            <!-- 🔽 CAMBIO: Select de productos -->
             <div class="col-md-6">
-              <label class="form-label">Producto ID</label>
-              <input type="number" class="form-control" name="producto_id" id="producto_id" required min="1">
-              <div class="invalid-feedback">Ingresa un producto válido.</div>
+              <label class="form-label">Producto</label>
+              <select class="form-select" name="producto_id" id="producto_id" required>
+                <option value="">Seleccione un producto...</option>
+                <?php if (!empty($productos)): ?>
+                  <?php foreach ($productos as $p): ?>
+                    <option value="<?= $p['id'] ?>">
+                      <?= htmlspecialchars($p['nombre']) ?>
+                    </option>
+                  <?php endforeach; ?>
+                <?php else: ?>
+                  <option disabled>No hay productos registrados</option>
+                <?php endif; ?>
+              </select>
+              <div class="invalid-feedback">Selecciona un producto válido.</div>
             </div>
+            <!-- 🔼 Fin del cambio -->
 
             <div class="col-md-6">
               <label class="form-label">Código Interno</label>
@@ -158,11 +171,9 @@ $base = $this->config['app']['base_url'] ?? '';
 </style>
 
 <script>
-  // Endpoint base para el módulo Inventario (router)
   window.INVENTARIO_API = '<?= $base ?>/?r=admin_inventario_api';
 
   document.addEventListener('DOMContentLoaded', () => {
-    // Abrir modal "Nuevo"
     const btn = document.getElementById('btnNuevo');
     if (btn && window.bootstrap) {
       btn.addEventListener('click', () => {
@@ -173,5 +184,4 @@ $base = $this->config['app']['base_url'] ?? '';
   });
 </script>
 
-<!-- JS propio de la página -->
 <script src="<?= $base ?>/assets/js/admin_inventario.js?v=2" defer></script>
