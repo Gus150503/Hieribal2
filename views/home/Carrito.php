@@ -12,11 +12,6 @@
 <body>
 
   <!-- Header -->
-  <header class="header">
-    <div class="header-content">
-      <div class="logo">
-        🌿 MI<span>HIERIBAL</span>
-      </div>
       <div class="profile-mini">
         <img src="<?= $base ?>/assets/img/Avatar.jfif" alt="Usuario">
         <div>
