@@ -28,6 +28,20 @@
   }
   function updateTotal(){ const el = $('#totalProveedores'); if (el) el.textContent = `${state.total} registro(s)`; }
 
+  // Toast para mensajes
+  function toast(msg, variant = 'info') {
+    const color = { success: '#198754', danger: '#dc3545', info: '#0d6efd', warning: '#ffc107' }[variant] || '#333';
+    const el = document.createElement('div');
+    el.textContent = msg;
+    Object.assign(el.style, {
+      background: color, color: '#fff', padding: '10px 14px',
+      borderRadius: '8px', position: 'fixed', right: '16px', bottom: '16px',
+      zIndex: 9999, fontSize: '14px', boxShadow: '0 4px 14px rgba(0,0,0,.2)'
+    });
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2800);
+  }
+
   async function listar(page = state.page){
     state.page = page<1 ? 1 : page;
     const q = encodeURIComponent(state.q||'');
@@ -50,7 +64,9 @@
       renderPager();
       updateTotal();
     }catch(e){
+      console.error('Error cargando proveedores:', e);
       emptyState();
+      toast('Error al cargar proveedores', 'danger');
     }
   }
 
@@ -133,33 +149,52 @@
 
     // Editar
     if(btn.dataset.editar){
-      const r = await fetch(`${window.PROVEEDOR_API}&action=get&id=${id}`); const j = await r.json();
-      if(!j || !j.data){ alert('No se pudo cargar el proveedor'); return; }
-      const f = $('#frmProveedor');
-      const d = j.data;
-      f.idProveedor.value = d.id;
-      f.empresa.value = d.empresa||'';
-      f.nit.value = d.nit||'';
-      f.nombre_contacto.value = d.nombre_contacto||'';
-      f.telefono.value = d.telefono||'';
-      f.email.value = d.email||'';
-      f.direccion.value = d.direccion||'';
-      f.ciudad.value = d.ciudad||'';
-      f.condiciones_pago.value = d.condiciones_pago||'';
-      f.estado.value = (d.estado||'activo').toLowerCase()==='inactivo'?'inactivo':'activo';
-      $('#modalTitleProveedor').textContent = 'Editar Proveedor';
-      new bootstrap.Modal($('#modalProveedor'), {backdrop:'static'}).show();
+      try {
+        const r = await fetch(`${window.PROVEEDOR_API}&action=get&id=${id}`);
+        const j = await r.json();
+        if(!j || !j.data){ 
+          toast('No se pudo cargar el proveedor', 'warning');
+          return; 
+        }
+        const f = $('#frmProveedor');
+        const d = j.data;
+        f.idProveedor.value = d.id;
+        f.empresa.value = d.empresa||'';
+        f.nit.value = d.nit||'';
+        f.nombre_contacto.value = d.nombre_contacto||'';
+        f.telefono.value = d.telefono||'';
+        f.email.value = d.email||'';
+        f.direccion.value = d.direccion||'';
+        f.ciudad.value = d.ciudad||'';
+        f.condiciones_pago.value = d.condiciones_pago||'';
+        f.estado.value = (d.estado||'activo').toLowerCase()==='inactivo'?'inactivo':'activo';
+        $('#modalTitleProveedor').textContent = 'Editar Proveedor';
+        new bootstrap.Modal($('#modalProveedor'), {backdrop:'static'}).show();
+      } catch (err) {
+        console.error('Error al editar:', err);
+        toast('Error al cargar proveedor', 'danger');
+      }
       return;
     }
 
     // Eliminar
     if(btn.dataset.eliminar){
-      if(!confirm('¿Eliminar este proveedor?')) return;
-      const fd=new FormData(); fd.append('id',id);
-      const r = await fetch(`${window.PROVEEDOR_API}&action=delete`, {method:'POST', body:fd});
-      const j = await r.json();
-      if(!j.ok){ alert(j.msg||'No se pudo eliminar'); return; }
-      listar(state.page);
+      if(!confirm('¿Está seguro de eliminar este proveedor?')) return;
+      toast('Eliminando...', 'info');
+      try {
+        const fd=new FormData(); fd.append('id',id);
+        const r = await fetch(`${window.PROVEEDOR_API}&action=delete`, {method:'POST', body:fd});
+        const j = await r.json();
+        if(!j.ok){ 
+          toast(j.msg||'No se pudo eliminar', 'danger');
+          return; 
+        }
+        toast('✓ Proveedor eliminado correctamente', 'success');
+        listar(state.page);
+      } catch (err) {
+        console.error('Error al eliminar:', err);
+        toast('Error al eliminar', 'danger');
+      }
       return;
     }
 
@@ -168,23 +203,34 @@
       const active = btn.dataset.active === '1';
       const verbo = active ? 'desactivar' : 'activar';
       if(!confirm(`¿Seguro que deseas ${verbo} este proveedor?`)) return;
-      const fd=new FormData(); fd.append('id',id);
-      const r = await fetch(`${window.PROVEEDOR_API}&action=toggle`, {method:'POST', body:fd});
-      const j = await r.json();
-      if(!j.ok){ alert(j.msg||'No se pudo cambiar el estado'); return; }
+      
+      try {
+        const fd=new FormData(); fd.append('id',id);
+        const r = await fetch(`${window.PROVEEDOR_API}&action=toggle`, {method:'POST', body:fd});
+        const j = await r.json();
+        if(!j.ok){ 
+          toast(j.msg||'No se pudo cambiar el estado', 'danger');
+          return; 
+        }
 
-      // Update visual inmediato
-      const tr = tblBody.querySelector(`tr[data-id="${id}"]`);
-      const tdEstado = tr?.querySelector('td[data-col="estado"]');
-      if(tdEstado) tdEstado.innerHTML = badgeEstado(j.estado);
+        toast('✓ Estado actualizado correctamente', 'success');
 
-      btn.dataset.active = (String(j.estado||'').toLowerCase()==='activo') ? '1' : '0';
-      btn.title = btn.dataset.active==='1' ? 'Desactivar' : 'Activar';
-      const icon = btn.querySelector('i');
-      if(icon) icon.className = `bi ${btn.dataset.active==='1' ? 'bi-toggle-on' : 'bi-toggle-off'}`;
+        // Update visual inmediato
+        const tr = tblBody.querySelector(`tr[data-id="${id}"]`);
+        const tdEstado = tr?.querySelector('td[data-col="estado"]');
+        if(tdEstado) tdEstado.innerHTML = badgeEstado(j.estado);
 
-      // Re-listar para quedar 100% en sync si cambió filtro/paginación
-      listar(state.page);
+        btn.dataset.active = (String(j.estado||'').toLowerCase()==='activo') ? '1' : '0';
+        btn.title = btn.dataset.active==='1' ? 'Desactivar' : 'Activar';
+        const icon = btn.querySelector('i');
+        if(icon) icon.className = `bi ${btn.dataset.active==='1' ? 'bi-toggle-on' : 'bi-toggle-off'}`;
+
+        // Re-listar para quedar 100% en sync si cambió filtro/paginación
+        listar(state.page);
+      } catch (err) {
+        console.error('Error al cambiar estado:', err);
+        toast('Error al cambiar estado', 'danger');
+      }
     }
   });
 
@@ -192,22 +238,50 @@
   const form = $('#frmProveedor');
   form?.addEventListener('submit', async (e)=>{
     e.preventDefault();
-    if(!form.checkValidity()){ form.classList.add('was-validated'); return; }
+    if(!form.checkValidity()){ 
+      form.classList.add('was-validated'); 
+      toast('⚠ Por favor complete todos los campos requeridos', 'warning');
+      return; 
+    }
     const fd = new FormData(form);
     const id = +(fd.get('id')||0);
     const action = id>0 ? 'update' : 'create';
     const btn = form.querySelector('button[type="submit"]');
     const prev = btn.innerHTML;
     btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando…';
+    
     try{
       const r = await fetch(`${window.PROVEEDOR_API}&action=${action}`, {method:'POST', body:fd});
       const j = await r.json();
       if(!j.ok) throw new Error(j.msg || 'Error al guardar');
-      bootstrap.Modal.getInstance($('#modalProveedor'))?.hide();
-      form.reset(); form.classList.remove('was-validated');
+      
+      const modalInstance = bootstrap.Modal.getInstance($('#modalProveedor'));
+      if (modalInstance) modalInstance.hide();
+      
+      form.reset(); 
+      form.classList.remove('was-validated');
+      
+      toast(id > 0 ? '✓ Proveedor actualizado correctamente' : '✓ Proveedor creado correctamente', 'success');
       listar(state.page);
-    }catch(err){ alert(err.message||'Error al guardar'); }
-    finally{ btn.disabled=false; btn.innerHTML=prev; }
+    }catch(err){ 
+      console.error('Error al guardar:', err);
+      toast('✗ ' + (err.message||'Error al guardar'), 'danger'); 
+    }
+    finally{ 
+      btn.disabled=false; 
+      btn.innerHTML=prev; 
+    }
+  });
+
+  // ===== Solución para backdrop que queda pegado =====
+  const modalProveedor = $('#modalProveedor');
+  modalProveedor?.addEventListener('hidden.bs.modal', () => {
+    // Remover todos los backdrops
+    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+    // Restaurar scroll del body
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
   });
 
   // Boot
