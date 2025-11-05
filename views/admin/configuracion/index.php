@@ -117,5 +117,10 @@ $base = $this->config['app']['base_url'] ?? '';
   </div>
 </section>
 
+<script>
+  // Base absoluta para el API, generada por el servidor (con $base correcto)
+  window.__API_BASE__ = <?= json_encode(rtrim($base, '/')) ?> + '/?r=admin_config_api';
+</script>
+
 <!-- JS específico de Configuración -->
 <script src="<?= $base ?>/assets/js/admin_config.js?v=4"></script>

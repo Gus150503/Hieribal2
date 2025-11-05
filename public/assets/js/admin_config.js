@@ -6,11 +6,10 @@
   if (window.__ADMIN_CONFIG_JS_BOUND__) return;
   window.__ADMIN_CONFIG_JS_BOUND__ = true;
 
-  // ====== Base API (funciona bajo /.../public) ======
-  const PUBLIC_SEG = '/public';
-  const ix = location.pathname.indexOf(PUBLIC_SEG);
-  const base = ix >= 0 ? location.pathname.slice(0, ix + PUBLIC_SEG.length) : PUBLIC_SEG;
-  const api  = (params) => `${base}/?r=admin_config_api&${params}`;
+// ====== Base API (inyectada por PHP) ======
+const apiBase = (window.__API_BASE__ && String(window.__API_BASE__)) || '/public/?r=admin_config_api';
+const api = (params = '') => params ? `${apiBase}&${params}` : apiBase;
+
 
   // ====== Atajos DOM ======
   const $  = (s) => document.querySelector(s);
@@ -147,6 +146,15 @@
       $('#ui_tema')            && ($('#ui_tema').value            = tema);
       $('#ui_color_principal') && ($('#ui_color_principal').value = brand);
 
+            // ⬇️ añade esto al final de cargar(), justo antes del catch/fin
+      window.__CFG_INIT__ = {
+        correo_activo: !!(document.querySelector('#correo_activo')?.checked),
+        correo_host: document.querySelector('#correo_host')?.value || '',
+        correo_usuario: document.querySelector('#correo_usuario')?.value || '',
+        correo_from: document.querySelector('#correo_from')?.value || ''
+      };
+
+
       // Aplicar en vivo
       applyTheme(tema);
       document.documentElement.style.setProperty('--brand', brand);
@@ -182,10 +190,24 @@
       ui_color_principal: $('#ui_color_principal')?.value || '#198754',
     };
 
-    if (items.correo_activo && (!items.correo_host || !items.correo_usuario || !items.correo_from)) {
-      uiToast('Completa host, usuario y remitente para activar el correo.', 'error', 4200);
-      return;
-    }
+   // ¿En qué pestaña estás?
+const activeHref = document.querySelector('.nav-tabs .nav-link.active')?.getAttribute('href') || '';
+const isOnCorreoTab = activeHref === '#tabCorreo';
+
+// ¿Se está activando el correo ahora (OFF -> ON)?
+const init = window.__CFG_INIT__ || {};
+const turnedOnMail = !init.correo_activo && !!items.correo_activo;
+
+// Solo exigimos host/usuario/from si:
+// 1) Estás en la pestaña Correo, o
+// 2) Estás activando el correo en esta acción
+if ((isOnCorreoTab || turnedOnMail) &&
+    items.correo_activo &&
+    (!items.correo_host || !items.correo_usuario || !items.correo_from)) {
+  uiToast('Completa host, usuario y remitente para activar el correo.', 'error', 4200);
+  return;
+}
+
 
     const btn = $('#btnGuardarCfg');
     const prev = btn ? btn.innerHTML : '';
@@ -209,7 +231,25 @@
         localStorage.setItem('ui_color_principal', items.ui_color_principal);
       } catch {}
 
+      // Mensaje de guardado OK
       uiToast('Configuración guardada correctamente.');
+
+      // Lee el tema realmente aplicado en <html data-theme="...">
+      const picked  = (items.ui_tema || '').toLowerCase().trim();
+      const applied = (document.documentElement.getAttribute('data-theme') || '').toLowerCase().trim();
+
+      // Si eligieron "auto", avisa eso. En los demás casos, usa lo que quedó aplicado.
+      if (picked === 'auto') {
+        uiToast('⚙️ El tema se ajustará automáticamente según tu sistema.', 'success', 3200);
+      } else if (applied === 'light') {
+        uiToast('🌞 Se aplicó el tema claro.', 'success', 3200);
+      } else if (applied === 'dark') {
+        uiToast('🌙 Se aplicó el tema oscuro.', 'success', 3200);
+      } else {
+        uiToast(`Tema aplicado: ${applied || picked}`, 'success', 3200);
+      }
+
+
     } catch (e) {
       console.error(e);
       uiToast(e.message || 'Error al guardar', 'error', 4200);
