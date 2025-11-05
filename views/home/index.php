@@ -38,7 +38,6 @@ if (!empty($_SESSION['flash_public'])):
 <?php endif; ?>
 
 
-
   <!-- HERO / BIENVENIDA -->
   <section id="top" class="bienvenida">
     <div class="texto-bienvenida">
