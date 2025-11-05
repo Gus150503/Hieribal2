@@ -166,19 +166,19 @@ $ui_tema_fallback = $ui_tema ?? 'light';
     <header class="site-header header">
       <div class="container header-wrap" style="display:flex;align-items:center;justify-content:space-between;">
         <a class="logo" href="<?= htmlspecialchars($base) ?>/?r=home">
-          <img src="<?= $asset('assets/img/logo1.png') ?>" alt="Logo MI HIERBAL" style="height:50px;">
+          <img src="<?= $asset('assets/img/logo2.png') ?>" alt="Logo MI HIERBAL" style="height:60px;">
         </a>
         <nav>
-          <ul style="list-style:none;display:flex;gap:25px;margin:0;padding:0;">
+          <ul style="list-style:none;display:flex;gap:25px;margin:0;padding:0;align-items:center;">
             <li><a href="<?= htmlspecialchars($base) ?>/?r=home#top">Inicio</a></li>
             <li><a href="<?= htmlspecialchars($base) ?>/?r=home#quienes-somos">Quiénes Somos</a></li>
             <?php if (!empty($_SESSION['cliente'])): ?>
               <li><a href="<?= htmlspecialchars($base) ?>/?r=dashboard">Panel</a></li>
-              <li><a class="btn btn-sm btn-ghost" href="<?= htmlspecialchars($base) ?>/?r=logout">Salir</a></li>
+              <li><a class="btn btn-sm btn-ghost" href="<?= htmlspecialchars($base) ?>/?r=logout" style="padding:8px 20px;border-radius:20px;">Salir</a></li>
             <?php else: ?>
-              <li><a class="btn btn-sm" href="<?= htmlspecialchars($base) ?>/?r=login">Ingresar</a></li>
-              <li><a class="btn btn-sm btn-ghost" href="<?= htmlspecialchars($base) ?>/?r=register">Registro</a></li>
-              <li><a class="btn btn-sm" href="<?= htmlspecialchars($base) ?>/?r=login">Comprar Ahora</a></li>
+              <li><a class="btn btn-sm" href="<?= htmlspecialchars($base) ?>/?r=login" style="padding:8px 20px;border-radius:20px;">Ingresar</a></li>
+              <li><a class="btn btn-sm btn-ghost" href="<?= htmlspecialchars($base) ?>/?r=register" style="padding:8px 20px;border-radius:20px;">Registro</a></li>
+              <li><a class="btn btn-sm" href="<?= htmlspecialchars($base) ?>/?r=login" style="padding:8px 20px;border-radius:20px;">Comprar Ahora</a></li>
             <?php endif; ?>
           </ul>
         </nav>

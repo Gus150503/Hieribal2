@@ -5,11 +5,13 @@ ob_start();
 <div class="login-wrapper">
   <div class="left-panel">
     <img src="<?= $base ?>/assets/img/logo.png" alt="Logo Hieribal">
+    
     <h1>Hieribal · Usuarios</h1>
     <p>Inicio de sesión para administradores, empleados y cajeros.</p>
   </div>
 
   <div class="right-panel">
+    
     <form method="post" action="<?= $base ?>/?r=admin_do_login" class="login-box">
       <h3 class="mb-3">Iniciar sesión</h3>
 

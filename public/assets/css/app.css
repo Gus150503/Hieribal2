@@ -254,4 +254,104 @@ html, body{
   padding-left: 0 !important;
 }
 
+/* --- Coloca logo y botón en la misma fila (sin mover el logo) --- */
+.login .left-panel{
+  display: grid;                 /* sobreescribe el flex anterior */
+  grid-template-columns: auto 46px;  /* logo | botón redondo */
+  grid-auto-rows: min-content;
+  align-items: center;           /* centra verticalmente logo y botón */
+  column-gap: 14px;              /* separación entre logo y botón */
+}
+
+/* Mantén el logo como lo tienes, solo quita el margin-bottom negativo */
+.login .logo{
+  grid-column: 1;
+  grid-row: 1;
+  width: 250px;
+  margin-left: -30px;    /* tus valores actuales */
+  margin-bottom: 0;      /* evita que “empuje” raro el contenido */
+}
+
+/* Botón redondo verde a la derecha del logo */
+.back-btn{
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #6FBC43;
+  color: #fff;
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: 700;
+  transition: background-color .2s ease, transform .2s ease;
+}
+
+.back-btn:hover{
+  background: #5aa837;
+  transform: scale(1.06);
+}
+
+/* El resto del formulario va debajo ocupando todo el ancho */
+.login .form-content{
+  grid-column: 1 / -1;
+  grid-row: 2;
+  margin-top: 16px;
+}
+
+/* En móvil, si apilas, que el botón quede debajo del logo si lo prefieres */
+@media (max-width: 560px){
+  .login .left-panel{
+    grid-template-columns: 1fr;
+    column-gap: 0;
+  }
+  .back-btn{
+    grid-column: 1;
+    margin-top: 10px;
+    justify-self: start;
+  }
+}
+/* 1) Volver a layout normal en el panel izquierdo */
+.login .left-panel{
+  display: block !important;        /* antes era flex/column */
+}
+
+/* 2) Logo y botón en la misma línea */
+.login .logo,
+.login .back-btn{
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* 3) Botón redondo verde, con separación del logo */
+.login .back-btn{
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #6FBC43;
+  color: #fff;
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 42px;                 /* centra la flecha */
+  text-align: center;
+  margin-left: 420px;                 /* separación respecto al logo */
+  transition: background-color .2s, transform .2s;
+}
+.login .back-btn:hover{
+  background: #5aa837;
+  transform: scale(1.06);
+}
+
+/* 4) Asegura que el resto ocupe todo el ancho normal */
+.login .form-content{
+  display: block;
+  margin-top: 18px;                  /* espacio bajo la fila logo+botón */
+}
+
+
+
 
