@@ -10,6 +10,9 @@ unset($_SESSION['error']);
     <div class="left-panel">
       <img src="<?= $this->config['app']['base_url'] ?>/assets/img/logo.png" class="logo" alt="Logo">
 
+      <!-- 🔙 Botón Atrás -->
+      <a href="<?= $this->config['app']['base_url'] ?>" class="back-btn"> ← </a>
+
       <div class="form-content">
         <h2>Ingresa sesión</h2>
         <p>Por favor ingresa tus credenciales</p>
@@ -50,21 +53,19 @@ unset($_SESSION['error']);
 
     <!-- Panel derecho: video -->
     <div class="right-panel">
-<video
-  autoplay
-  muted
-  loop
-  playsinline
-  preload="auto"
-  disablepictureinpicture
-  controlslist="nodownload nofullscreen noremoteplayback"
-  aria-hidden="true"
-  tabindex="-1"
->
-  <source src="<?= $this->config['app']['base_url'] ?>/assets/video/video.mp4" type="video/mp4">
-</video>
-
-
+    <video
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="auto"
+      disablepictureinpicture
+      controlslist="nodownload nofullscreen noremoteplayback"
+      aria-hidden="true"
+      tabindex="-1"
+    >
+      <source src="<?= $this->config['app']['base_url'] ?>/assets/video/video.mp4" type="video/mp4">
+    </video>
     </div>
 
   </div>
