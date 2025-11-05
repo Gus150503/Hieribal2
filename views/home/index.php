@@ -1,9 +1,10 @@
 <?php $base = $this->config['app']['base_url']; ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MI HIERBAL - Bienvenida</title>
 
   <!-- Fuente moderna -->
@@ -12,6 +13,7 @@
   <!-- Estilos propios -->
   <link rel="stylesheet" href="<?= $base ?>/assets/css/home.css">
 </head>
+
 <body>
 
 <?php
@@ -69,14 +71,15 @@ if (!empty($_SESSION['flash_public'])):
       <p>
         Somos MI HIERBAL, un oasis de bienestar natural. Creemos que la salud es un viaje, no un destino.
         Y en cada paso de ese camino, queremos acompañarte con productos naturales de la más alta calidad.
-        En nuestra tienda, encontrarás más que simples productos; encontrarás un compromiso con tu bienestar integral.
+        En nuestra tienda, encontrarás más que simples productos; encontrarás un compromiso con tu bienestar
+        integral.
       </p>
       <div class="text-section-buttons">
         <a href="https://api.whatsapp.com/send?phone=573212322978&text=Hola,%20me%20gustaría%20más%20información%20sobre%20sus%20productos"
           target="_blank"
           class="btn btn-contactanos">Contáctanos</a>
         <button class="btn btn-mas-nosotros"
-                onclick="document.getElementById('nosotros').scrollIntoView({ behavior: 'smooth' })">
+          onclick="document.getElementById('nosotros').scrollIntoView({ behavior: 'smooth' })">
           Más sobre nosotros
         </button>
       </div>
@@ -98,7 +101,7 @@ if (!empty($_SESSION['flash_public'])):
       <div>
         <div class="commitment-card">
 
-    
+
 
           <h3>Compromiso</h3>
           <p>Nuestro lema es ser comprometidos de una manera eficiente con nuestros clientes.</p>
@@ -110,7 +113,8 @@ if (!empty($_SESSION['flash_public'])):
   <!-- CALL TO ACTION -->
   <section class="call-to-action-section">
     <h2>Únete a Nuestra Comunidad Saludable</h2>
-    <p>Recibe las últimas noticias, ofertas exclusivas y consejos de bienestar directamente en tu bandeja de entrada.</p>
+    <p>Recibe las últimas noticias, ofertas exclusivas y consejos de bienestar directamente en tu bandeja de
+      entrada.</p>
     <div class="form-container">
       <input type="text" placeholder="Tu Nombre" />
       <input type="email" placeholder="Tu Correo Electrónico" />
@@ -133,4 +137,5 @@ if (!empty($_SESSION['flash_public'])):
 </script>
 
 </body>
+
 </html>
