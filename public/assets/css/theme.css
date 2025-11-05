@@ -474,3 +474,41 @@ html[data-theme] .table, html[data-theme] .pagination .page-link {
 :root[data-theme="dark"] .page-content {
   min-height: 100vh;
 }
+
+/* ==== DARK: quitar blanco de TODAS las tablas (Bootstrap/DataTables) ==== */
+html[data-theme="dark"] .table{
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border-color: var(--border) !important;
+}
+
+/* Celdas (Bootstrap pinta el fondo aquí) */
+html[data-theme="dark"] .table>:not(caption)>*>*{
+  background-color: transparent !important;  /* <-- adiós blanco */
+  color: var(--ink) !important;
+  border-color: var(--border) !important;
+  box-shadow: none !important;
+}
+
+/* Encabezado por si alguna tabla usa table-light / utilitarios claros */
+html[data-theme="dark"] .table thead,
+html[data-theme="dark"] .table thead.table-light{
+  background: linear-gradient(180deg, var(--bg-soft), var(--surface)) !important;
+  color: #dbe3f1 !important;
+  box-shadow: 0 1px 0 var(--border);
+}
+html[data-theme="dark"] .table thead th{ color:#dbe3f1 !important; }
+
+/* Striped & hover (tono oscuro agradable) */
+html[data-theme="dark"] .table-striped>tbody>tr:nth-of-type(odd)>*{
+  background-color: rgba(255,255,255,.04) !important;
+}
+html[data-theme="dark"] .table-hover>tbody>tr:hover>*{
+  background-color: rgba(59,130,246,.10) !important; /* o usa var(--tbl-hover) si la definas */
+  color: var(--ink) !important;
+}
+
+/* DataTables: bordes y lomo inferior */
+html[data-theme="dark"] table.dataTable.no-footer{
+  border-bottom: 1px solid var(--border) !important;
+}

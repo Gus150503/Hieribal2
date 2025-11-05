@@ -1,0 +1,13 @@
+{
+    "empresa_nombre": "",
+    "empresa_ruc": "",
+    "empresa_direccion": "",
+    "correo_host": "",
+    "correo_puerto": "587",
+    "correo_seguridad": "tls",
+    "correo_usuario": "",
+    "correo_from": "",
+    "correo_activo": "1",
+    "ui_tema": "light",
+    "ui_color_principal": "#198754"
+}
