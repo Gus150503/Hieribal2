@@ -164,6 +164,10 @@ switch ($r) {
     case 'admin_usuarios_verify_email':  (new AdminUsuariosController($config))->verifyEmail();        break;
     case 'admin_usuarios_resend_verif':  (new AdminUsuariosController($config))->resendVerification(); break;
 
+    /* ====== Clientes ====== */
+    case 'admin_clientes':      (new \Controllers\AdminClientesController($config))->index(); break;
+    case 'admin_clientes_api':  (new \Controllers\AdminClientesController($config))->api();   break;
+
     /* ====== Inventario ====== */
     case 'admin_inventario':      (new AdminInventario($config))->index(); break;
     case 'admin_inventario_api':  (new AdminInventario($config))->api();   break;
