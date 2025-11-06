@@ -1,5 +1,4 @@
 <?php
-
 namespace Controllers;
 
 use Core\Controller;
@@ -9,14 +8,13 @@ final class HomeController extends Controller
     /** Home público (no requiere sesión) */
     public function index(): void
     {
-        $base = $this->config['app']['base_url'];
+        $base = rtrim((string)($this->config['app']['base_url'] ?? ''), '/');
+
         $this->render(
             'home/index',
             [
-                // Carga CSS específico de la portada
                 'extra_css' => [$base . '/assets/css/home.css'],
-                // Si algún día necesitas JS propio de la home:
-                // 'extra_js'  => [ $base . '/assets/js/home.js' ],
+                // 'extra_js'  => [$base . '/assets/js/home.js'],
             ],
             'Inicio'
         );
@@ -25,22 +23,15 @@ final class HomeController extends Controller
     /** Dashboard privado (solo logueados) */
     public function dashboard(): void
     {
-        if (!isset($_SESSION['cliente'])) {
-            // Redirige a login con base_url
+        if (empty($_SESSION['cliente'])) {
             $this->redirect('/?r=login');
+            return;
         }
 
         $this->render(
-
-            [
-                'cliente' => $_SESSION['cliente'] ?? null,
-            ],
-            'Panel'
+            'home/dashboard',           // ← vista (string)
+            [ 'cliente' => $_SESSION['cliente'] ?? null ], // ← data (array)
+            'Panel'                      // ← título (opcional)
         );
     }
 }
- 
-
-
-
-
