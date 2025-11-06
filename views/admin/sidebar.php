@@ -20,11 +20,11 @@ $active = fn (string $key) => $sec === strtolower($key) ? 'active' : '';
 
 $rol = strtolower($_SESSION['admin']['rol'] ?? 'empleado');
 
-/* ACL */
+/* ACL (Control de acceso por rol) */
 $ACL = [
-  'admin'    => ['dashboard','ventas','inventario','productos','usuarios','proveedores','configuracion','reportes'],
-  'cajero'   => ['dashboard','ventas','inventario.view','productos.view'],
-  'empleado' => ['dashboard','inventario','productos'],
+  'admin'    => ['dashboard','ventas','inventario','productos','clientes','usuarios','proveedores','configuracion','reportes'],
+  'cajero'   => ['dashboard','ventas','inventario.view','productos.view','clientes.view'],
+  'empleado' => ['dashboard','inventario','productos','clientes.view'],
 ];
 
 $can = function (string $perm) use ($rol, $ACL): bool {
@@ -81,6 +81,14 @@ $can = function (string $perm) use ($rol, $ACL): bool {
       <li class="<?= $active('productos') ?>">
         <a href="?r=admin/productos" aria-current="<?= $sec==='productos'?'page':'false' ?>">
           <i class="bi bi-bag"></i><span class="label">Productos</span>
+        </a>
+      </li>
+    <?php endif; ?>
+
+    <?php if ($can('clientes')): ?>
+      <li class="<?= $active('clientes') ?>">
+        <a href="?r=admin/clientes" aria-current="<?= $sec==='clientes'?'page':'false' ?>">
+          <i class="bi bi-person-badge"></i><span class="label">Clientes</span>
         </a>
       </li>
     <?php endif; ?>
