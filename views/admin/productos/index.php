@@ -208,28 +208,6 @@ $base = $this->config['app']['base_url'] ?? '';
     </div>
   </div>
 </div>
-<!-- Modal: Ver Detalle de Producto -->
-<div class="modal fade" id="modalVerProducto" tabindex="-1" aria-labelledby="modalVerProductoLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header bg-info text-white">
-        <h5 class="modal-title" id="modalVerProductoLabel">Detalles del Producto</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body">
-        <h5 id="verNombre"></h5>
-        <p><strong>Precio:</strong> <span id="verPrecio"></span></p>
-        <p><strong>Stock:</strong> <span id="verStock"></span></p>
-        <p><strong>Descripción:</strong></p>
-        <div id="verDescripcion" class="border rounded p-2 bg-light" style="white-space: pre-wrap;"></div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <style>
   
   #tblProductos thead.table-light{
