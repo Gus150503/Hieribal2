@@ -16,7 +16,7 @@ $asset = function (string $path) use ($base) {
   return rtrim($base, '/') . '/' . ltrim($path, '/');
 };
 
-$bodyClasses = [];
+$bodyClasses   = [];
 $bodyClasses[] = $full ? 'admin-login' : 'app';
 if ($isAdmin) $bodyClasses[] = 'admin-layout';
 $bodyClassAttr = implode(' ', $bodyClasses);
@@ -157,6 +157,7 @@ $ui_tema_fallback = $ui_tema ?? 'light';
 <!-- ===== Scripts ===== -->
 <?php if ($isAdmin): ?>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
   <script>
   document.addEventListener('DOMContentLoaded', () => {
     const root        = document.body;
@@ -167,7 +168,7 @@ $ui_tema_fallback = $ui_tema ?? 'light';
     const closeBtn    = sidebarEl?.querySelector('.sidebar-close');     // opcional, en sidebar.php
     const mobileBtn   = document.getElementById('mobileSidebarToggle');
 
-    const isDesktop   = () => window.matchMedia('(min-width: 992px)').matches;
+    const isDesktop    = () => window.matchMedia('(min-width: 992px)').matches;
     const lockScroll   = () => { document.documentElement.style.overflow='hidden'; document.body.style.overflow='hidden'; };
     const unlockScroll = () => { document.documentElement.style.overflow='';       document.body.style.overflow='';       };
 
@@ -215,14 +216,22 @@ $ui_tema_fallback = $ui_tema ?? 'light';
   </script>
 <?php endif; ?>
 
+<!-- Tu JS base -->
 <script src="<?= $asset('assets/js/app.js') ?>"></script>
 
+<!-- SweetAlert2 (solo cuando se pida desde la vista/controlador) -->
+<?php if (!empty($carga_swal)): ?>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<?php endif; ?>
+
+<!-- Scripts extra por página (después de SweetAlert2 para que Swal esté disponible) -->
 <?php if (!empty($extra_js) && is_array($extra_js)): ?>
   <?php foreach ($extra_js as $src): ?>
     <script src="<?= htmlspecialchars($src) ?>"></script>
   <?php endforeach; ?>
 <?php endif; ?>
 
+<!-- Chart.js (si aplica en páginas admin/dashboard) -->
 <?php if (!empty($carga_chartjs)): ?>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script src="<?= $asset('assets/js/admin-dashboard.js') ?>"></script>
