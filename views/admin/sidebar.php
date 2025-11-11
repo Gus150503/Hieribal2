@@ -85,6 +85,15 @@ $can = function (string $perm) use ($rol, $ACL): bool {
       </li>
     <?php endif; ?>
 
+
+      <?php if ($can('proveedores')): ?>
+      <li class="<?= $active('proveedores') ?>">
+        <a href="?r=admin/proveedores" aria-current="<?= $sec==='proveedores'?'page':'false' ?>">
+          <i class="bi bi-truck"></i><span class="label">Proveedores</span>
+        </a>
+      </li>
+    <?php endif; ?>
+
     <?php if ($can('clientes')): ?>
       <li class="<?= $active('clientes') ?>">
         <a href="?r=admin/clientes" aria-current="<?= $sec==='clientes'?'page':'false' ?>">
@@ -93,13 +102,7 @@ $can = function (string $perm) use ($rol, $ACL): bool {
       </li>
     <?php endif; ?>
 
-    <?php if ($can('proveedores')): ?>
-      <li class="<?= $active('proveedores') ?>">
-        <a href="?r=admin/proveedores" aria-current="<?= $sec==='proveedores'?'page':'false' ?>">
-          <i class="bi bi-truck"></i><span class="label">Proveedores</span>
-        </a>
-      </li>
-    <?php endif; ?>
+
 
     <?php if ($can('usuarios')): ?>
       <li class="<?= $active('usuarios') ?>">

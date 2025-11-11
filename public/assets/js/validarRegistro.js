@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     return box;
   };
-  const showErrors = (msgs) => {
+  const showErrors = (msgs) =>
     const box = createOrGetErrorBox();
     box.innerHTML = msgs.map(m => `<div>• ${m}</div>`).join("");
     box.style.display = "block";
