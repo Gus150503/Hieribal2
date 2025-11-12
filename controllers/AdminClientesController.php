@@ -137,7 +137,7 @@ final class AdminClientesController extends Controller
         $nombres   = trim($in['nombres']    ?? '');
         $apellidos = trim($in['apellidos']  ?? '');
         $telefono  = trim($in['telefono']   ?? '');
-        $password  = trim($in['contrasena'] ?? ''); // usa 'contrasena' en el POST
+        $password  = trim($in['contraseña'] ?? ''); // usa 'contrasena' en el POST
 
         if (!preg_match('/^\d{6,15}$/', $cedula))          throw new \Exception('Cédula inválida.');
         if (!preg_match($nameRe, $nombres))                throw new \Exception('Nombres inválidos.');
@@ -152,7 +152,7 @@ final class AdminClientesController extends Controller
             'apellidos'  => $apellidos,
             'telefono'   => $telefono,
             'correo'     => $email,
-            'contrasena' => $password,   // el modelo decide si hash/ignora vacío en update
+            'contraseña' => $password,   // el modelo decide si hash/ignora vacío en update
         ];
         if ($creating) $out['estado'] = 'Activo';
 

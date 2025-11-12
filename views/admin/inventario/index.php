@@ -1,4 +1,3 @@
-
 <?php
 // views/admin/inventario/index.php
 $base = $this->config['app']['base_url'] ?? '';
@@ -10,9 +9,7 @@ $base = $this->config['app']['base_url'] ?? '';
         <i class="bi bi-box-seam fs-4 text-success"></i>
         <h1 class="h4 m-0">Inventario</h1>
       </div>
-
-      <!-- Botón Nuevo -->
-      <button id="btnNuevo" type="button" class="btn btn-success">
+      <button id="btnNuevoInventario" type="button" class="btn btn-success">
         <i class="bi bi-plus-lg me-1"></i> Nuevo
       </button>
     </div>
@@ -20,21 +17,21 @@ $base = $this->config['app']['base_url'] ?? '';
     <!-- Buscador -->
     <div class="input-group mb-3" style="max-width:520px;">
       <span class="input-group-text"><i class="bi bi-search"></i></span>
-      <input id="q" type="search" class="form-control" placeholder="Buscar por código interno o ubicación…">
-      <button id="btnBuscar" class="btn btn-outline-success">Buscar</button>
+      <input id="qInventario" type="search" class="form-control" placeholder="Buscar por código interno, producto o ubicación…">
+      <button id="btnBuscarInventario" class="btn btn-outline-success">Buscar</button>
     </div>
 
     <!-- Tabla -->
     <div class="table-responsive">
-      <table id="tblInventario" class="table table-sm align-middle table-hover">
+      <table id="tblInventario" class="table table-sm table-hover align-middle">
         <thead class="table-light position-sticky" style="top:0; z-index:1;">
           <tr>
             <th>ID</th>
             <th>Producto</th>
             <th>Código Interno</th>
             <th>Stock</th>
-            <th>Stock Mínimo</th>
-            <th>Stock Máximo</th>
+            <th>Stock Mín.</th>
+            <th>Stock Máx.</th>
             <th>Punto Reorden</th>
             <th>Ubicación</th>
             <th>Estado</th>
@@ -47,7 +44,7 @@ $base = $this->config['app']['base_url'] ?? '';
       <div class="d-flex align-items-center justify-content-between mt-3">
         <div class="d-flex align-items-center gap-2">
           <label class="text-muted small me-1">Mostrar</label>
-          <select id="perPage" class="form-select form-select-sm" style="width:80px">
+          <select id="perPageInventario" class="form-select form-select-sm" style="width:80px">
             <option value="5">5</option>
             <option value="10" selected>10</option>
             <option value="20">20</option>
@@ -56,7 +53,7 @@ $base = $this->config['app']['base_url'] ?? '';
           <span id="totalInventario" class="text-muted small ms-2"></span>
         </div>
         <nav aria-label="Paginación">
-          <ul id="paginador" class="pagination pagination-sm mb-0"></ul>
+          <ul id="paginadorInventario" class="pagination pagination-sm mb-0"></ul>
         </nav>
       </div>
     </div>
@@ -68,70 +65,60 @@ $base = $this->config['app']['base_url'] ?? '';
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content border-0 rounded-4 shadow">
       <div class="modal-header border-0 pb-0">
-        <h5 class="modal-title fw-semibold" id="modalTitle">Nuevo inventario</h5>
+        <h5 class="modal-title fw-semibold" id="modalTitleInventario">Nuevo inventario</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
 
-      <div class="modal-body pt-3">
-        <form id="frmInventario" class="needs-validation" novalidate>
-          <input type="hidden" name="id" id="idInventario">
+      <form id="frmInventario" class="needs-validation" novalidate>
+        <div class="modal-body pt-3">
+          <input type="hidden" name="id" id="idInventario" value="">
 
           <div class="row g-3">
-            
-            <!-- 🔽 CAMBIO: Select de productos -->
             <div class="col-md-6">
               <label class="form-label">Producto</label>
               <select class="form-select" name="producto_id" id="producto_id" required>
-                <option value="">Seleccione un producto...</option>
-                <?php if (!empty($productos)): ?>
-                  <?php foreach ($productos as $p): ?>
-                    <option value="<?= $p['id'] ?>">
-                      <?= htmlspecialchars($p['nombre']) ?>
-                    </option>
-                  <?php endforeach; ?>
-                <?php else: ?>
-                  <option disabled>No hay productos registrados</option>
-                <?php endif; ?>
+                <option value="">Seleccione un producto…</option>
               </select>
               <div class="invalid-feedback">Selecciona un producto válido.</div>
             </div>
-            <!-- 🔼 Fin del cambio -->
 
             <div class="col-md-6">
               <label class="form-label">Código Interno</label>
-              <input type="text" class="form-control" name="codigo_interno" id="codigo_interno" required maxlength="50">
-              <div class="invalid-feedback">Código inválido (mín. 3).</div>
+              <input type="text" class="form-control" name="codigo_interno" id="codigo_interno" required minlength="3" maxlength="50">
+              <div class="invalid-feedback">Código mínimo 3 caracteres.</div>
             </div>
 
             <div class="col-md-4">
               <label class="form-label">Stock</label>
-              <input type="number" class="form-control" name="stock" id="stock" required min="0">
+              <input type="number" class="form-control" name="stock" id="stock" required min="0" step="1">
               <div class="invalid-feedback">Stock inválido.</div>
             </div>
 
             <div class="col-md-4">
               <label class="form-label">Stock Mínimo</label>
-              <input type="number" class="form-control" name="stock_minimo" id="stock_minimo" required min="0">
+              <input type="number" class="form-control" name="stock_minimo" id="stock_minimo" required min="0" step="1">
               <div class="invalid-feedback">Stock mínimo inválido.</div>
             </div>
 
             <div class="col-md-4">
               <label class="form-label">Stock Máximo</label>
-              <input type="number" class="form-control" name="stock_maximo" id="stock_maximo" required min="0">
+              <input type="number" class="form-control" name="stock_maximo" id="stock_maximo" required min="0" step="1">
               <div class="invalid-feedback">Stock máximo inválido.</div>
             </div>
 
             <div class="col-md-6">
               <label class="form-label">Punto de Reorden</label>
-              <input type="number" class="form-control" name="punto_reorden" id="punto_reorden" required min="0">
+              <input type="number" class="form-control" name="punto_reorden" id="punto_reorden" required min="0" step="1">
               <div class="invalid-feedback">Punto de reorden inválido.</div>
             </div>
 
-            <div class="col-md-6">
-              <label class="form-label">Ubicación</label>
-              <input type="text" class="form-control" name="ubicacion" id="ubicacion" maxlength="100">
-              <div class="invalid-feedback">Ubicación inválida.</div>
-            </div>
+              <div class="col-md-6">
+                <label class="form-label">Ubicación</label>
+                <input type="text" class="form-control" name="ubicacion" id="ubicacion" maxlength="100">
+                <div class="valid-feedback">Opcional.</div>          <!-- aparece en verde cuando es válido -->
+                <div class="invalid-feedback">Ubicación inválida.</div> <!-- rojo solo si es inválido -->
+              </div>
+
 
             <div class="col-md-6">
               <label class="form-label">Estado</label>
@@ -143,16 +130,33 @@ $base = $this->config['app']['base_url'] ?? '';
               <div class="invalid-feedback">Selecciona un estado.</div>
             </div>
           </div>
+        </div>
 
-          <div class="modal-footer border-0 pt-3">
-            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-success">
-              <i class="bi bi-check2-circle me-1"></i> Guardar
-            </button>
-          </div>
-        </form>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-check2-circle me-1"></i> Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Contenedores para toasts y confirm usados por el JS -->
+<div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 rounded-4 shadow">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-semibold" id="confirmTitle">Confirmar acción</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
-
+      <div class="modal-body pt-3" id="confirmBody">¿Seguro?</div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success" id="btnOkConfirm">Sí, continuar</button>
+      </div>
     </div>
   </div>
 </div>
@@ -170,18 +174,12 @@ $base = $this->config['app']['base_url'] ?? '';
   #tblInventario thead.table-light th{ color:#fff !important; }
 </style>
 
+<!-- Endpoints para que el JS pegue al controlador correcto -->
 <script>
   window.INVENTARIO_API = '<?= $base ?>/?r=admin_inventario_api';
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('btnNuevo');
-    if (btn && window.bootstrap) {
-      btn.addEventListener('click', () => {
-        const el = document.getElementById('modalInventario');
-        if (el) new bootstrap.Modal(el).show();
-      });
-    }
-  });
+  window.PRODUCTO_API   = '<?= $base ?>/?r=admin_productos_api';
 </script>
 
-<script src="<?= $base ?>/assets/js/admin_inventario.js?v=2" defer></script>
+
+<!-- JS específico -->
+<script src="<?= $base ?>/assets/js/admin_inventario.js?v=3" defer></script>

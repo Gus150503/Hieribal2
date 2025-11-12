@@ -1,19 +1,36 @@
+<?php
+// === Activar SweetAlert2 y JS de validación ===
+$carga_swal = true;  // el layout cargará SweetAlert2
+$extra_js   = $extra_js ?? [];
+$extra_js[] = $this->config['app']['base_url'] . '/assets/js/validarRegistro.js';
+?>
+
 <div class="login-page">
   <div class="login">
     <div class="left-panel">
-      <img src="<?= $this->config['app']['base_url'] ?>/assets/img/logo.png" class="logo" alt="Logo">
 
-            <!-- 🔙 Botón Atrás -->
+      <!-- Logo -->
+      <img 
+        src="<?= $this->config['app']['base_url'] ?>/assets/img/logo.png" 
+        class="logo" 
+        alt="Logo"
+      >
+
+      <!-- Botón Atrás -->
       <a href="<?= $this->config['app']['base_url'] ?>" class="back-btn"> ← </a>
+
       <div class="form-content">
         <h2>Crea tu cuenta</h2>
         <p>Completa tus datos para empezar</p>
 
+        <!-- Error visible del controlador -->
         <?php if (!empty($error)): ?>
           <div class="error-msg"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
+        <!-- Formulario de registro -->
         <form method="POST" action="?r=do_register" autocomplete="off">
+
           <!-- Fila 1: 3 columnas -->
           <div class="form-row form-3">
             <input type="text"   name="cedula"    placeholder="Cédula"   required>
@@ -24,29 +41,39 @@
           <!-- Fila 2: 2 columnas -->
           <div class="form-row form-2">
             <input
-            id="telefono"
-            name="telefono"
-            type="text"
-            placeholder="Teléfono"
-            inputmode="numeric"
-            pattern="\d{10}"
-            maxlength="10"
-            autocomplete="tel"
-            required
-          >
-
-            
-            <input type="email"  name="correo"    placeholder="Correo"   required autocomplete="email">
+              id="telefono"
+              name="telefono"
+              type="text"
+              placeholder="Teléfono"
+              inputmode="numeric"
+              pattern="\d{10}"
+              maxlength="10"
+              autocomplete="tel"
+              required
+            >
+            <input 
+              type="email"  
+              name="correo"    
+              placeholder="Correo"   
+              required 
+              autocomplete="email"
+            >
           </div>
 
           <!-- Fila 3: 1 columna -->
-          <input type="password" name="password"  placeholder="Contraseña" required autocomplete="new-password">
+          <input 
+            type="password" 
+            name="password"  
+            placeholder="Contraseña" 
+            required 
+            autocomplete="new-password"
+          >
 
           <button type="submit" class="submit-btn">Crear cuenta</button>
         </form>
 
-
-        <p class="bottom-link">¿Ya tienes una cuenta?
+        <p class="bottom-link">
+          ¿Ya tienes una cuenta?
           <a href="?r=login">Inicia sesión</a>
         </p>
       </div>
@@ -54,8 +81,12 @@
 
     <div class="right-panel">
       <video autoplay muted loop playsinline>
-        <source src="<?= $this->config['app']['base_url'] ?>/assets/video/video.mp4" type="video/mp4">
+        <source 
+          src="<?= $this->config['app']['base_url'] ?>/assets/video/video.mp4" 
+          type="video/mp4"
+        >
       </video>
     </div>
+
   </div>
 </div>

@@ -192,7 +192,6 @@ $base = $this->config['app']['base_url'] ?? '';
 
   document.addEventListener('DOMContentLoaded', () => {
     const modalEl = document.getElementById('modalUsuario');
-    const modal   = window.bootstrap ? new bootstrap.Modal(modalEl) : null;
     const form    = document.getElementById('frmUsuario');
     const titleEl = document.getElementById('modalTitle');
 

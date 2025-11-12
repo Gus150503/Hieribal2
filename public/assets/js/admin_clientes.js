@@ -308,7 +308,7 @@
   function fillForm(data = {}) {
     const d = {
       id_cliente: 0, cedula:'', nombres:'', apellidos:'', telefono:'', correo:'',
-      contrasena:'', estado:'activo', ...data
+      contraseña:'', estado:'activo', ...data
     };
     d.estado = String(d.estado||'').toLowerCase().startsWith('inac') ? 'inactivo' : 'activo';
 
@@ -319,7 +319,7 @@
     set('apellidos', d.apellidos);
     set('telefono', d.telefono);
     set('correo', d.correo);
-    set('contrasena',''); // nunca prellenar
+    set('contraseña',''); // nunca prellenar
     const est = frm?.querySelector('#estado'); if (est) est.value = d.estado;
   }
   function openEditor(data, title) {
@@ -431,7 +431,7 @@
     if (!nameRe.test(plain.nombres || '')) return 'Nombres inválidos (sólo letras/espacios, 2-60).';
     if (!nameRe.test(plain.apellidos || '')) return 'Apellidos inválidos (sólo letras/espacios, 2-60).';
     if (!/.+@.+\..+/.test(plain.correo || '')) return 'Correo inválido.';
-    if (!isUpdate && (!plain.contrasena || plain.contrasena.length < 8)) return 'Contraseña mínima 8 caracteres.';
+    if (!isUpdate && (!plain.contraseña || plain.contraseña.length < 8)) return 'Contraseña mínima 8 caracteres.';
     return '';
   }
 
@@ -492,3 +492,4 @@
   window.addEventListener('pageshow', (e) => { if (e.persisted) boot(); });
 
 })();
+  
