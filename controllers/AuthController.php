@@ -18,11 +18,32 @@ final class AuthController extends Controller
         $this->clientes = new Cliente($config);
     }
 
+    /* ================= Helpers comunes ================= */
+    protected function isAjax(): bool
+    {
+        return (
+            isset($_SERVER['HTTP_ACCEPT']) &&
+            strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false
+        ) || (
+            isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
+        );
+    }
+
+    private function json(array $data, int $status = 200): void
+    {
+        http_response_code($status);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($data, JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
     /** Muestra formulario de login */
     public function loginForm(): void
     {
         $error = $_SESSION['error'] ?? null; unset($_SESSION['error']);
-        $this->render('auth/login', ['error' => $error, 'full' => true], 'Login');
+        $msg   = $_SESSION['msg']   ?? null; unset($_SESSION['msg']);
+        $this->render('auth/login', ['error' => $error, 'msg' => $msg, 'full' => true], 'Login');
     }
 
     /** Inicia flujo OAuth con Google */
@@ -137,7 +158,7 @@ final class AuthController extends Controller
     /** Endpoint AJAX: verifica existencia de correo/cedula */
     public function checkField(): void
     {
-        header('Content-Type: application/json');
+        header('Content-Type: application/json; charset=utf-8');
         $type   = $_GET['type']  ?? '';
         $value  = $_GET['value'] ?? '';
         $exists = false;
@@ -149,7 +170,7 @@ final class AuthController extends Controller
             $exists = true;
         }
 
-        echo json_encode(['exists' => $exists]);
+        echo json_encode(['exists' => $exists], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
@@ -162,9 +183,10 @@ final class AuthController extends Controller
         $this->render(
             'auth/registro',
             [
-                'error'    => $error,
-                'full'     => true,
-                'extra_js' => [ $base . '/assets/js/validarRegistro.js' ],
+                'error'      => $error,
+                'full'       => true,
+                'carga_swal' => true, // <-- para que el layout cargue SweetAlert2
+                'extra_js'   => [ $base . '/assets/js/validarRegistro.js' ], // <-- tu JS
             ],
             'Registro'
         );
@@ -173,7 +195,10 @@ final class AuthController extends Controller
     /** Procesa registro (con verificación por email) */
     public function registrar(): void
     {
-        if (!$this->isPost()) { $this->redirect('/?r=register'); }
+        if (!$this->isPost()) {
+            if ($this->isAjax()) $this->json(['ok' => false, 'msg' => 'Método inválido'], 405);
+            $this->redirect('/?r=register');
+        }
 
         $data = [
             'cedula'    => trim((string)$this->post('cedula')),
@@ -186,18 +211,22 @@ final class AuthController extends Controller
 
         // Validaciones mínimas
         if ($data['cedula']==='' || $data['nombres']==='' || $data['correo']==='' || $data['password']==='') {
+            if ($this->isAjax()) $this->json(['ok' => false, 'msg' => 'Completa los campos obligatorios.'], 400);
             $_SESSION['error'] = 'Completa los campos obligatorios.';
             $this->redirect('/?r=register');
         }
         if (!filter_var($data['correo'], FILTER_VALIDATE_EMAIL)) {
+            if ($this->isAjax()) $this->json(['ok' => false, 'msg' => 'Correo inválido.'], 400);
             $_SESSION['error'] = 'Correo inválido.';
             $this->redirect('/?r=register');
         }
         if ($this->clientes->correoExiste($data['correo'])) {
+            if ($this->isAjax()) $this->json(['ok' => false, 'msg' => 'El correo ya está registrado.'], 409);
             $_SESSION['error'] = 'El correo ya está registrado.';
             $this->redirect('/?r=register');
         }
         if ($this->clientes->cedulaExiste($data['cedula'])) {
+            if ($this->isAjax()) $this->json(['ok' => false, 'msg' => 'La cédula ya está registrada.'], 409);
             $_SESSION['error'] = 'La cédula ya está registrada.';
             $this->redirect('/?r=register');
         }
@@ -213,6 +242,12 @@ final class AuthController extends Controller
         $mailer = new ServicioCorreo($this->config);
         $mailer->enviarVerificacion($data['correo'], $data['nombres'], $link);
 
+        // === Responder según tipo de petición ===
+        if ($this->isAjax()) {
+            $this->json(['ok' => true]); // <-- esto leerá tu JS para mostrar el modal y luego redirigir
+        }
+
+        // Flujo normal (no AJAX)
         $_SESSION['msg'] = '✅ Perfil creado con éxito. Te enviamos un correo para activar tu cuenta.';
         $this->redirect('/?r=login');
     }

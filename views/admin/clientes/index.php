@@ -113,7 +113,7 @@ $base = $this->config['app']['base_url'] ?? '';
               <label class="form-label">
                 Contraseña <small class="text-muted">(mín. 8; vacío no cambia)</small>
               </label>
-              <input class="form-control" id="contrasena" name="contrasena" type="password" minlength="8" autocomplete="new-password">
+              <input class="form-control" id="contraseña" name="contraseña" type="password" minlength="8" autocomplete="new-password">
               <div class="invalid-feedback">Mínimo 8 caracteres.</div>
             </div>
           </div>
