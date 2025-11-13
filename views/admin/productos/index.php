@@ -227,6 +227,7 @@ $base = $this->config['app']['base_url'] ?? '';
 </div>
 
 <style>
+
 /* Encabezado verde */
 #tblProductos thead.table-light {
     --bs-table-bg: var(--brand, #198754);
@@ -289,6 +290,29 @@ $base = $this->config['app']['base_url'] ?? '';
     font-size: 24px;
     border: 2px dashed #dee2e6;
 }
+
+      /* PRODUCTOS – encabezado verde forzado */
+      #tblProductos thead.table-light {
+        background-color: #198754 !important;
+      }
+      #tblProductos thead.table-light th {
+        background-color: #198754 !important;
+        color: #ffffff !important;
+        border-color: rgba(255,255,255,.25) !important;
+      }
+
+
+
+  /* Tabla amplia y legible */
+  #tblProductos { width:100%; min-width:1500px; }
+  #tblProductos th, #tblProductos td { vertical-align: middle; white-space: nowrap; }
+  #tblProductos td.descripcion { white-space: normal; max-width: 250px; overflow-wrap: break-word; text-align: left; }
+
+  /* Imagen miniatura */
+  .producto-img{ width:55px;height:55px;object-fit:cover;border-radius:8px;border:2px solid #e9ecef;box-shadow:0 2px 8px rgba(0,0,0,.1);transition:transform .2s, box-shadow .2s; }
+  .producto-img:hover{ transform:scale(1.8); box-shadow:0 4px 16px rgba(0,0,0,.2); z-index:10; cursor:pointer; }
+  .producto-img-placeholder{ width:55px;height:55px;border-radius:8px;background:linear-gradient(135deg,#f5f7fa,#e9ecef);display:flex;align-items:center;justify-content:center;color:#adb5bd;font-size:24px;border:2px dashed #dee2e6; }
+
 </style>
 
 <!-- Solo endpoint; el modal lo maneja admin_productos.js -->
