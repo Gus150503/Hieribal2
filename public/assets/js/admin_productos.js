@@ -550,6 +550,67 @@
       return;
     }
   });
+// =====================================
+// Fecha de vencimiento: solo hoy o futuro
+// =====================================
+function esFechaFuturaOHoy(valor) {
+  if (!valor) return true; // si está vacío, lo consideramos opcional
+
+  let d, m, y;
+
+  // Soporta dd/mm/aaaa y yyyy-mm-dd
+  if (valor.includes('/')) {
+    const partes = valor.split('/');
+    if (partes.length !== 3) return false;
+    [d, m, y] = partes.map(p => parseInt(p, 10));
+  } else {
+    const partes = valor.split('-');
+    if (partes.length !== 3) return false;
+    [y, m, d] = partes.map(p => parseInt(p, 10));
+  }
+
+  const fecha = new Date(y, m - 1, d);
+  if (isNaN(fecha.getTime())) return false;
+
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  fecha.setHours(0, 0, 0, 0);
+
+  return fecha >= hoy;
+}
+
+        // Limitar visualmente el selector de fecha
+        function limitFechaVencimiento() {
+          const inp = document.getElementById('f_vencimiento');
+          if (!inp) return;
+
+          // Si el input es type="date", bloqueamos directamente días anteriores
+          const hoy = new Date();
+          const y = hoy.getFullYear();
+          const m = String(hoy.getMonth() + 1).padStart(2, '0');
+          const d = String(hoy.getDate()).padStart(2, '0');
+          const iso = `${y}-${m}-${d}`;
+
+          if (inp.type === 'date') {
+            inp.setAttribute('min', iso);
+          }
+
+          // Validar también cuando cambie el valor (para texto + datepicker)
+          inp.addEventListener('change', () => {
+            const v = inp.value.trim();
+            if (!v) {
+              setValid(inp, true, 'Opcional');
+              return;
+            }
+
+            const ok = esFechaFuturaOHoy(v);
+            setValid(inp, ok, ok ? '' : '');
+            if (!ok) {
+              uiToast('La fecha de vencimiento debe ser hoy o una fecha futura.', 'warning');
+              inp.value = '';
+            }
+          });
+        }
 
   // =====================================
   // Guardar (crear / actualizar)
@@ -557,13 +618,20 @@
   //   crear   -> verde (success)
   //   actualizar -> amarillo (warning)
   // =====================================
-  function validatePlain(plain) {
-    if (!plain.nombre || !plain.nombre.trim()) return 'Nombre es requerido.';
-    if (!plain.marca  || !plain.marca.trim())  return 'Marca es requerida.';
-    if (plain.precio_compra !== undefined && +plain.precio_compra <= 0) return 'Precio Compra debe ser mayor a 0';
-    if (plain.precio_venta  !== undefined && +plain.precio_venta  <= 0) return 'Precio Venta debe ser mayor a 0';
-    return '';
-  }
+        function validatePlain(plain) {
+          if (!plain.nombre || !plain.nombre.trim()) return 'Nombre es requerido.';
+          if (!plain.marca  || !plain.marca.trim())  return 'Marca es requerida.';
+          if (plain.precio_compra !== undefined && +plain.precio_compra <= 0) return 'Precio Compra debe ser mayor a 0';
+          if (plain.precio_venta  !== undefined && +plain.precio_venta  <= 0) return 'Precio Venta debe ser mayor a 0';
+
+          // ⭐ NUEVO: validar que la fecha de vencimiento no sea pasada
+          if (plain.f_vencimiento && !esFechaFuturaOHoy(plain.f_vencimiento)) {
+            return 'La fecha de vencimiento debe ser hoy o una fecha futura.';
+          }
+
+          return '';
+        }
+
 
   frm?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -579,16 +647,24 @@
     // Validación lógica
     const err = validatePlain(plain);
     // Marcar campos clave
+
     setValid($('#nombre'),  !(!plain.nombre || !plain.nombre.trim()));
     setValid($('#marca'),   !(!plain.marca || !plain.marca.trim()));
     setValid($('#precio_compra'), !(plain.precio_compra === '' || +plain.precio_compra <= 0));
     setValid($('#precio_venta'),  !(plain.precio_venta  === '' || +plain.precio_venta  <= 0));
+   
+
+    // Fecha vencimiento (opcional pero debe ser hoy o futuro)
+    const fvInput = document.getElementById('f_vencimiento');
+    const fvOk = !plain.f_vencimiento || esFechaFuturaOHoy(plain.f_vencimiento);
+    setValid(fvInput, fvOk, plain.f_vencimiento ? '' : 'Opcional');
+
+
     // Campos opcionales con “Opcional”
     setValid($('#categoria'), true, 'Opcional');
     setValid($('#presentacion'), true, 'Opcional');
     setValid($('#descripcion'), true, 'Opcional');
     setValid($('#lote'), true, 'Opcional');
-    setValid($('#f_vencimiento'), true, 'Opcional');
     setValid($('#codigo_sku'), true, 'Opcional');
     setValid($('#ubicacion'), true, 'Opcional');
     setValid($('#iva'), true, 'Opcional');
@@ -639,13 +715,17 @@
   // =====================================
   // Init
   // =====================================
-  function boot() {
-    ensureToastCSS();
-    ensureConfirmModal();
-    ensureFieldStyles();
-    ensureHidden();
-    listar(1);
-  }
+    function boot() {
+      ensureToastCSS();
+      ensureConfirmModal();
+      ensureFieldStyles();
+      ensureHidden();
+
+      limitFechaVencimiento();   // ⭐ aquí se aplica la restricción visual
+
+      listar(1);
+    }
+
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 

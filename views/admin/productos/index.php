@@ -213,15 +213,18 @@ $base = $this->config['app']['base_url'] ?? '';
 </div>
 
 <style>
-  /* Encabezado verde */
-  #tblProductos thead.table-light{
-    --bs-table-bg: var(--brand, #198754);
-    --bs-table-color: #fff;
-    --bs-table-border-color: rgba(255,255,255,.25);
-    background: var(--brand, #198754) !important;
-    color: #fff !important;
-  }
-  #tblProductos thead.table-light th{ color:#fff !important; }
+
+      /* PRODUCTOS – encabezado verde forzado */
+      #tblProductos thead.table-light {
+        background-color: #198754 !important;
+      }
+      #tblProductos thead.table-light th {
+        background-color: #198754 !important;
+        color: #ffffff !important;
+        border-color: rgba(255,255,255,.25) !important;
+      }
+
+
 
   /* Tabla amplia y legible */
   #tblProductos { width:100%; min-width:1500px; }
