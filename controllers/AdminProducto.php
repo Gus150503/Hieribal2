@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Controllers;
@@ -47,7 +48,8 @@ final class AdminProducto extends Controller
         if (session_status() !== \PHP_SESSION_ACTIVE) session_start();
         if (empty($_SESSION['admin'])) {
             $_SESSION['admin_error'] = 'Inicia sesión para continuar.';
-            header('Location: /?r=admin_login'); exit;
+            header('Location: /?r=admin_login');
+            exit;
         }
     }
 
@@ -62,6 +64,42 @@ final class AdminProducto extends Controller
         }
         return $e->getMessage();
     }
+
+    private function procesarImagen(): ?string
+    {
+        // 1. Si subieron archivo
+        if (!empty($_FILES['imagen_archivo']['name'])) {
+
+            $file = $_FILES['imagen_archivo'];
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+            $permitidas = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            if (!in_array($ext, $permitidas)) {
+                throw new \Exception("Formato de imagen no permitido");
+            }
+
+            $nuevo = uniqid('prod_') . "." . $ext;
+
+            $rutaFS = __DIR__ . "/../public/assets/img/" . $nuevo;
+
+
+            if (!move_uploaded_file($file['tmp_name'], $rutaFS)) {
+                throw new \Exception("No se pudo subir la imagen");
+            }
+
+            // URL final
+            $base = rtrim($this->config['app']['base_url'], '/');
+            return $base . "/assets/img/" . $nuevo;
+        }
+
+        // 2. Si vino URL en el POST
+        if (!empty($_POST['imagen'])) {
+            return trim($_POST['imagen']);
+        }
+
+        return null;
+    }
+
 
     /* ---------- VISTA ---------- */
     public function index(): void
@@ -93,57 +131,83 @@ final class AdminProducto extends Controller
                     $per  = max(1, min(100, (int)($_GET['per'] ?? 10)));
                     $data = $this->Model->listar($q, $page, $per);
                     $this->json($data);
-                } catch (\Throwable $e) { $this->fail($this->friendlyDbError($e), 500); }
+                } catch (\Throwable $e) {
+                    $this->fail($this->friendlyDbError($e), 500);
+                }
                 return;
             }
 
             if ($m === 'GET' && $action === 'get') {
                 try {
                     $id = (int)($_GET['id'] ?? 0);
-                    if ($id <= 0) { $this->fail('ID inválido'); return; }
+                    if ($id <= 0) {
+                        $this->fail('ID inválido');
+                        return;
+                    }
                     $row = $this->Model->obtener($id);
                     $this->json(['data' => $row]);
-                } catch (\Throwable $e) { $this->fail($this->friendlyDbError($e), 500); }
+                } catch (\Throwable $e) {
+                    $this->fail($this->friendlyDbError($e), 500);
+                }
                 return;
             }
 
             if ($m === 'POST' && $action === 'create') {
                 try {
                     $d  = $this->sanitize($_POST, true);
+                    $d['imagen'] = $this->procesarImagen();
                     $id = $this->Model->crear($d);
                     $this->ok(['id' => $id], 201);
-                } catch (\Throwable $ex) { $this->fail($this->friendlyDbError($ex), 500); }
+                } catch (\Throwable $ex) {
+                    $this->fail($this->friendlyDbError($ex), 500);
+                }
                 return;
             }
 
             if ($m === 'POST' && $action === 'update') {
                 try {
                     $id = (int)($_POST['id'] ?? 0);
-                    if ($id <= 0) { $this->fail('ID inválido'); return; }
+                    if ($id <= 0) {
+                        $this->fail('ID inválido');
+                        return;
+                    }
                     $d = $this->sanitize($_POST, false);
+                    $d['imagen'] = $this->procesarImagen();
                     $this->Model->actualizar($id, $d);
                     $this->ok();
-                } catch (\Throwable $ex) { $this->fail($this->friendlyDbError($ex), 500); }
+                } catch (\Throwable $ex) {
+                    $this->fail($this->friendlyDbError($ex), 500);
+                }
                 return;
             }
 
             if ($m === 'POST' && $action === 'delete') {
                 try {
                     $id = (int)($_POST['id'] ?? 0);
-                    if ($id <= 0) { $this->fail('ID inválido'); return; }
+                    if ($id <= 0) {
+                        $this->fail('ID inválido');
+                        return;
+                    }
                     $this->Model->eliminar($id);
                     $this->ok();
-                } catch (\Throwable $ex) { $this->fail($this->friendlyDbError($ex), 500); }
+                } catch (\Throwable $ex) {
+                    $this->fail($this->friendlyDbError($ex), 500);
+                }
                 return;
             }
 
             if ($m === 'POST' && $action === 'toggle') {
                 try {
                     $id = (int)($_POST['id'] ?? 0);
-                    if ($id <= 0) { $this->fail('ID inválido'); return; }
+                    if ($id <= 0) {
+                        $this->fail('ID inválido');
+                        return;
+                    }
                     $res = $this->Model->toggleEstado($id);
                     $this->ok(['estado' => $res['estado'] ?? null]);
-                } catch (\Throwable $e) { $this->fail($this->friendlyDbError($e), 500); }
+                } catch (\Throwable $e) {
+                    $this->fail($this->friendlyDbError($e), 500);
+                }
                 return;
             }
 
@@ -174,7 +238,7 @@ final class AdminProducto extends Controller
         $ubicacion      = trim($in['ubicacion'] ?? '');
         $imagen         = trim($in['imagen'] ?? '');
         $estadoIn       = strtolower(trim($in['estado'] ?? 'activo'));
-        $estado         = in_array($estadoIn, ['activo','inactivo'], true) ? $estadoIn : 'activo';
+        $estado         = in_array($estadoIn, ['activo', 'inactivo'], true) ? $estadoIn : 'activo';
 
         if ($stock_actual < 0 || $stock_minimo < 0) {
             throw new \Exception('El stock no puede ser negativo');
