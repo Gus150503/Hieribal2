@@ -22,32 +22,32 @@
   // =====================================
   // Selectores
   // =====================================
-  const $  = (s) => document.querySelector(s);
+  const $ = (s) => document.querySelector(s);
   const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-  const tblBody   = $('#tblProductos tbody');
-  const pager     = $('#paginadorProd');
-  const perSel    = $('#perPageProd');
-  const totalEl   = $('#totalProductos');
-  const qInput    = $('#qProd');
+  const tblBody = $('#tblProductos tbody');
+  const pager = $('#paginadorProd');
+  const perSel = $('#perPageProd');
+  const totalEl = $('#totalProductos');
+  const qInput = $('#qProd');
   const btnBuscar = $('#btnBuscarProd');
-  const btnNuevo  = $('#btnNuevoProd');
+  const btnNuevo = $('#btnNuevoProd');
 
-  const modalEl   = $('#modalProducto');
-  const frm       = $('#frmProducto');
-  const modalTit  = $('#modalProdTitle');
-  let bsModal     = null;
+  const modalEl = $('#modalProducto');
+  const frm = $('#frmProducto');
+  const modalTit = $('#modalProdTitle');
+  let bsModal = null;
 
   // Imagen
-  const tipoURL         = $('#tipoURL');
-  const tipoArchivo     = $('#tipoArchivo');
-  const seccionURL      = $('#seccionURL');
-  const seccionArchivo  = $('#seccionArchivo');
-  const inputImagenURL  = $('#imagen');
-  const archivoImagen   = $('#archivoImagen');
-  const previewWrap     = $('#previewImagen');
-  const imgPreview      = $('#imgPreview');
-  const btnLimpiarImg   = $('#btnLimpiarImagen');
+  const tipoURL = $('#tipoURL');
+  const tipoArchivo = $('#tipoArchivo');
+  const seccionURL = $('#seccionURL');
+  const seccionArchivo = $('#seccionArchivo');
+  const inputImagenURL = $('#imagen');
+  const archivoImagen = $('#archivoImagen');
+  const previewWrap = $('#previewImagen');
+  const imgPreview = $('#imgPreview');
+  const btnLimpiarImg = $('#btnLimpiarImagen');
 
   // =====================================
   // TOASTS 1A (colores por acción)
@@ -88,15 +88,15 @@
     el.innerHTML = `
       <div class="dot"></div>
       <div class="msg">${(msg ?? '').toString()
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}</div>
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;')}</div>
       <button type="button" class="close" aria-label="Cerrar">✕</button>
     `;
     host.appendChild(el);
     const close = () => el.remove();
     el.querySelector('.close')?.addEventListener('click', close);
     const timer = setTimeout(close, ms);
-    el.addEventListener('mouseenter', () => clearTimeout(timer), { once:true });
+    el.addEventListener('mouseenter', () => clearTimeout(timer), { once: true });
   }
 
   // =====================================
@@ -123,29 +123,29 @@
       </div>`;
     document.body.appendChild(wrap.firstElementChild);
   }
-  function uiConfirm({title='Confirmar', body='¿Seguro?', confirmText='Sí, continuar', variant='success'} = {}) {
+  function uiConfirm({ title = 'Confirmar', body = '¿Seguro?', confirmText = 'Sí, continuar', variant = 'success' } = {}) {
     const modal = $('#confirmModal');
     if (!modal || !window.bootstrap) return Promise.resolve(confirm(body));
     $('#confirmTitle').textContent = title;
     $('#confirmBody').innerHTML = (body ?? '').toString()
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/\n/g,'<br>');
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/\n/g, '<br>');
     const okBtn = $('#btnOkConfirm');
     okBtn.className = 'btn ' + (variant === 'danger' ? 'btn-outline-danger'
-                            : variant === 'warning' ? 'btn-outline-secondary'
-                            : 'btn-success');
+      : variant === 'warning' ? 'btn-outline-secondary'
+        : 'btn-success');
     okBtn.textContent = confirmText;
 
     return new Promise(resolve => {
       const bs = new bootstrap.Modal(modal, { backdrop: 'static' });
-      const onOk   = () => { cleanup(); bs.hide(); resolve(true); };
+      const onOk = () => { cleanup(); bs.hide(); resolve(true); };
       const onHide = () => { cleanup(); resolve(false); };
       const cleanup = () => {
         okBtn.removeEventListener('click', onOk);
         modal.removeEventListener('hidden.bs.modal', onHide);
       };
       okBtn.addEventListener('click', onOk);
-      modal.addEventListener('hidden.bs.modal', onHide, { once:true });
+      modal.addEventListener('hidden.bs.modal', onHide, { once: true });
       bs.show();
     });
   }
@@ -178,7 +178,7 @@
   }
   function setValid(el, ok, msgIfOptional = '') {
     if (!el) return;
-    el.classList.remove('is-valid','is-invalid');
+    el.classList.remove('is-valid', 'is-invalid');
     // limpiar feedback anterior
     const next = el.nextElementSibling;
     if (next && (next.classList?.contains('invalid-feedback') || next.classList?.contains('valid-optional'))) {
@@ -210,11 +210,11 @@
   // =====================================
   function escapeHtml(s) {
     return (s ?? '').toString().replace(/[&<>"']/g, m => ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
     }[m]));
   }
-  function fmtMoney(n){ const v=Number(n||0); return isNaN(v)?'0.00':v.toFixed(2); }
-  function fmtNumber(n){ const v=Number(n||0); return isNaN(v)?'0':v.toString(); }
+  function fmtMoney(n) { const v = Number(n || 0); return isNaN(v) ? '0.00' : v.toFixed(2); }
+  function fmtNumber(n) { const v = Number(n || 0); return isNaN(v) ? '0' : v.toString(); }
 
   // =====================================
   // Listar + paginación + búsqueda
@@ -239,7 +239,7 @@
 
     const win = 2;
     let start = Math.max(1, state.page - win);
-    let end   = Math.min(pages, state.page + win);
+    let end = Math.min(pages, state.page + win);
 
     if (start > 1) {
       html += `<li class="page-item"><button class="page-link" data-page="1">1</button></li>`;
@@ -262,7 +262,7 @@
 
     pager.innerHTML = html;
   }
-  function updateTotal(){ if (totalEl) totalEl.textContent = `${state.total} registro(s)`; }
+  function updateTotal() { if (totalEl) totalEl.textContent = `${state.total} registro(s)`; }
 
   async function listar(page = 1) {
     state.page = page;
@@ -272,13 +272,13 @@
 
     try {
       const res = await fetch(api(`action=list&q=${q}&page=${state.page}&per=${state.per}`));
-      const j   = await res.json();
+      const j = await res.json();
       if (seq !== __SEQ__) return;
 
       const items = j.items || j.data || [];
       state.total = j.total || items.length;
-      state.page  = +j.page  || state.page;
-      state.per   = +j.per   || state.per;
+      state.page = +j.page || state.page;
+      state.per = +j.per || state.per;
 
       if (!items.length) {
         tblBody.innerHTML = `<tr><td colspan="18" class="text-center text-muted py-3">Sin resultados</td></tr>`;
@@ -381,7 +381,7 @@
       imagenBase64 = null;
       frm?.reset();
       // limpiar estilos
-      $$('.is-valid, .is-invalid').forEach(el => el.classList.remove('is-valid','is-invalid'));
+      $$('.is-valid, .is-invalid').forEach(el => el.classList.remove('is-valid', 'is-invalid'));
       // limpiar “Opcional”
       $$('.valid-optional').forEach(el => el.remove());
     });
@@ -435,7 +435,7 @@
     if (url && /^(https?:)?\/\//i.test(url)) {
       imgPreview.src = url;
       previewWrap.style.display = 'block';
-      imgPreview.onerror = () => { previewWrap.style.display='none'; uiToast('No se pudo cargar la imagen (URL).','warning'); };
+      imgPreview.onerror = () => { previewWrap.style.display = 'none'; uiToast('No se pudo cargar la imagen (URL).', 'warning'); };
     } else {
       previewWrap.style.display = 'none';
     }
@@ -443,17 +443,17 @@
 
   archivoImagen?.addEventListener('change', (e) => {
     const file = e.target.files?.[0]; if (!file) return;
-    if (file.size > 2 * 1024 * 1024) { uiToast('La imagen es muy grande (máx 2MB).','warning'); archivoImagen.value=''; return; }
-    if (!file.type.startsWith('image/')) { uiToast('Selecciona una imagen válida.','warning'); archivoImagen.value=''; return; }
+    if (file.size > 2 * 1024 * 1024) { uiToast('La imagen es muy grande (máx 2MB).', 'warning'); archivoImagen.value = ''; return; }
+    if (!file.type.startsWith('image/')) { uiToast('Selecciona una imagen válida.', 'warning'); archivoImagen.value = ''; return; }
 
     const reader = new FileReader();
     reader.onload = (ev) => {
       imagenBase64 = ev.target.result;
       imgPreview.src = imagenBase64;
       previewWrap.style.display = 'block';
-      uiToast('Imagen cargada.','success');
+      uiToast('Imagen cargada.', 'success');
     };
-    reader.onerror = () => uiToast('Error al leer la imagen.','danger');
+    reader.onerror = () => uiToast('Error al leer la imagen.', 'danger');
     reader.readAsDataURL(file);
   });
 
@@ -470,7 +470,7 @@
   // =====================================
   tblBody?.addEventListener('click', async (e) => {
     const btn = e.target.closest('button'); if (!btn) return;
-    const id  = btn.dataset.edit || btn.dataset.del || btn.dataset.toggle;
+    const id = btn.dataset.edit || btn.dataset.del || btn.dataset.toggle;
     if (!id) return;
 
     // Editar (mensaje azul)
@@ -479,10 +479,10 @@
         const r = await fetch(api(`action=get&id=${id}`));
         const j = await r.json();
         const d = j.data;
-        if (!d) return uiToast('Producto no encontrado','warning');
+        if (!d) return uiToast('Producto no encontrado', 'warning');
 
         // llenar form
-        for (const [k,v] of Object.entries(d)) {
+        for (const [k, v] of Object.entries(d)) {
           if (frm[k]) frm[k].value = v ?? '';
         }
 
@@ -509,15 +509,15 @@
     // Eliminar (rojo)
     if (btn.dataset.del) {
       const ok = await uiConfirm({
-        title:'Eliminar producto',
-        body:'¿Seguro que deseas eliminar este producto?\nEsta acción no se puede deshacer.',
-        confirmText:'Sí, eliminar',
-        variant:'danger'
+        title: 'Eliminar producto',
+        body: '¿Seguro que deseas eliminar este producto?\nEsta acción no se puede deshacer.',
+        confirmText: 'Sí, eliminar',
+        variant: 'danger'
       });
       if (!ok) return;
 
       try {
-        const r = await fetch(api('action=delete'), { method:'POST', body: (()=>{const fd=new FormData(); fd.append('id',id); return fd;})() });
+        const r = await fetch(api('action=delete'), { method: 'POST', body: (() => { const fd = new FormData(); fd.append('id', id); return fd; })() });
         const j = await r.json();
         if (!j.ok) throw new Error(j.msg || 'No se pudo eliminar');
         uiToast('Eliminado exitosamente', 'danger'); // rojo
@@ -539,7 +539,7 @@
       if (!ok) return;
 
       try {
-        const r = await fetch(api('action=toggle'), { method:'POST', body:(()=>{const fd=new FormData(); fd.append('id',id); return fd;})() });
+        const r = await fetch(api('action=toggle'), { method: 'POST', body: (() => { const fd = new FormData(); fd.append('id', id); return fd; })() });
         const j = await r.json();
         if (!j.ok) throw new Error(j.msg || 'No se pudo cambiar el estado');
         uiToast(j.msg || 'Estado actualizado', 'info'); // azul
@@ -550,6 +550,67 @@
       return;
     }
   });
+// =====================================
+// Fecha de vencimiento: solo hoy o futuro
+// =====================================
+function esFechaFuturaOHoy(valor) {
+  if (!valor) return true; // si está vacío, lo consideramos opcional
+
+  let d, m, y;
+
+  // Soporta dd/mm/aaaa y yyyy-mm-dd
+  if (valor.includes('/')) {
+    const partes = valor.split('/');
+    if (partes.length !== 3) return false;
+    [d, m, y] = partes.map(p => parseInt(p, 10));
+  } else {
+    const partes = valor.split('-');
+    if (partes.length !== 3) return false;
+    [y, m, d] = partes.map(p => parseInt(p, 10));
+  }
+
+  const fecha = new Date(y, m - 1, d);
+  if (isNaN(fecha.getTime())) return false;
+
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  fecha.setHours(0, 0, 0, 0);
+
+  return fecha >= hoy;
+}
+
+        // Limitar visualmente el selector de fecha
+        function limitFechaVencimiento() {
+          const inp = document.getElementById('f_vencimiento');
+          if (!inp) return;
+
+          // Si el input es type="date", bloqueamos directamente días anteriores
+          const hoy = new Date();
+          const y = hoy.getFullYear();
+          const m = String(hoy.getMonth() + 1).padStart(2, '0');
+          const d = String(hoy.getDate()).padStart(2, '0');
+          const iso = `${y}-${m}-${d}`;
+
+          if (inp.type === 'date') {
+            inp.setAttribute('min', iso);
+          }
+
+          // Validar también cuando cambie el valor (para texto + datepicker)
+          inp.addEventListener('change', () => {
+            const v = inp.value.trim();
+            if (!v) {
+              setValid(inp, true, 'Opcional');
+              return;
+            }
+
+            const ok = esFechaFuturaOHoy(v);
+            setValid(inp, ok, ok ? '' : '');
+            if (!ok) {
+              uiToast('La fecha de vencimiento debe ser hoy o una fecha futura.', 'warning');
+              inp.value = '';
+            }
+          });
+        }
 
   // =====================================
   // Guardar (crear / actualizar)
@@ -557,43 +618,80 @@
   //   crear   -> verde (success)
   //   actualizar -> amarillo (warning)
   // =====================================
+
   function validatePlain(plain) {
     if (!plain.nombre || !plain.nombre.trim()) return 'Nombre es requerido.';
-    if (!plain.marca  || !plain.marca.trim())  return 'Marca es requerida.';
+    if (!plain.marca || !plain.marca.trim()) return 'Marca es requerida.';
     if (plain.precio_compra !== undefined && +plain.precio_compra <= 0) return 'Precio Compra debe ser mayor a 0';
-    if (plain.precio_venta  !== undefined && +plain.precio_venta  <= 0) return 'Precio Venta debe ser mayor a 0';
+    if (plain.precio_venta !== undefined && +plain.precio_venta <= 0) return 'Precio Venta debe ser mayor a 0';
     return '';
   }
+
+        function validatePlain(plain) {
+          if (!plain.nombre || !plain.nombre.trim()) return 'Nombre es requerido.';
+          if (!plain.marca  || !plain.marca.trim())  return 'Marca es requerida.';
+          if (plain.precio_compra !== undefined && +plain.precio_compra <= 0) return 'Precio Compra debe ser mayor a 0';
+          if (plain.precio_venta  !== undefined && +plain.precio_venta  <= 0) return 'Precio Venta debe ser mayor a 0';
+
+          // ⭐ NUEVO: validar que la fecha de vencimiento no sea pasada
+          if (plain.f_vencimiento && !esFechaFuturaOHoy(plain.f_vencimiento)) {
+            return 'La fecha de vencimiento debe ser hoy o una fecha futura.';
+          }
+
+          return '';
+        }
+
 
   frm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     ensureFieldStyles();
 
-    const fd    = new FormData(frm);
-    const id    = fd.get('id');
+    const fd = new FormData(frm);
+    const id = fd.get('id');
     const plain = Object.fromEntries(fd.entries());
 
     // Imagen: si subieron archivo, priorizamos base64
-    if (imagenBase64) fd.set('imagen', imagenBase64);
+    // Imagen — si subieron archivo lo enviamos como File
+    const file = archivoImagen.files?.[0];
+    if (file) {
+      fd.set('imagen_archivo', file);  // enviamos archivo real
+      fd.delete('imagen');             // borramos URL si existe
+    }
+
 
     // Validación lógica
     const err = validatePlain(plain);
     // Marcar campos clave
+
+    setValid($('#nombre'), !(!plain.nombre || !plain.nombre.trim()));
+    setValid($('#marca'), !(!plain.marca || !plain.marca.trim()));
+    setValid($('#precio_compra'), !(plain.precio_compra === '' || +plain.precio_compra <= 0));
+    setValid($('#precio_venta'), !(plain.precio_venta === '' || +plain.precio_venta <= 0));
+
+
     setValid($('#nombre'),  !(!plain.nombre || !plain.nombre.trim()));
     setValid($('#marca'),   !(!plain.marca || !plain.marca.trim()));
     setValid($('#precio_compra'), !(plain.precio_compra === '' || +plain.precio_compra <= 0));
     setValid($('#precio_venta'),  !(plain.precio_venta  === '' || +plain.precio_venta  <= 0));
+   
+
+    // Fecha vencimiento (opcional pero debe ser hoy o futuro)
+    const fvInput = document.getElementById('f_vencimiento');
+    const fvOk = !plain.f_vencimiento || esFechaFuturaOHoy(plain.f_vencimiento);
+    setValid(fvInput, fvOk, plain.f_vencimiento ? '' : 'Opcional');
+
+
+
     // Campos opcionales con “Opcional”
     setValid($('#categoria'), true, 'Opcional');
     setValid($('#presentacion'), true, 'Opcional');
     setValid($('#descripcion'), true, 'Opcional');
     setValid($('#lote'), true, 'Opcional');
-    setValid($('#f_vencimiento'), true, 'Opcional');
     setValid($('#codigo_sku'), true, 'Opcional');
     setValid($('#ubicacion'), true, 'Opcional');
     setValid($('#iva'), true, 'Opcional');
 
-    if (err) { uiToast(`⚠ ${err}`,'warning'); return; }
+    if (err) { uiToast(`⚠ ${err}`, 'warning'); return; }
 
     // Confirmación
     const isUpdate = !!id;
@@ -607,13 +705,13 @@
 
     // Botón submit en loading
     const btnSubmit = frm.querySelector('button[type="submit"]');
-    const prevHtml  = btnSubmit.innerHTML;
+    const prevHtml = btnSubmit.innerHTML;
     btnSubmit.disabled = true;
     btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando…';
 
     try {
       const action = isUpdate ? 'update' : 'create';
-      const r = await fetch(api(`action=${action}`), { method:'POST', body: fd });
+      const r = await fetch(api(`action=${action}`), { method: 'POST', body: fd });
       const j = await r.json();
       if (!j.ok) throw new Error(j.msg || 'Error al guardar');
 
@@ -628,7 +726,7 @@
         listar(1);
       }
     } catch (err2) {
-      uiToast(err2.message || 'Error al guardar','danger');
+      uiToast(err2.message || 'Error al guardar', 'danger');
     } finally {
       btnSubmit.disabled = false;
       btnSubmit.innerHTML = prevHtml;
@@ -639,13 +737,17 @@
   // =====================================
   // Init
   // =====================================
-  function boot() {
-    ensureToastCSS();
-    ensureConfirmModal();
-    ensureFieldStyles();
-    ensureHidden();
-    listar(1);
-  }
+    function boot() {
+      ensureToastCSS();
+      ensureConfirmModal();
+      ensureFieldStyles();
+      ensureHidden();
+
+      limitFechaVencimiento();   // ⭐ aquí se aplica la restricción visual
+
+      listar(1);
+    }
+
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
