@@ -2,17 +2,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.querySelector("form");
   if (!form) return;
 
-  const cedula    = form.querySelector("[name='cedula']");
-  const nombres   = form.querySelector("[name='nombres']");
+  const cedula = form.querySelector("[name='cedula']");
+  const nombres = form.querySelector("[name='nombres']");
   const apellidos = form.querySelector("[name='apellidos']");
-  const telefono  = form.querySelector("[name='telefono']");
-  const correo    = form.querySelector("[name='correo']");
-  const password  = form.querySelector("[name='password']");
+  const telefono = form.querySelector("[name='telefono']");
+  const correo = form.querySelector("[name='correo']");
+  const password = form.querySelector("[name='password']");
 
   // RegEx
-  const regexNombre   = /^[a-zA-ZÀ-ÿ\s]+$/;
-  const regexNumero   = /^[0-9]+$/;
-  const regexCorreo   = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const regexNombre = /^[a-zA-ZÀ-ÿ\s]+$/;
+  const regexNumero = /^[0-9]+$/;
+  const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const regexTelefono = /^\d{10}$/;
 
   // --- utilidades ---
@@ -25,11 +25,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     return box;
   };
-  const showErrors = (msgs) =>
+
+  const showErrors = (msgs) => {
     const box = createOrGetErrorBox();
     box.innerHTML = msgs.map(m => `<div>• ${m}</div>`).join("");
     box.style.display = "block";
   };
+
+
   const clearErrors = () => {
     const box = form.querySelector(".error-msg");
     if (box) { box.innerHTML = ""; box.style.display = "none"; }

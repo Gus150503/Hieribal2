@@ -1,28 +1,16 @@
-<?php $base = $this->config['app']['base_url']; ?>
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MI HIERBAL - Bienvenida</title>
-
-  <!-- Fuente moderna -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
-  <!-- Estilos propios -->
-  <link rel="stylesheet" href="<?= $base ?>/assets/css/home.css">
-</head>
-
-<body>
-
 <?php
+// home/index.php (o la ruta que uses)
 if (session_status() !== PHP_SESSION_ACTIVE) session_start();
-if (!empty($_SESSION['flash_public'])):
+
+$base = rtrim($this->config['app']['base_url'] ?? '', '/');
+$logeado = !empty($_SESSION['cliente']);
+?>
+
+<?php if (!empty($_SESSION['flash_public'])):
   $f = $_SESSION['flash_public'];
   unset($_SESSION['flash_public']);
 ?>
-  <div id="alertaFlash" style="
+<div id="alertaFlash" style="
     margin: 20px auto;
     max-width: 600px;
     padding: 15px 20px;
@@ -32,110 +20,111 @@ if (!empty($_SESSION['flash_public'])):
     font-family: Poppins, sans-serif;
     text-align: center;
     box-shadow: 0 3px 10px rgba(0,0,0,.15);
-    transition: opacity .8s ease; /* <- importante para el fade */
+    transition: opacity .8s ease;
     opacity: 1;
   ">
     <?= htmlspecialchars($f['msg']) ?>
-  </div>
+</div>
 <?php endif; ?>
 
 
-  <!-- HERO / BIENVENIDA -->
-  <section id="top" class="bienvenida">
+<!-- HERO / BIENVENIDA -->
+<section id="top" class="bienvenida">
     <div class="texto-bienvenida">
-      <h1>¡Hola <span>somos Hieribal</span>!</h1>
-      <p>Cuidarte naturalmente es la mejor forma de quererte. Hierbal lo hace posible.</p>
-      <a href="<?= $base ?>/?r=login" class="btn-ver-todo">Iniciar sesión (Cliente)</a>
-      <a href="<?= $base ?>/?r=admin_login" class="btn-ver-todo">Modo Administrador</a>
+        <h1>¡Hola <span>somos Hieribal</span>!</h1>
+        <p>Cuidarte naturalmente es la mejor forma de quererte. Hierbal lo hace posible.</p>
+
+        <?php if (!$logeado): ?>
+        <!-- ✅ Usuario NO logueado -->
+        <a href="<?= $base ?>/?r=login" class="btn-ver-todo">Iniciar sesión (Cliente)</a>
+        <a href="<?= $base ?>/?r=admin_login" class="btn-ver-todo">Modo Administrador</a>
+        <?php else: ?>
+        <!-- ✅ Usuario logueado -->
+        <a href="<?= $base ?>/?r=dashboard" class="btn-ver-todo">Ir a mi panel</a>
+        <a href="<?= $base ?>/?r=logout" class="btn-ver-todo" style="background:#444;">Cerrar sesión</a>
+        <?php endif; ?>
     </div>
 
     <div class="imagenes-bienvenida">
-      <div class="img-card grande"><img src="<?= $base ?>.../assets/img/IA 1.jpg" alt="Persona 1"></div>
-      <div class="img-card"><img src="<?= $base ?>.../assets/img/IA 2.jpg" alt="Persona 2"></div>
-      <div class="img-card"><img src="<?= $base ?>.../assets/img/IA 3.jpg" alt="Persona 2"></div>
-  </section>
+        <div class="img-card grande">
+            <img src="<?= $base ?>/assets/img/IA1.jpg" alt="Persona 1">
+        </div>
+        <div class="img-card">
+            <img src="<?= $base ?>/assets/img/IA2.jpg" alt="Persona 2">
+        </div>
+        <div class="img-card">
+            <img src="<?= $base ?>/assets/img/IA3.jpg" alt="Persona 3">
+        </div>
+    </div>
+</section>
 
-  <!-- QUIÉNES SOMOS -->
-  <main id="quienes-somos" class="main-content">
-    <!-- VIDEO -->
+<!-- QUIÉNES SOMOS -->
+<main id="quienes-somos" class="main-content">
     <div class="image-section">
-      <video autoplay loop playsinline controls class="video-pequeno">
-        <source src="<?= $base ?>/assets/video/Hieribal.mp4" type="video/mp4">
-        Tu navegador no soporta videos en HTML5.
-      </video>
+        <video autoplay loop playsinline controls class="video-pequeno">
+            <source src="<?= $base ?>/assets/video/Hieribal.mp4" type="video/mp4">
+            Tu navegador no soporta videos en HTML5.
+        </video>
     </div>
 
-    <!-- TEXTO -->
     <section class="text-section">
-      <h1>¿Quiénes somos?</h1>
-      <p>
-        Somos MI HIERBAL, un oasis de bienestar natural. Creemos que la salud es un viaje, no un destino.
-        Y en cada paso de ese camino, queremos acompañarte con productos naturales de la más alta calidad.
-        En nuestra tienda, encontrarás más que simples productos; encontrarás un compromiso con tu bienestar
-        integral.
-      </p>
-      <div class="text-section-buttons">
-        <a href="https://api.whatsapp.com/send?phone=573212322978&text=Hola,%20me%20gustaría%20más%20información%20sobre%20sus%20productos"
-          target="_blank"
-          class="btn btn-contactanos">Contáctanos</a>
-        <button class="btn btn-mas-nosotros"
-          onclick="document.getElementById('nosotros').scrollIntoView({ behavior: 'smooth' })">
-          Más sobre nosotros
-        </button>
-      </div>
+        <h1>¿Quiénes somos?</h1>
+        <p>
+            Somos MI HIERBAL, un oasis de bienestar natural. Creemos que la salud es un viaje, no un destino.
+            Y en cada paso de ese camino, queremos acompañarte con productos naturales de la más alta calidad...
+        </p>
+        <div class="text-section-buttons">
+            <a href="https://api.whatsapp.com/send?phone=573212322978&text=Hola,%20me%20gustaría%20más%20información%20sobre%20sus%20productos"
+                target="_blank" class="btn btn-contactanos">Contáctanos</a>
+            <button class="btn btn-mas-nosotros"
+                onclick="document.getElementById('nosotros').scrollIntoView({ behavior: 'smooth' })">
+                Más sobre nosotros
+            </button>
+        </div>
     </section>
-  </main>
-  <!-- NOSOTROS -->
-  <section id="nosotros" class="nosotros-section">
+</main>
+
+<section id="nosotros" class="nosotros-section">
     <div class="nosotros-about-section">
-      <div>
-        <div class="nosotros-text-block">
-          <h2>Misión</h2>
-          <p>Nuestra misión es mejorar la calidad de vida de nuestros clientes...</p>
+        <div>
+            <div class="nosotros-text-block">
+                <h2>Misión</h2>
+                <p>Nuestra misión es mejorar la calidad de vida de nuestros clientes...</p>
+            </div>
+            <div class="nosotros-text-block">
+                <h2>Visión</h2>
+                <p>Ser la droguería naturista líder en la zona...</p>
+            </div>
         </div>
-        <div class="nosotros-text-block">
-          <h2>Visión</h2>
-          <p>Ser la droguería naturista líder en la zona...</p>
+        <div>
+            <div class="commitment-card">
+                <h3>Compromiso</h3>
+                <p>Nuestro lema es ser comprometidos de una manera eficiente con nuestros clientes.</p>
+            </div>
         </div>
-      </div>
-      <div>
-        <div class="commitment-card">
-
-
-
-          <h3>Compromiso</h3>
-          <p>Nuestro lema es ser comprometidos de una manera eficiente con nuestros clientes.</p>
-        </div>
-      </div>
     </div>
-  </section>
+</section>
 
-  <!-- CALL TO ACTION -->
-  <section class="call-to-action-section">
+<section class="call-to-action-section">
     <h2>Únete a Nuestra Comunidad Saludable</h2>
-    <p>Recibe las últimas noticias, ofertas exclusivas y consejos de bienestar directamente en tu bandeja de
-      entrada.</p>
+    <p>Recibe las últimas noticias, ofertas exclusivas y consejos de bienestar directamente en tu bandeja de entrada.
+    </p>
     <div class="form-container">
-      <input type="text" placeholder="Tu Nombre" />
-      <input type="email" placeholder="Tu Correo Electrónico" />
-      <button type="submit">Suscribirse</button>
+        <input type="text" placeholder="Tu Nombre" />
+        <input type="email" placeholder="Tu Correo Electrónico" />
+        <button type="submit">Suscribirse</button>
     </div>
-  </section>
+</section>
 
-  
 <script>
-  // Desvanecer y eliminar el mensaje después de 5 segundos
-  window.addEventListener('DOMContentLoaded', () => {
+// Desvanecer y eliminar el mensaje después de unos segundos
+window.addEventListener('DOMContentLoaded', () => {
     const alerta = document.getElementById('alertaFlash');
     if (alerta) {
-      setTimeout(() => {
-        alerta.style.opacity = '0';
-        setTimeout(() => alerta.remove(), 300); // espera animación antes de quitarlo
-      }, 4000); // 5 segundos visibles
+        setTimeout(() => {
+            alerta.style.opacity = '0';
+            setTimeout(() => alerta.remove(), 300);
+        }, 4000);
     }
-  });
+});
 </script>
-
-</body>
-
-</html>
