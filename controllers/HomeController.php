@@ -29,7 +29,7 @@ final class HomeController extends Controller
         }
 
         $this->render(
-            'home/dashboard',           // ← vista (string)
+            'home/carrito',           // ← vista (string)
             [ 'cliente' => $_SESSION['cliente'] ?? null ], // ← data (array)
             'Panel'                      // ← título (opcional)
         );
