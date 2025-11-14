@@ -1,15 +1,39 @@
 <?php /* views/admin/dashboard.php */ ?>
 <?php
-$base = htmlspecialchars($this->config['app']['base_url'] ?? '');
+$base = rtrim((string)($this->config['app']['base_url'] ?? ''), '/');
 
-/** Normaliza imagen (products/personas) */
-$normFoto = function(array $row): string {
-  $f = $row['imagen'] ?? ($row['img'] ?? '');
-  $f = ltrim((string)$f, '/');
-  if (stripos($f, 'assets/img/') === 0) { $f = substr($f, strlen('assets/img/')); }
-  if (stripos($f, 'img/') === 0)        { $f = substr($f, strlen('img/')); }
-  return $f !== '' ? $f : 'placeholder.png';
+/**
+ * Normaliza imagen de productos:
+ * - Si viene URL completa (http...), se usa tal cual.
+ * - Si viene ruta tipo "assets/img/archivo.png", se le antepone $base.
+ * - Si viene solo nombre, se arma como $base/assets/img/nombre.
+ */
+$normFotoProd = function (array $row) use ($base): string {
+  $f = trim((string)($row['imagen'] ?? ($row['img'] ?? '')));
+
+  if ($f === '') {
+    return $base . '/assets/img/placeholder.png';
+  }
+
+  // Si ya es URL absoluta
+  if (preg_match('~^https?://~i', $f)) {
+    return $f;
+  }
+
+  // Si empieza por "/": ruta absoluta dentro del sitio
+  if ($f[0] === '/') {
+    return $base . $f;
+  }
+
+  // Si viene como "assets/img/xxx.png" o "img/xxx.png"
+  if (stripos($f, 'assets/img/') === 0 || stripos($f, 'img/') === 0) {
+    return $base . '/' . ltrim($f, '/');
+  }
+
+  // Solo nombre de archivo
+  return $base . '/assets/img/' . ltrim($f, '/');
 };
+
 ?>
 
 <div class="dash-container"><!-- ancho máx y márgenes del contenido -->
@@ -50,9 +74,9 @@ $normFoto = function(array $row): string {
       <h5 class="hero-title">🌟 Inventario destacado</h5>
       <div class="slider slider--hero" data-slider data-autoplay="4000">
         <div class="slider-track" data-track>
-          <?php if (!empty($invDestacados)): foreach ($invDestacados as $p): $foto = $normFoto($p); ?>
+          <?php if (!empty($invDestacados)): foreach ($invDestacados as $p): $foto = $normFotoProd($p); ?>
             <div class="hero-card">
-              <img class="hero-avatar" src="<?= $base ?>/assets/img/<?= htmlspecialchars($foto) ?>" alt="<?= htmlspecialchars($p['nombre'] ?? 'Producto') ?>">
+              <img class="hero-avatar" src="<?= htmlspecialchars($foto) ?>" alt="<?= htmlspecialchars($p['nombre'] ?? 'Producto') ?>">
               <div class="hero-text">
                 <div class="hero-name"><?= htmlspecialchars($p['nombre'] ?? 'Producto') ?></div>
                 <div class="hero-sub">Stock: <?= (int)($p['stock'] ?? 0) ?></div>
@@ -70,9 +94,9 @@ $normFoto = function(array $row): string {
       <h5 class="hero-title">🏆 Más vendidos</h5>
       <div class="slider slider--hero" data-slider data-autoplay="4000">
         <div class="slider-track" data-track>
-          <?php if (!empty($topVendidos)): foreach ($topVendidos as $p): $foto = $normFoto($p); ?>
-            <div class="hero-card">
-              <img class="hero-avatar" src="<?= $base ?>/assets/img/<?= htmlspecialchars($foto) ?>" alt="<?= htmlspecialchars($p['nombre'] ?? 'Producto') ?>">
+          <?php if (!empty($topVendidos)): foreach ($topVendidos as $p): $foto = $normFotoProd($p); ?>
+          <div class="hero-card">
+            <img class="hero-avatar" src="<?= htmlspecialchars($foto) ?>" alt="<?= htmlspecialchars($p['nombre'] ?? 'Producto') ?>">
               <div class="hero-text">
                 <div class="hero-name"><?= htmlspecialchars($p['nombre'] ?? 'Producto') ?></div>
                 <div class="hero-sub">Unidades: <?= (int)($p['unidades'] ?? 0) ?></div>
@@ -90,9 +114,9 @@ $normFoto = function(array $row): string {
       <h5 class="hero-title">🚨 Productos agotados</h5>
       <div class="slider slider--hero" data-slider data-autoplay="4000">
         <div class="slider-track" data-track>
-          <?php if (!empty($agotados)): foreach ($agotados as $p): $foto = $normFoto($p); ?>
+          <?php if (!empty($agotados)): foreach ($agotados as $p): $foto = $normFotoProd($p); ?>
             <div class="hero-card">
-              <img class="hero-avatar" src="<?= $base ?>/assets/img/<?= htmlspecialchars($foto) ?>" alt="<?= htmlspecialchars($p['nombre'] ?? 'Producto') ?>">
+              <img class="hero-avatar" src="<?= htmlspecialchars($foto) ?>" alt="<?= htmlspecialchars($p['nombre'] ?? 'Producto') ?>">
               <div class="hero-text">
                 <div class="hero-name"><?= htmlspecialchars($p['nombre'] ?? 'Producto') ?></div>
                 <div class="hero-sub" style="opacity:.9">Agotado</div>
