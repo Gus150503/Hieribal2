@@ -24,7 +24,8 @@ $base = $this->config['app']['base_url'] ?? '';
         <i class="bi bi-people-fill fs-4 text-success"></i>
         <h1 class="h4 m-0">Usuarios</h1>
       </div>
-      <button id="btnNuevoUsuario" class="btn btn-success">
+      <!-- ID AJUSTADO PARA QUE COINCIDA CON EL JS -->
+      <button id="btnNuevo" class="btn btn-success">
         <i class="bi bi-plus-lg me-1"></i> Nuevo
       </button>
     </div>
@@ -40,8 +41,9 @@ $base = $this->config['app']['base_url'] ?? '';
 
     <div class="input-group mb-3" style="max-width:520px;">
       <span class="input-group-text"><i class="bi bi-search"></i></span>
-      <input id="qUsuario" type="search" class="form-control" placeholder="Buscar por nombre, usuario o correo…">
-      <button id="btnBuscarUsuario" class="btn btn-outline-success">Buscar</button>
+      <!-- IDs AJUSTADOS PARA COINCIDIR CON JS -->
+      <input id="q" type="search" class="form-control" placeholder="Buscar por nombre, usuario o correo…">
+      <button id="btnBuscar" class="btn btn-outline-success">Buscar</button>
     </div>
 
     <div class="table-responsive">
@@ -64,7 +66,8 @@ $base = $this->config['app']['base_url'] ?? '';
       <div class="d-flex align-items-center justify-content-between mt-3">
         <div class="d-flex align-items-center gap-2">
           <label class="text-muted small me-1">Mostrar</label>
-          <select id="perPageUsuarios" class="form-select form-select-sm" style="width:80px">
+          <!-- IDs AJUSTADOS -->
+          <select id="perPage" class="form-select form-select-sm" style="width:80px">
             <option value="5">5</option>
             <option value="10" selected>10</option>
             <option value="20">20</option>
@@ -73,7 +76,8 @@ $base = $this->config['app']['base_url'] ?? '';
           <span id="totalUsuarios" class="text-muted small ms-2"></span>
         </div>
         <nav aria-label="Paginación">
-          <ul id="paginadorUsuarios" class="pagination pagination-sm mb-0"></ul>
+          <!-- ID AJUSTADO -->
+          <ul id="paginador" class="pagination pagination-sm mb-0"></ul>
         </nav>
       </div>
     </div>
@@ -152,6 +156,15 @@ $base = $this->config['app']['base_url'] ?? '';
                      autocomplete="new-password">
               <div class="invalid-feedback">La contraseña debe tener al menos 8 caracteres.</div>
             </div>
+
+            <!-- Teléfono opcional: validado a 10 dígitos -->
+            <div class="col-md-4">
+              <label class="form-label">Teléfono</label>
+              <input class="form-control" type="tel" name="telefono" id="telefono"
+                     pattern="\d{10}" minlength="10" maxlength="10" inputmode="numeric"
+                     placeholder="Ej: 3001234567">
+              <div class="invalid-feedback">El teléfono debe tener exactamente 10 dígitos.</div>
+            </div>
           </div>
         </div>
 
@@ -169,7 +182,7 @@ $base = $this->config['app']['base_url'] ?? '';
 <!-- Contenedor para toasts -->
 <div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
 
-<!-- Modal de confirmación -->
+<!-- Modal de confirmación (usado por el JS) -->
 <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 rounded-4 shadow">
@@ -186,66 +199,6 @@ $base = $this->config['app']['base_url'] ?? '';
   </div>
 </div>
 
-<script>
-  // Endpoint base de usuarios (evita hardcodear /public)
-  window.USUARIO_API = '<?= $base ?>/controllers/AdminUsuario.php';
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const modalEl = document.getElementById('modalUsuario');
-    const form    = document.getElementById('frmUsuario');
-    const titleEl = document.getElementById('modalTitle');
-
-    function setModeNuevo() {
-      // Limpia todo el estado de un posible "Editar" anterior
-      form.reset();
-      form.classList.remove('was-validated');
-      document.getElementById('id_usuario').value = '';
-      titleEl.textContent = 'Nuevo usuario';
-
-      // Valores por defecto (ajusta a tu gusto)
-      document.getElementById('rol').value = 'empleado';
-      document.getElementById('estado').value = 'activo';
-
-      // Si para crear quieres exigir password, déjalo required; para editar se desactiva
-      const pass = document.getElementById('password');
-      pass.value = '';
-      pass.required = true;
-    }
-
-    // Por si acaso: cuando se cierre el modal, que vuelva a "Nuevo"
-    if (modalEl && window.bootstrap) {
-      modalEl.addEventListener('hidden.bs.modal', setModeNuevo);
-    }
-
-    // Botón "Nuevo"
-    const btn = document.getElementById('btnNuevoUsuario');
-    if (btn && modal) {
-      btn.addEventListener('click', () => {
-        setModeNuevo();
-        modal.show();
-      });
-    }
-
-    // (Sugerencia) Cuando abras el modal en modo editar desde tu admin_usuario.js,
-    // haz algo así:
-    window.openEditarUsuario = function(u) {
-      if (!modal) return;
-      form.classList.remove('was-validated');
-      titleEl.textContent = 'Editar usuario';
-      document.getElementById('id_usuario').value = u.id_usuario;
-      document.getElementById('usuario').value    = u.usuario ?? '';
-      document.getElementById('rol').value        = (u.rol ?? 'empleado').toLowerCase();
-      document.getElementById('estado').value     = (u.estado ?? 'activo').toLowerCase();
-      document.getElementById('nombres').value    = u.nombres ?? '';
-      document.getElementById('apellidos').value  = u.apellidos ?? '';
-      document.getElementById('correo').value     = u.correo ?? '';
-      const pass = document.getElementById('password');
-      pass.value = '';
-      pass.required = false; // en editar no obligues a cambiarla
-      modal.show();
-    };
-  });
-</script>
-
-<!-- JS específico de la página -->
-<script src="<?= $base ?>/assets/js/admin_usuario.js?v=2" defer></script>
+<?php
+// Nada más de JS aquí: admin_usuarios.js se carga desde el controlador vía 'extra_js'
+?>

@@ -1,4 +1,4 @@
-// admin_usuarios.js
+// assets/js/admin_usuarios.js
 // =====================================================
 // Evitar doble carga/binding del script
 // =====================================================
@@ -90,27 +90,24 @@
   }
 
   /** uiToast('mensaje', 'success'|'danger'|'warning'|'info', ms=3500) */
-  /** uiToast('mensaje', 'success'|'danger'|'warning'|'info', ms=3500) */
-function uiToast(msg, variant='info', ms=3500){
-  const host = ensureToastHost();
-  const t = document.createElement('div');
-  t.className = `toast toast-${variant}`;
-  t.innerHTML = `
-    <div class="dot"></div>
-    <div class="toast-msg">${escapeHtml(String(msg))}</div>
-    <button class="btn-close" aria-label="Cerrar"></button>
-  `;
-  host.appendChild(t);
+  function uiToast(msg, variant='info', ms=3500){
+    const host = ensureToastHost();
+    const t = document.createElement('div');
+    t.className = `toast toast-${variant}`;
+    t.innerHTML = `
+      <div class="dot"></div>
+      <div class="toast-msg">${escapeHtml(String(msg))}</div>
+      <button class="btn-close" aria-label="Cerrar"></button>
+    `;
+    host.appendChild(t);
 
-  // 👇 Necesario cuando hay Bootstrap: sin .show el toast queda con opacity:0
-  t.classList.add('show');
+    t.classList.add('show');
 
-  const close = () => t.remove();
-  t.querySelector('.btn-close')?.addEventListener('click', close);
-  const timer = setTimeout(close, ms);
-  // si pasas el mouse, se queda
-  t.addEventListener('mouseenter', () => clearTimeout(timer), { once:true });
-}
+    const close = () => t.remove();
+    t.querySelector('.btn-close')?.addEventListener('click', close);
+    const timer = setTimeout(close, ms);
+    t.addEventListener('mouseenter', () => clearTimeout(timer), { once:true });
+  }
 
   // ===== Confirm genérico (Bootstrap) + fallback =====
   function ensureConfirmModal(){
@@ -209,13 +206,11 @@ function uiToast(msg, variant='info', ms=3500){
       state.page  = parseInt(j.page  ?? state.page, 10);
       state.per   = parseInt(j.per   ?? state.per, 10);
 
-      // ajustar página si quedó fuera de rango
       const pages = Math.max(1, Math.ceil((state.total || 0) / (state.per || 10)));
       if (state.total > 0 && state.page > pages) {
-        return listar(pages); // reintenta con la última página existente
+        return listar(pages);
       }
 
-      // backend inconsistente: total>0 pero items vacíos en page 1 -> reintenta
       if (state.total > 0 && items.length === 0 && state.page === 1) {
         return listar(1);
       }
@@ -231,7 +226,6 @@ function uiToast(msg, variant='info', ms=3500){
       renderPager();
       updateTotal();
     } catch (err) {
-      // si llegó otra petición más nueva, no pintes error
       if (mySeq !== __LIST_REQ_SEQ__) return;
       console.error('Error listar:', err);
       emptyState();
@@ -253,7 +247,7 @@ function uiToast(msg, variant='info', ms=3500){
         : '<span class="badge bg-danger-subtle text-danger border">Pendiente</span>';
 
       const tr = document.createElement('tr');
-      tr.dataset.id = u.id_usuario; // clave para actualizar luego
+      tr.dataset.id = u.id_usuario;
 
       tr.innerHTML = `
         <td>${u.id_usuario}</td>
@@ -301,11 +295,9 @@ function uiToast(msg, variant='info', ms=3500){
 
     const isActive = String(nuevoEstado || '').toLowerCase().startsWith('activo');
 
-    // Actualiza celda de estado
     const tdEstado = tr.querySelector('td[data-col="estado"]');
     if (tdEstado) tdEstado.innerHTML = htmlBadgeEstado(nuevoEstado);
 
-    // Actualiza botón toggle (icono + title + data-active)
     const btn = tr.querySelector(`button[data-toggle="${id}"]`);
     if (btn) {
       btn.dataset.active = isActive ? '1' : '0';
@@ -314,9 +306,8 @@ function uiToast(msg, variant='info', ms=3500){
       if (icon) icon.className = `bi ${isActive ? 'bi-toggle-on' : 'bi-toggle-off'}`;
     }
 
-    // flash visual
     tr.classList.remove('flash-success','flash-danger');
-    void tr.offsetWidth; // reflow para reiniciar la animación
+    void tr.offsetWidth;
     tr.classList.add(isActive ? 'flash-success' : 'flash-danger');
   }
 
@@ -408,7 +399,7 @@ function uiToast(msg, variant='info', ms=3500){
   function fillForm(data = {}) {
     const d = {
       id_usuario: 0, usuario: '', rol: 'empleado', estado: 'activo',
-      nombres: '', apellidos: '', correo: '', ...data
+      nombres: '', apellidos: '', correo: '', telefono: '', ...data
     };
     d.estado = String(d.estado || '').toLowerCase().startsWith('inac') ? 'inactivo' : 'activo';
     frm.querySelector('#id_usuario').value = d.id_usuario || 0;
@@ -418,21 +409,37 @@ function uiToast(msg, variant='info', ms=3500){
     frm.querySelector('#nombres').value    = d.nombres || '';
     frm.querySelector('#apellidos').value  = d.apellidos || '';
     frm.querySelector('#correo').value     = d.correo || '';
+    const tel = frm.querySelector('#telefono');
+    if (tel) tel.value = d.telefono || '';
     frm.querySelector('#password').value   = '';
   }
 
   function openEditor(data, title) {
+    if (!frm) return;
     fillForm(data);
+    frm.classList.remove('was-validated');
     if (modalTitle) modalTitle.textContent = title || 'Nuevo usuario';
+
+    const pass = frm.querySelector('#password');
+    if (pass) {
+      pass.value = '';
+      // Crear: requerido, Editar: opcional (se setea en submit según id_usuario)
+      pass.required = !data || !data.id_usuario;
+    }
+
     ensureHidden();
     if (bsModal) {
       bsModal.show();
       setTimeout(() => document.getElementById('usuario')?.focus(), 120);
-    } else {
+    } else if (modalEl) {
       modalEl.style.display = 'block';
     }
   }
-  function closeEditor() { if (bsModal) bsModal.hide(); ensureHidden(); }
+
+  function closeEditor() {
+    if (bsModal) bsModal.hide();
+    ensureHidden();
+  }
 
   btnNuevo?.addEventListener('click', () => openEditor({}, 'Nuevo usuario'));
 
@@ -490,15 +497,12 @@ function uiToast(msg, variant='info', ms=3500){
         const j = await resToJsonSafe(r);
         if (!j.ok) throw new Error(j.msg || 'No se pudo cambiar el estado');
 
-        // Actualización optimista + flash
         applyToggleToRow(id, j.estado);
         uiToast(
           j.msg || (j.estado && String(j.estado).toLowerCase().startsWith('activo')
             ? 'Usuario activado.' : 'Usuario desactivado.'),
           'success'
         );
-
-        // Refrescar para quedar en sync con BD (manteniendo página actual con auto-ajuste)
         listar(state.page);
       } catch (err) {
         uiToast(err.message || 'Error al cambiar estado', 'danger');
@@ -511,76 +515,106 @@ function uiToast(msg, variant='info', ms=3500){
     }
   }
 
-  // Quita cualquier listener previo y agrega uno solo
-  tbl.removeEventListener('click', onTableClick);
-  tbl.addEventListener('click', onTableClick);
+  tbl?.addEventListener('click', onTableClick);
 
-// ===== Validación y submit =====
-const nameRe = /^[A-Za-zÁÉÍÓÚÑáéíóúñ ]{2,60}$/u;
-const userRe = /^[A-Za-z0-9._-]{3,30}$/;
+  // ===== Validación y submit =====
+  const nameRe = /^[A-Za-zÁÉÍÓÚÑáéíóúñ ]{2,60}$/u;
+  const userRe = /^[A-Za-z0-9._-]{3,30}$/;
+  const telRe  = /^\d{10}$/;
 
-function validate(data, isUpdate) {
-  if (!userRe.test(data.usuario || '')) return 'Usuario inválido (3-30, letras/números . _ -).';
-  if (!nameRe.test(data.nombres || '')) return 'Nombres inválidos (sólo letras/espacios, 2-60).';
-  if (!nameRe.test(data.apellidos || '')) return 'Apellidos inválidos (sólo letras/espacios, 2-60).';
-  if (!/.+@.+\..+/.test(data.correo || '')) return 'Correo inválido.';
-  // Nota: tu modal dice mín. 8; aquí estaba 6. Unifico a 8 para crear.
-  if (!isUpdate && (!data.password || data.password.length < 8)) return 'Password mínimo 8 caracteres.';
-  return '';
-}
-
-frm?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const fd = new FormData(frm);
-  const id = +fd.get('id_usuario');
-  const isUpdate = id > 0;
-
-  const plain = Object.fromEntries(fd.entries());
-  const err = validate(plain, isUpdate);
-  if (err) { uiToast(err, 'warning'); return; }
-
-  // >>> CONFIRMAR ANTES DE GUARDAR <<<
-  const msg = isUpdate
-    ? `¿Estás seguro de guardar estos cambios del usuario?\n\n` +
-      `Usuario: ${plain.usuario || '(sin usuario)'}\n` +
-      `Nombre: ${plain.nombres || ''} ${plain.apellidos || ''}\n` +
-      `Rol: ${plain.rol || ''} · Estado: ${plain.estado || ''}`
-    : `¿Estás seguro de crear este usuario?\n\n` +
-      `Usuario: ${plain.usuario || '(sin usuario)'}\n` +
-      `Nombre: ${plain.nombres || ''} ${plain.apellidos || ''}\n` +
-      `Rol: ${plain.rol || ''} · Estado: ${plain.estado || ''}`;
-
-  const ok = await uiConfirm({
-    title: isUpdate ? 'Confirmar guardar cambios' : 'Confirmar creación',
-    body: msg,
-    confirmText: isUpdate ? 'Sí, guardar' : 'Sí, crear',
-    variant: 'success'
-  });
-  if (!ok) return;
-
-  const btnSubmit = frm.querySelector('button[type="submit"]');
-  const prevHtml = btnSubmit.innerHTML;
-  btnSubmit.disabled = true;
-  btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando…';
-
-  try {
-    const action = isUpdate ? 'update' : 'create';
-    const res = await fetch(api(`action=${action}`), { method:'POST', body: fd });
-    const j   = await resToJsonSafe(res);
-    if (!j.ok) throw new Error(j.msg || 'Error al guardar');
-
-    closeEditor();
-    uiToast(isUpdate ? 'Usuario actualizado.' : 'Usuario creado.', 'success');
-    listar(state.page);
-  } catch (er) {
-    uiToast(er.message || 'Error al guardar', 'danger');
-  } finally {
-    btnSubmit.disabled = false;
-    btnSubmit.innerHTML = prevHtml;
+  function validate(data, isUpdate) {
+    if (!userRe.test(data.usuario || '')) return 'Usuario inválido (3-30, letras/números . _ -).';
+    if (!nameRe.test(data.nombres || '')) return 'Nombres inválidos (sólo letras/espacios, 2-60).';
+    if (!nameRe.test(data.apellidos || '')) return 'Apellidos inválidos (sólo letras/espacios, 2-60).';
+    if (!/.+@.+\..+/.test(data.correo || '')) return 'Correo inválido.';
+    if (data.telefono && !telRe.test(data.telefono)) return 'El teléfono debe tener exactamente 10 dígitos.';
+    if (!isUpdate && (!data.password || data.password.length < 8)) return 'Password mínimo 8 caracteres.';
+    return '';
   }
-});
 
+  // Filtro en tiempo real: sólo letras en nombres/apellidos y sólo números en teléfono
+  if (frm) {
+    const inpNom = frm.querySelector('#nombres');
+    const inpApe = frm.querySelector('#apellidos');
+    const inpTel = frm.querySelector('#telefono');
+
+    function allowLetters(el){
+      el?.addEventListener('input', e => {
+        e.target.value = e.target.value.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ ]/g,'');
+      });
+    }
+    function allowDigits(el){
+      el?.addEventListener('input', e => {
+        e.target.value = e.target.value.replace(/\D/g,'').slice(0,10);
+      });
+    }
+
+    allowLetters(inpNom);
+    allowLetters(inpApe);
+    allowDigits(inpTel);
+  }
+
+  frm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!frm) return;
+
+    frm.classList.add('was-validated');
+    if (!frm.checkValidity()) {
+      uiToast('Por favor corrige los campos marcados.', 'warning');
+      return;
+    }
+
+    const fd = new FormData(frm);
+    const id = +fd.get('id_usuario');
+    const isUpdate = id > 0;
+
+    const plain = Object.fromEntries(fd.entries());
+    const err = validate(plain, isUpdate);
+    if (err) { uiToast(err, 'warning'); return; }
+
+    const msg = isUpdate
+      ? `¿Estás seguro de guardar estos cambios del usuario?\n\n` +
+        `Usuario: ${plain.usuario || '(sin usuario)'}\n` +
+        `Nombre: ${plain.nombres || ''} ${plain.apellidos || ''}\n` +
+        `Rol: ${plain.rol || ''} · Estado: ${plain.estado || ''}`
+      : `¿Estás seguro de crear este usuario?\n\n` +
+        `Usuario: ${plain.usuario || '(sin usuario)'}\n` +
+        `Nombre: ${plain.nombres || ''} ${plain.apellidos || ''}\n` +
+        `Rol: ${plain.rol || ''} · Estado: ${plain.estado || ''}`;
+
+    const ok = await uiConfirm({
+      title: isUpdate ? 'Confirmar guardar cambios' : 'Confirmar creación',
+      body: msg,
+      confirmText: isUpdate ? 'Sí, guardar' : 'Sí, crear',
+      variant: 'success'
+    });
+    if (!ok) return;
+
+    const btnSubmit = frm.querySelector('button[type="submit"]');
+    const prevHtml = btnSubmit ? btnSubmit.innerHTML : '';
+    if (btnSubmit) {
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando…';
+    }
+
+    try {
+      const action = isUpdate ? 'update' : 'create';
+      const res = await fetch(api(`action=${action}`), { method:'POST', body: fd });
+      const j   = await resToJsonSafe(res);
+      if (!j.ok) throw new Error(j.msg || 'Error al guardar');
+
+      closeEditor();
+      uiToast(isUpdate ? 'Usuario actualizado.' : 'Usuario creado.', 'success');
+      listar(state.page);
+    } catch (er) {
+      uiToast(er.message || 'Error al guardar', 'danger');
+    } finally {
+      if (btnSubmit) {
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = prevHtml;
+      }
+    }
+  });
 
   // ===== Init =====
   function boot(){
@@ -594,7 +628,7 @@ frm?.addEventListener('submit', async (e) => {
 
   function formData(obj){ const fd=new FormData(); Object.entries(obj).forEach(([k,v])=>fd.append(k,v)); return fd; }
 
-  // helper robusto para JSON (por si el backend devuelve HTML de error)
+  // helper robusto para JSON
   async function resToJsonSafe(res){
     try { return await res.json(); }
     catch { return { ok:false, msg:'Respuesta inválida del servidor' }; }
