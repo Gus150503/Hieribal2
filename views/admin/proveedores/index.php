@@ -44,7 +44,7 @@ $base = $this->config['app']['base_url'] ?? '';
             <th>Dirección</th>
             <th>Ciudad</th>
             <th>Condiciones de Pago</th>
-            <th>Estado</th>           <!-- 👈 NUEVA COLUMNA -->
+            <th>Estado</th>
             <th>Creado</th>
             <th class="text-end">Acciones</th>
           </tr>
@@ -156,20 +156,8 @@ $base = $this->config['app']['base_url'] ?? '';
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // Rutas API por router
+  // Solo definir la URL de la API; el JS se encarga del resto
   window.PROVEEDOR_API = '<?= $base ?>/public/?r=admin_proveedores_api';
-
-  // Abrir modal "Nuevo"
-  document.getElementById('btnNuevoProveedor')?.addEventListener('click', () => {
-    const f = document.getElementById('frmProveedor');
-    f.reset();
-    f.classList.remove('was-validated');
-    document.getElementById('idProveedor').value = '';
-    document.getElementById('modalTitleProveedor').textContent = 'Nuevo Proveedor';
-    new bootstrap.Modal(document.getElementById('modalProveedor'), {backdrop:'static'}).show();
-  });
-});
 </script>
 
-<script src="<?= $base ?>/assets/js/admin_proveedores.js?v=4" defer></script>
+<script src="<?= $base ?>/assets/js/admin_proveedores.js?v=5" defer></script>

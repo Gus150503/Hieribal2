@@ -1,24 +1,27 @@
 <?php
-// views/admin/inventario/index.php
 $base = $this->config['app']['base_url'] ?? '';
 ?>
 <section class="card shadow-sm ui-pro border-0 rounded-4">
   <div class="card-body">
     <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
       <div class="d-flex align-items-center gap-2">
-        <i class="bi bi-box-seam fs-4 text-success"></i>
+        <!-- ICONO AZUL -->
+        <i class="bi bi-box-seam fs-4 text-primary"></i>
         <h1 class="h4 m-0">Inventario</h1>
       </div>
-      <button id="btnNuevoInventario" type="button" class="btn btn-success">
+      
+      <!-- BOTÓN NUEVO AZUL -->
+      <button id="btnNuevoInventario" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i> Nuevo
       </button>
     </div>
 
-    <!-- Buscador -->
+    <!-- BUSCADOR AZUL -->
     <div class="input-group mb-3" style="max-width:520px;">
       <span class="input-group-text"><i class="bi bi-search"></i></span>
-      <input id="qInventario" type="search" class="form-control" placeholder="Buscar por código interno, producto o ubicación…">
-      <button id="btnBuscarInventario" class="btn btn-outline-success">Buscar</button>
+      <input id="qInventario" type="search" class="form-control"
+             placeholder="Buscar por código interno, producto o ubicación…">
+      <button id="btnBuscarInventario" class="btn btn-outline-primary">Buscar</button>
     </div>
 
     <!-- Tabla -->
@@ -162,16 +165,18 @@ $base = $this->config['app']['base_url'] ?? '';
 </div>
 
 <style>
-  /* Encabezado verde para la tabla de Inventario */
-  #tblInventario thead.table-light{
-    --bs-table-bg: var(--brand, #198754);
-    --bs-table-color: #fff;
-    --bs-table-border-color: rgba(255,255,255,.25);
-    background: var(--brand, #198754) !important;
-    color: #fff !important;
-    background-image: none !important;
+
+  /* INVENTARIO – encabezado azul forzado */
+  #tblInventario thead.table-light {
+    background-color: #0d6efd !important;
   }
-  #tblInventario thead.table-light th{ color:#fff !important; }
+  #tblInventario thead.table-light th {
+    background-color: #0d6efd !important;
+    color: #ffffff !important;
+    border-color: rgba(255,255,255,.25) !important;
+  }
+
+
 </style>
 
 <!-- Endpoints para que el JS pegue al controlador correcto -->

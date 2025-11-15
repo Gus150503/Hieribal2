@@ -6,7 +6,7 @@
   'use strict';
 
   // =====================================
-  // Endpoints (puedes override desde index)
+  // Endpoints
   // =====================================
   const API_BASE = window.PRODUCTO_API
     || (location.pathname.replace(/\/public\/?$/, '') + '/public/?r=admin_productos_api');
@@ -17,7 +17,7 @@
   // =====================================
   const state = { page: 1, per: 10, total: 0, q: '' };
   let __SEQ__ = 0;
-  let imagenBase64 = null; // si suben archivo
+  let imagenBase64 = null; // si suben archivo (por si luego lo usas)
 
   // =====================================
   // Selectores
@@ -50,7 +50,7 @@
   const btnLimpiarImg = $('#btnLimpiarImagen');
 
   // =====================================
-  // TOASTS 1A (colores por acción)
+  // TOASTS
   // =====================================
   function ensureToastCSS() {
     if ($('#_prod_toast_css')) return;
@@ -62,7 +62,6 @@
     .nvtoast .close{margin-left:auto;background:none;border:0;color:inherit;opacity:.9;cursor:pointer;font-size:16px;line-height:1}
     .nvtoast .dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.9}
     @keyframes _tSlide{to{transform:translateY(0)}}
-    /* Paleta */
     .nv-success{background:#198754;border-color:#198754;color:#EAF6EF}
     .nv-danger{background:#dc3545;border-color:#dc3545;color:#FFE5E8}
     .nv-warning{background:#ffc107;border-color:#ffc107;color:#1f1f1f}
@@ -100,7 +99,7 @@
   }
 
   // =====================================
-  // Confirm modal (reutilizable)
+  // Confirm modal
   // =====================================
   function ensureConfirmModal() {
     if ($('#confirmModal')) return;
@@ -151,7 +150,7 @@
   }
 
   // =====================================
-  // Validación visual 1A (bordes e iconos)
+  // Validación visual
   // =====================================
   function ensureFieldStyles() {
     if ($('#_prod_field_css')) return;
@@ -179,23 +178,23 @@
   function setValid(el, ok, msgIfOptional = '') {
     if (!el) return;
     el.classList.remove('is-valid', 'is-invalid');
-    // limpiar feedback anterior
     const next = el.nextElementSibling;
     if (next && (next.classList?.contains('invalid-feedback') || next.classList?.contains('valid-optional'))) {
-      next.remove();
+      // si es el mensaje dinámico, lo quitamos (no el HTML original de invalid-feedback)
+      if (next.classList.contains('valid-optional')) {
+        next.remove();
+      }
     }
     if (ok === true) {
       el.classList.add('is-valid');
       if (msgIfOptional) {
         const small = document.createElement('div');
         small.className = 'valid-optional';
-        small.textContent = msgIfOptional; // “Opcional”
+        small.textContent = msgIfOptional;
         el.parentNode.insertBefore(small, el.nextSibling);
       }
     } else if (ok === false) {
       el.classList.add('is-invalid');
-      // si el elemento ya trae su <div class="invalid-feedback"> en HTML, lo respetamos
-      // de lo contrario, ponemos uno básico
       if (!(next && next.classList?.contains('invalid-feedback'))) {
         const fb = document.createElement('div');
         fb.className = 'invalid-feedback';
@@ -262,7 +261,9 @@
 
     pager.innerHTML = html;
   }
-  function updateTotal() { if (totalEl) totalEl.textContent = `${state.total} registro(s)`; }
+  function updateTotal() {
+    if (totalEl) totalEl.textContent = `${state.total} registro(s)`;
+  }
 
   async function listar(page = 1) {
     state.page = page;
@@ -357,10 +358,20 @@
     const pages = Math.max(1, Math.ceil((state.total || 0) / (state.per || 10)));
     if (to >= 1 && to <= pages && to !== state.page) listar(to);
   });
-  perSel?.addEventListener('change', (e) => { state.per = parseInt(e.target.value, 10) || 10; listar(1); });
-  btnBuscar?.addEventListener('click', () => { state.q = qInput?.value.trim() || ''; listar(1); });
+  perSel?.addEventListener('change', (e) => {
+    state.per = parseInt(e.target.value, 10) || 10;
+    listar(1);
+  });
+  btnBuscar?.addEventListener('click', () => {
+    state.q = qInput?.value.trim() || '';
+    listar(1);
+  });
   qInput?.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); state.q = e.target.value.trim(); listar(1); }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      state.q = e.target.value.trim();
+      listar(1);
+    }
   });
 
   // =====================================
@@ -378,12 +389,22 @@
     ensureHidden();
     bsModal = new bootstrap.Modal(modalEl, { backdrop: 'static' });
     modalEl.addEventListener('hidden.bs.modal', () => {
+      if (!frm) return;
       imagenBase64 = null;
-      frm?.reset();
+      frm.reset();
+
+      // 🔥 limpiar ID para que no se quede cargado al volver a abrir en modo "Nuevo"
+      const idInput = frm.querySelector('[name="id"]');
+      if (idInput) idInput.value = '';
+
       // limpiar estilos
       $$('.is-valid, .is-invalid').forEach(el => el.classList.remove('is-valid', 'is-invalid'));
-      // limpiar “Opcional”
+      // limpiar mensajes "Opcional"
       $$('.valid-optional').forEach(el => el.remove());
+
+      // limpiar preview imagen
+      if (previewWrap) previewWrap.style.display = 'none';
+      if (imgPreview) imgPreview.src = '';
     });
   }
 
@@ -392,16 +413,33 @@
     ensureHidden();
     bsModal?.show();
   }
-  function closeEditor() { bsModal?.hide(); ensureHidden(); }
+  function closeEditor() {
+    bsModal?.hide();
+    ensureHidden();
+  }
 
+  // Botón "Nuevo" – modo creación real
   btnNuevo?.addEventListener('click', () => {
-    frm?.reset();
+    if (!frm) return;
+
+    frm.reset();
+
+    // 🔥 ID vacío = creación
+    const idInput = frm.querySelector('[name="id"]');
+    if (idInput) {
+      idInput.value = '';
+    }
+
     imagenBase64 = null;
+
+    // Imagen: por defecto URL
     if (tipoURL) tipoURL.checked = true;
     if (seccionURL) seccionURL.style.display = 'block';
     if (seccionArchivo) seccionArchivo.style.display = 'none';
     if (previewWrap) previewWrap.style.display = 'none';
-    uiToast('Modo creación', 'info'); // azul (editar/crear = info)
+    if (imgPreview) imgPreview.src = '';
+
+    uiToast('Modo creación', 'info'); // azul
     openEditor('Nuevo producto');
   });
 
@@ -435,7 +473,10 @@
     if (url && /^(https?:)?\/\//i.test(url)) {
       imgPreview.src = url;
       previewWrap.style.display = 'block';
-      imgPreview.onerror = () => { previewWrap.style.display = 'none'; uiToast('No se pudo cargar la imagen (URL).', 'warning'); };
+      imgPreview.onerror = () => {
+        previewWrap.style.display = 'none';
+        uiToast('No se pudo cargar la imagen (URL).', 'warning');
+      };
     } else {
       previewWrap.style.display = 'none';
     }
@@ -443,8 +484,16 @@
 
   archivoImagen?.addEventListener('change', (e) => {
     const file = e.target.files?.[0]; if (!file) return;
-    if (file.size > 2 * 1024 * 1024) { uiToast('La imagen es muy grande (máx 2MB).', 'warning'); archivoImagen.value = ''; return; }
-    if (!file.type.startsWith('image/')) { uiToast('Selecciona una imagen válida.', 'warning'); archivoImagen.value = ''; return; }
+    if (file.size > 2 * 1024 * 1024) {
+      uiToast('La imagen es muy grande (máx 2MB).', 'warning');
+      archivoImagen.value = '';
+      return;
+    }
+    if (!file.type.startsWith('image/')) {
+      uiToast('Selecciona una imagen válida.', 'warning');
+      archivoImagen.value = '';
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = (ev) => {
@@ -473,7 +522,7 @@
     const id = btn.dataset.edit || btn.dataset.del || btn.dataset.toggle;
     if (!id) return;
 
-    // Editar (mensaje azul)
+    // Editar
     if (btn.dataset.edit) {
       try {
         const r = await fetch(api(`action=get&id=${id}`));
@@ -482,8 +531,10 @@
         if (!d) return uiToast('Producto no encontrado', 'warning');
 
         // llenar form
-        for (const [k, v] of Object.entries(d)) {
-          if (frm[k]) frm[k].value = v ?? '';
+        if (frm) {
+          for (const [k, v] of Object.entries(d)) {
+            if (frm[k]) frm[k].value = v ?? '';
+          }
         }
 
         // imagen
@@ -496,6 +547,7 @@
           previewWrap.style.display = 'block';
         } else {
           previewWrap.style.display = 'none';
+          imgPreview.src = '';
         }
 
         uiToast('Modo edición', 'info'); // azul
@@ -506,7 +558,7 @@
       return;
     }
 
-    // Eliminar (rojo)
+    // Eliminar
     if (btn.dataset.del) {
       const ok = await uiConfirm({
         title: 'Eliminar producto',
@@ -517,10 +569,17 @@
       if (!ok) return;
 
       try {
-        const r = await fetch(api('action=delete'), { method: 'POST', body: (() => { const fd = new FormData(); fd.append('id', id); return fd; })() });
+        const r = await fetch(api('action=delete'), {
+          method: 'POST',
+          body: (() => {
+            const fd = new FormData();
+            fd.append('id', id);
+            return fd;
+          })()
+        });
         const j = await r.json();
         if (!j.ok) throw new Error(j.msg || 'No se pudo eliminar');
-        uiToast('Eliminado exitosamente', 'danger'); // rojo
+        uiToast('Eliminado exitosamente', 'danger');
         listar(state.page);
       } catch (err) {
         uiToast(err.message || 'Error al eliminar', 'danger');
@@ -528,7 +587,7 @@
       return;
     }
 
-    // Toggle activar/inactivar (azul)
+    // Toggle activar/inactivar
     if (btn.dataset.toggle) {
       const ok = await uiConfirm({
         title: 'Cambiar estado',
@@ -539,10 +598,17 @@
       if (!ok) return;
 
       try {
-        const r = await fetch(api('action=toggle'), { method: 'POST', body: (() => { const fd = new FormData(); fd.append('id', id); return fd; })() });
+        const r = await fetch(api('action=toggle'), {
+          method: 'POST',
+          body: (() => {
+            const fd = new FormData();
+            fd.append('id', id);
+            return fd;
+          })()
+        });
         const j = await r.json();
         if (!j.ok) throw new Error(j.msg || 'No se pudo cambiar el estado');
-        uiToast(j.msg || 'Estado actualizado', 'info'); // azul
+        uiToast(j.msg || 'Estado actualizado', 'info');
         listar(state.page);
       } catch (err) {
         uiToast(err.message || 'Error al cambiar estado', 'danger');
@@ -552,57 +618,139 @@
   });
 
   // =====================================
-  // Guardar (crear / actualizar)
-  // Colores:
-  //   crear   -> verde (success)
-  //   actualizar -> amarillo (warning)
+  // Fecha de vencimiento: solo hoy o futuro
+  // =====================================
+  function esFechaFuturaOHoy(valor) {
+    if (!valor) return true; // si está vacío, opcional
+
+    let d, m, y;
+
+    // Soporta dd/mm/aaaa y yyyy-mm-dd
+    if (valor.includes('/')) {
+      const partes = valor.split('/');
+      if (partes.length !== 3) return false;
+      [d, m, y] = partes.map(p => parseInt(p, 10));
+    } else {
+      const partes = valor.split('-');
+      if (partes.length !== 3) return false;
+      [y, m, d] = partes.map(p => parseInt(p, 10));
+    }
+
+    const fecha = new Date(y, m - 1, d);
+    if (isNaN(fecha.getTime())) return false;
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    fecha.setHours(0, 0, 0, 0);
+
+    return fecha >= hoy;
+  }
+
+  function limitFechaVencimiento() {
+    const inp = document.getElementById('f_vencimiento');
+    if (!inp) return;
+
+    const hoy = new Date();
+    const y = hoy.getFullYear();
+    const m = String(hoy.getMonth() + 1).padStart(2, '0');
+    const d = String(hoy.getDate()).padStart(2, '0');
+    const iso = `${y}-${m}-${d}`;
+
+    if (inp.type === 'date') {
+      inp.setAttribute('min', iso);
+    }
+
+    inp.addEventListener('change', () => {
+      const v = inp.value.trim();
+      if (!v) {
+        setValid(inp, true, 'Opcional');
+        return;
+      }
+
+      const ok = esFechaFuturaOHoy(v);
+      setValid(inp, ok, ok ? '' : '');
+      if (!ok) {
+        uiToast('La fecha de vencimiento debe ser hoy o una fecha futura.', 'warning');
+        inp.value = '';
+      }
+    });
+  }
+
+  // =====================================
+  // Validación lógica antes de enviar
   // =====================================
   function validatePlain(plain) {
     if (!plain.nombre || !plain.nombre.trim()) return 'Nombre es requerido.';
     if (!plain.marca || !plain.marca.trim()) return 'Marca es requerida.';
     if (plain.precio_compra !== undefined && +plain.precio_compra <= 0) return 'Precio Compra debe ser mayor a 0';
     if (plain.precio_venta !== undefined && +plain.precio_venta <= 0) return 'Precio Venta debe ser mayor a 0';
+
+    if (plain.f_vencimiento && !esFechaFuturaOHoy(plain.f_vencimiento)) {
+      return 'La fecha de vencimiento debe ser hoy o una fecha futura.';
+    }
+
     return '';
   }
 
+  // =====================================
+  // Guardar (crear / actualizar)
+  // =====================================
   frm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     ensureFieldStyles();
 
-    const fd = new FormData(frm);
-    const id = fd.get('id');
-    const plain = Object.fromEntries(fd.entries());
+    if (!frm) return;
 
-    // Imagen: si subieron archivo, priorizamos base64
-    // Imagen — si subieron archivo lo enviamos como File
-    const file = archivoImagen.files?.[0];
-    if (file) {
-      fd.set('imagen_archivo', file);  // enviamos archivo real
-      fd.delete('imagen');             // borramos URL si existe
+    const fd = new FormData(frm);
+
+    // 🔥 ID: decidir si es create o update
+    let id = fd.get('id');
+    id = (id ?? '').toString().trim();
+    const isUpdate = id !== '' && id !== '0';
+
+    // Si es creación, no mandamos id al backend
+    if (!isUpdate) {
+      fd.delete('id');
     }
 
+    // Imagen archivo: priorizar file sobre URL
+    const file = archivoImagen?.files?.[0];
+    if (file) {
+      fd.set('imagen_archivo', file);
+      fd.delete('imagen'); // no mandar URL si hay archivo
+    }
 
-    // Validación lógica
+    const plain = Object.fromEntries(fd.entries());
+
+    // Validación básica
     const err = validatePlain(plain);
+
     // Marcar campos clave
-    setValid($('#nombre'), !(!plain.nombre || !plain.nombre.trim()));
-    setValid($('#marca'), !(!plain.marca || !plain.marca.trim()));
+    setValid($('#nombre'), !!(plain.nombre && plain.nombre.trim()));
+    setValid($('#marca'), !!(plain.marca && plain.marca.trim()));
     setValid($('#precio_compra'), !(plain.precio_compra === '' || +plain.precio_compra <= 0));
     setValid($('#precio_venta'), !(plain.precio_venta === '' || +plain.precio_venta <= 0));
+
+    // Fecha vencimiento (opcional pero debe ser hoy o futuro)
+    const fvInput = document.getElementById('f_vencimiento');
+    const fvOk = !plain.f_vencimiento || esFechaFuturaOHoy(plain.f_vencimiento);
+    setValid(fvInput, fvOk, plain.f_vencimiento ? '' : 'Opcional');
+
     // Campos opcionales con “Opcional”
     setValid($('#categoria'), true, 'Opcional');
     setValid($('#presentacion'), true, 'Opcional');
     setValid($('#descripcion'), true, 'Opcional');
     setValid($('#lote'), true, 'Opcional');
-    setValid($('#f_vencimiento'), true, 'Opcional');
     setValid($('#codigo_sku'), true, 'Opcional');
     setValid($('#ubicacion'), true, 'Opcional');
     setValid($('#iva'), true, 'Opcional');
 
-    if (err) { uiToast(`⚠ ${err}`, 'warning'); return; }
+    if (err) {
+      uiToast(`⚠ ${err}`, 'warning');
+      return;
+    }
 
     // Confirmación
-    const isUpdate = !!id;
     const ok = await uiConfirm({
       title: isUpdate ? 'Confirmar actualización' : 'Confirmar creación',
       body: isUpdate ? '¿Guardar cambios del producto?' : '¿Crear nuevo producto?',
@@ -611,7 +759,6 @@
     });
     if (!ok) return;
 
-    // Botón submit en loading
     const btnSubmit = frm.querySelector('button[type="submit"]');
     const prevHtml = btnSubmit.innerHTML;
     btnSubmit.disabled = true;
@@ -625,7 +772,6 @@
 
       closeEditor();
 
-      // Mensajes por color solicitado
       if (isUpdate) {
         uiToast('Actualizado exitosamente', 'warning'); // amarillo
         listar(state.page);
@@ -650,12 +796,16 @@
     ensureConfirmModal();
     ensureFieldStyles();
     ensureHidden();
+    limitFechaVencimiento();
     listar(1);
   }
+
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
   // Safari bfcache
-  window.addEventListener('pageshow', (e) => { if (e.persisted) boot(); });
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted) boot();
+  });
 
 })();
