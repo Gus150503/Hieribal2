@@ -5,22 +5,13 @@
 
   'use strict';
 
-  // =========================
-  // Endpoints
-  // =========================
   const API_BASE = window.PROVEEDOR_API
     || (location.pathname.replace(/\/public\/?$/, '') + '/public/?r=admin_proveedores_api');
   const api = (params = '') => `${API_BASE}&${params}`;
 
-  // =========================
-  // Estado
-  // =========================
   const state = { page: 1, per: 10, total: 0, q: '' };
   let __SEQ__ = 0;
 
-  // =========================
-  // Selectores
-  // =========================
   const $  = (s) => document.querySelector(s);
   const $$ = (s) => Array.from(document.querySelectorAll(s));
 
@@ -37,9 +28,6 @@
   const modalTit  = $('#modalTitleProveedor');
   let   bsModal   = null;
 
-  // =========================
-  // Limpieza de backdrops (BUG pantalla gris)
-  // =========================
   function cleanupBackdrops() {
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
     document.body.classList.remove('modal-open');
@@ -47,9 +35,7 @@
     document.body.style.paddingRight = '';
   }
 
-  // =========================
-  // TOASTS (igual estilo Productos)
-  // =========================
+  // ========= TOASTS =========
   function ensureToastCSS() {
     if ($('#_prov_toast_css')) return;
     const css = document.createElement('style');
@@ -96,9 +82,7 @@
     el.addEventListener('mouseenter', () => clearTimeout(timer), { once:true });
   }
 
-  // =========================
-  // Confirm modal Bootstrap
-  // =========================
+  // ========= CONFIRM MODAL =========
   function ensureConfirmModal() {
     if ($('#confirmModal')) return;
     const wrap = document.createElement('div');
@@ -120,13 +104,20 @@
       </div>`;
     document.body.appendChild(wrap.firstElementChild);
   }
+
   function uiConfirm({title='Confirmar', body='¿Seguro?', confirmText='Sí, continuar', variant='success'} = {}) {
+    ensureConfirmModal(); // nos aseguramos de crearlo
     const modal = $('#confirmModal');
-    if (!modal || !window.bootstrap) return Promise.resolve(confirm(body));
+    if (!modal || !window.bootstrap || !bootstrap.Modal) {
+      // fallback solo si de verdad no hay Bootstrap
+      return Promise.resolve(confirm(body));
+    }
+
     $('#confirmTitle').textContent = title;
     $('#confirmBody').innerHTML = (body ?? '').toString()
       .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
       .replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/\n/g,'<br>');
+
     const okBtn = $('#btnOkConfirm');
     okBtn.className = 'btn ' + (variant === 'danger' ? 'btn-outline-danger'
                             : variant === 'warning' ? 'btn-outline-secondary'
@@ -147,19 +138,13 @@
     });
   }
 
-
-    // Forzar encabezado amarillo en tabla de proveedores
+  // ========= HEADER AMARILLO =========
   function colorizeHeaderProveedores() {
     const thead = document.querySelector('#tblProveedor thead');
     if (!thead) return;
-
-    // Por si algún CSS le mete clases azules
     thead.classList.remove('table-primary', 'bg-primary');
-
-    // Forzar colores con !important
     thead.style.setProperty('background-color', '#ffc107', 'important');
     thead.style.setProperty('color', '#ffffff', 'important');
-
     thead.querySelectorAll('th').forEach(th => {
       th.style.setProperty('background-color', '#ffc107', 'important');
       th.style.setProperty('color', '#ffffff', 'important');
@@ -167,10 +152,7 @@
     });
   }
 
-
-  // =========================
-  // Validación visual
-  // =========================
+  // ========= VALIDACIÓN VISUAL =========
   function ensureFieldStyles() {
     if ($('#_prov_field_css')) return;
     const css = document.createElement('style');
@@ -199,9 +181,7 @@
     else if (ok === false) el.classList.add('is-invalid');
   }
 
-  // =========================
-  // Utils
-  // =========================
+  // ========= UTILS =========
   function escapeHtml(s) {
     return (s ?? '').toString().replace(/[&<>"']/g, m => ({
       '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
@@ -214,9 +194,7 @@
       : '<span class="badge bg-secondary-subtle text-secondary border">Inactivo</span>';
   }
 
-  // =========================
-  // Listar + paginación
-  // =========================
+  // ========= LISTA + PAGINACIÓN =========
   function setLoading(on) {
     if (!tblBody) return;
     if (on) {
@@ -332,9 +310,7 @@
     }
   }
 
-  // =========================
-  // Filtros
-  // =========================
+  // ========= FILTROS =========
   pager?.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-page]'); if (!btn) return;
     const to = parseInt(btn.dataset.page, 10);
@@ -347,9 +323,7 @@
     if (e.key === 'Enter') { e.preventDefault(); state.q = e.target.value.trim(); listar(1); }
   });
 
-  // =========================
-  // Modal crear/editar
-  // =========================
+  // ========= MODAL CREAR / EDITAR =========
   function ensureHidden() {
     if (!modalEl) return;
     modalEl.classList.remove('show');
@@ -357,7 +331,8 @@
     modalEl.style.display = 'none';
     cleanupBackdrops();
   }
-  if (modalEl && window.bootstrap) {
+
+  if (modalEl && window.bootstrap && bootstrap.Modal) {
     ensureHidden();
     bsModal = new bootstrap.Modal(modalEl, { backdrop: 'static' });
     modalEl.addEventListener('hidden.bs.modal', () => {
@@ -366,6 +341,7 @@
       cleanupBackdrops();
     });
   }
+
   function openEditor(title) {
     if (modalTit) modalTit.textContent = title || 'Nuevo Proveedor';
     ensureHidden();
@@ -375,14 +351,12 @@
 
   btnNuevo?.addEventListener('click', () => {
     frm?.reset();
-    if (frm) frm.idProveedor.value = '';
-    uiToast('Modo creación de proveedor', 'info'); // azul
+    if (frm && frm.idProveedor) frm.idProveedor.value = '';
+    uiToast('Modo creación de proveedor', 'info');
     openEditor('Nuevo Proveedor');
   });
 
-  // =========================
-  // Acciones tabla
-  // =========================
+  // ========= ACCIONES TABLA =========
   tblBody?.addEventListener('click', async (e) => {
     const btn = e.target.closest('button'); if (!btn) return;
     const id  = btn.dataset.edit || btn.dataset.del || btn.dataset.toggle;
@@ -397,17 +371,17 @@
         if (!d) return uiToast('Proveedor no encontrado','warning');
 
         frm.idProveedor.value       = d.id;
-        frm.empresa.value          = d.empresa || '';
-        frm.nit.value              = d.nit || '';
-        frm.nombre_contacto.value  = d.nombre_contacto || '';
-        frm.telefono.value         = d.telefono || '';
-        frm.email.value            = d.email || '';
-        frm.direccion.value        = d.direccion || '';
-        frm.ciudad.value           = d.ciudad || '';
-        frm.condiciones_pago.value = d.condiciones_pago || '';
-        frm.estado.value           = (d.estado || 'activo').toLowerCase()==='inactivo'?'inactivo':'activo';
+        frm.empresa.value           = d.empresa || '';
+        frm.nit.value               = d.nit || '';
+        frm.nombre_contacto.value   = d.nombre_contacto || '';
+        frm.telefono.value          = d.telefono || '';
+        frm.email.value             = d.email || '';
+        frm.direccion.value         = d.direccion || '';
+        frm.ciudad.value            = d.ciudad || '';
+        frm.condiciones_pago.value  = d.condiciones_pago || '';
+        frm.estado.value            = (d.estado || 'activo').toLowerCase()==='inactivo'?'inactivo':'activo';
 
-        uiToast('Modo edición de proveedor', 'info'); // azul
+        uiToast('Modo edición de proveedor', 'info');
         openEditor('Editar Proveedor');
       } catch {
         uiToast('Error al cargar proveedor', 'danger');
@@ -430,7 +404,7 @@
         const r  = await fetch(api('action=delete'), { method:'POST', body: fd });
         const j  = await r.json();
         if (!j.ok) throw new Error(j.msg || 'No se pudo eliminar');
-        uiToast('Proveedor eliminado exitosamente.', 'danger'); // rojo
+        uiToast('Proveedor eliminado exitosamente.', 'danger');
         listar(state.page);
       } catch (err) {
         uiToast(err.message || 'Error al eliminar','danger');
@@ -470,7 +444,7 @@
 
         uiToast(
           activoNow ? 'Proveedor activado exitosamente.' : 'Proveedor inactivado exitosamente.',
-          'info'  // azul
+          'info'
         );
         listar(state.page);
       } catch (err) {
@@ -480,9 +454,7 @@
     }
   });
 
-  // =========================
-  // Validación + Guardar
-  // =========================
+  // ========= VALIDACIÓN + GUARDAR =========
   function validatePlain(p) {
     if (!p.empresa || !p.empresa.trim())          return 'La empresa es obligatoria.';
     if (!p.nit || !p.nit.trim())                  return 'El NIT es obligatorio.';
@@ -535,10 +507,10 @@
       cleanupBackdrops();
 
       if (isUpdate) {
-        uiToast('Proveedor actualizado exitosamente.', 'warning'); // amarillo
+        uiToast('Proveedor actualizado exitosamente.', 'warning');
         listar(state.page);
       } else {
-        uiToast('Proveedor creado exitosamente.', 'success');      // verde
+        uiToast('Proveedor creado exitosamente.', 'success');
         listar(1);
       }
     } catch (err2) {
@@ -549,12 +521,12 @@
     }
   });
 
-  // =========================
-  // Init
-  // =========================
-  // Boot
+  // ========= INIT =========
   function boot(){
-    colorizeHeaderProveedores();   // 👈 pintamos el encabezado SIEMPRE
+    ensureToastCSS();
+    ensureConfirmModal();
+    ensureFieldStyles();
+    colorizeHeaderProveedores();
     listar(1);
   }
 

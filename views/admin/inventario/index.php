@@ -9,7 +9,7 @@ $base = $this->config['app']['base_url'] ?? '';
         <i class="bi bi-box-seam fs-4 text-primary"></i>
         <h1 class="h4 m-0">Inventario</h1>
       </div>
-
+      
       <!-- BOTÓN NUEVO AZUL -->
       <button id="btnNuevoInventario" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i> Nuevo

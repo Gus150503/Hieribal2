@@ -18,7 +18,7 @@ $base = $this->config['app']['base_url'] ?? '';
         <div class="input-group mb-3" style="max-width:520px;">
             <span class="input-group-text"><i class="bi bi-search"></i></span>
             <input id="qProd" type="search" class="form-control"
-                placeholder="Buscar por nombre, SKU, marca o categoría…">
+                   placeholder="Buscar por nombre, SKU, marca o categoría…">
             <button id="btnBuscarProd" class="btn btn-outline-success">Buscar</button>
         </div>
 
@@ -26,26 +26,26 @@ $base = $this->config['app']['base_url'] ?? '';
         <div class="table-responsive">
             <table id="tblProductos" class="table table-sm align-middle table-hover">
                 <thead class="table-light position-sticky" style="top:0; z-index:1;">
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Categoría</th>
-                        <th>Marca</th>
-                        <th>Presentación</th>
-                        <th>Stock Actual</th>
-                        <th>Stock Mínimo</th>
-                        <th>Descripción</th>
-                        <th>Lote</th>
-                        <th>Fecha de Vencimiento</th>
-                        <th>Precio Compra</th>
-                        <th>Precio Venta</th>
-                        <th>IVA</th>
-                        <th>Cod. Barras</th>
-                        <th>Ubicación</th>
-                        <th>Estado</th>
-                        <th>Imagen</th>
-                        <th class="text-end">Acciones</th>
-                    </tr>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Marca</th>
+                    <th>Presentación</th>
+                    <th>Stock Actual</th>
+                    <th>Stock Mínimo</th>
+                    <th>Descripción</th>
+                    <th>Lote</th>
+                    <th>Fecha de Vencimiento</th>
+                    <th>Precio Compra</th>
+                    <th>Precio Venta</th>
+                    <th>IVA</th>
+                    <th>Cod. Barras</th>
+                    <th>Ubicación</th>
+                    <th>Estado</th>
+                    <th>Imagen</th>
+                    <th class="text-end">Acciones</th>
+                </tr>
                 </thead>
                 <tbody></tbody>
             </table>
@@ -80,7 +80,8 @@ $base = $this->config['app']['base_url'] ?? '';
 
             <div class="modal-body pt-3">
                 <form id="frmProducto" class="needs-validation" novalidate>
-                    <input type="hidden" name="id" id="idProducto">
+                    <!-- Este ID se usa solo para editar; en "Nuevo" lo limpia el JS -->
+                    <input type="hidden" name="id" id="idProducto" value="">
 
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -104,20 +105,20 @@ $base = $this->config['app']['base_url'] ?? '';
 
                         <div class="col-md-3">
                             <label class="form-label">Stock actual</label>
-                            <input type="number" class="form-control" name="stock_actual" id="stock_actual" min="0"
-                                value="0" required>
+                            <input type="number" class="form-control" name="stock_actual" id="stock_actual"
+                                   min="0" value="0" required>
                         </div>
 
                         <div class="col-md-3">
                             <label class="form-label">Stock mínimo</label>
-                            <input type="number" class="form-control" name="stock_minimo" id="stock_minimo" min="0"
-                                value="0" required>
+                            <input type="number" class="form-control" name="stock_minimo" id="stock_minimo"
+                                   min="0" value="0" required>
                         </div>
 
                         <div class="col-12">
                             <label class="form-label">Descripción</label>
                             <textarea class="form-control" name="descripcion" id="descripcion" rows="2"
-                                maxlength="1000"></textarea>
+                                      maxlength="1000"></textarea>
                         </div>
 
                         <div class="col-md-3">
@@ -133,20 +134,21 @@ $base = $this->config['app']['base_url'] ?? '';
                         <div class="col-md-3">
                             <label class="form-label">Precio Compra</label>
                             <input type="number" step="0.01" class="form-control" name="precio_compra"
-                                id="precio_compra" min="0.01" value="0" required>
+                                   id="precio_compra" min="0.01" value="0" required>
                             <div class="invalid-feedback">Precio Compra requerido.</div>
                         </div>
 
                         <div class="col-md-3">
                             <label class="form-label">Precio Venta</label>
-                            <input type="number" step="0.01" class="form-control" name="precio_venta" id="precio_venta"
-                                min="0.01" value="0" required>
+                            <input type="number" step="0.01" class="form-control" name="precio_venta"
+                                   id="precio_venta" min="0.01" value="0" required>
                             <div class="invalid-feedback">Precio Venta requerido.</div>
                         </div>
 
                         <div class="col-md-3">
                             <label class="form-label">IVA (%)</label>
-                            <input type="number" step="0.01" class="form-control" name="iva" id="iva" min="0" value="0">
+                            <input type="number" step="0.01" class="form-control" name="iva" id="iva"
+                                   min="0" value="0">
                         </div>
 
                         <div class="col-md-3">
@@ -172,14 +174,12 @@ $base = $this->config['app']['base_url'] ?? '';
                             <label class="form-label d-block">Imagen del Producto (Opcional)</label>
 
                             <div class="btn-group mb-3" role="group">
-                                <input type="radio" class="btn-check" name="tipoImagen" id="tipoURL" value="url"
-                                    checked>
+                                <input type="radio" class="btn-check" name="tipoImagen" id="tipoURL" value="url" checked>
                                 <label class="btn btn-outline-success" for="tipoURL">
                                     <i class="bi bi-link-45deg me-1"></i> URL
                                 </label>
 
-                                <input type="radio" class="btn-check" name="tipoImagen" id="tipoArchivo"
-                                    value="archivo">
+                                <input type="radio" class="btn-check" name="tipoImagen" id="tipoArchivo" value="archivo">
                                 <label class="btn btn-outline-success" for="tipoArchivo">
                                     <i class="bi bi-upload me-1"></i> Subir Archivo
                                 </label>
@@ -187,24 +187,22 @@ $base = $this->config['app']['base_url'] ?? '';
 
                             <div id="seccionURL">
                                 <input type="text" class="form-control" name="imagen" id="imagen"
-                                    placeholder="https://ejemplo.com/imagen.jpg" maxlength="500">
+                                       placeholder="https://ejemplo.com/imagen.jpg" maxlength="500">
                                 <small class="text-muted">Pega la URL de una imagen de internet</small>
                             </div>
 
                             <div id="seccionArchivo" style="display:none;">
                                 <input type="file" class="form-control" id="archivoImagen" name="imagen_archivo"
-                                    accept="image/*">
-
-
+                                       accept="image/*">
                                 <small class="text-muted">Formatos: JPG, PNG, GIF (Máx. 2MB)</small>
                             </div>
 
                             <div id="previewImagen" class="mt-3" style="display:none;">
                                 <label class="form-label text-muted small">Vista previa:</label>
                                 <div class="border rounded p-2 bg-light d-flex align-items-center justify-content-center"
-                                    style="height:150px;">
+                                     style="height:150px;">
                                     <img id="imgPreview" src="" alt="Preview"
-                                        style="max-height:140px; max-width:100%; object-fit:contain; border-radius:8px;">
+                                         style="max-height:140px; max-width:100%; object-fit:contain; border-radius:8px;">
                                 </div>
                                 <button type="button" id="btnLimpiarImagen" class="btn btn-sm btn-outline-danger mt-2">
                                     <i class="bi bi-x-circle me-1"></i> Quitar imagen
@@ -227,18 +225,19 @@ $base = $this->config['app']['base_url'] ?? '';
 </div>
 
 <style>
-
-/* Encabezado verde */
+/* Encabezado verde productos */
 #tblProductos thead.table-light {
-    --bs-table-bg: var(--brand, #198754);
+    --bs-table-bg: #198754;
     --bs-table-color: #fff;
     --bs-table-border-color: rgba(255, 255, 255, .25);
-    background: var(--brand, #198754) !important;
+    background-color: #198754 !important;
     color: #fff !important;
 }
 
 #tblProductos thead.table-light th {
-    color: #fff !important;
+    background-color: #198754 !important;
+    color: #ffffff !important;
+    border-color: rgba(255,255,255,.25) !important;
 }
 
 /* Tabla amplia y legible */
@@ -290,34 +289,11 @@ $base = $this->config['app']['base_url'] ?? '';
     font-size: 24px;
     border: 2px dashed #dee2e6;
 }
-
-      /* PRODUCTOS – encabezado verde forzado */
-      #tblProductos thead.table-light {
-        background-color: #198754 !important;
-      }
-      #tblProductos thead.table-light th {
-        background-color: #198754 !important;
-        color: #ffffff !important;
-        border-color: rgba(255,255,255,.25) !important;
-      }
-
-
-
-  /* Tabla amplia y legible */
-  #tblProductos { width:100%; min-width:1500px; }
-  #tblProductos th, #tblProductos td { vertical-align: middle; white-space: nowrap; }
-  #tblProductos td.descripcion { white-space: normal; max-width: 250px; overflow-wrap: break-word; text-align: left; }
-
-  /* Imagen miniatura */
-  .producto-img{ width:55px;height:55px;object-fit:cover;border-radius:8px;border:2px solid #e9ecef;box-shadow:0 2px 8px rgba(0,0,0,.1);transition:transform .2s, box-shadow .2s; }
-  .producto-img:hover{ transform:scale(1.8); box-shadow:0 4px 16px rgba(0,0,0,.2); z-index:10; cursor:pointer; }
-  .producto-img-placeholder{ width:55px;height:55px;border-radius:8px;background:linear-gradient(135deg,#f5f7fa,#e9ecef);display:flex;align-items:center;justify-content:center;color:#adb5bd;font-size:24px;border:2px dashed #dee2e6; }
-
 </style>
 
-<!-- Solo endpoint; el modal lo maneja admin_productos.js -->
+<!-- Endpoint API; el JS lo usa -->
 <script>
-window.PRODUCTO_API = '<?= $base ?>/?r=admin_productos_api';
+    window.PRODUCTO_API = '<?= $base ?>/?r=admin_productos_api';
 </script>
 
-<script src="<?= $base ?>/assets/js/admin_productos.js?v=4" defer></script>
+<script src="<?= $base ?>/assets/js/admin_productos.js?v=5" defer></script>
