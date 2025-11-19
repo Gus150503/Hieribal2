@@ -26,10 +26,6 @@ ob_start();
         <i class="bi bi-eye toggle-password" onclick="toggleAdminPassword()" aria-label="Mostrar/ocultar contraseña"></i>
       </div>
 
-      <div class="text-end mb-3">
-        <a href="<?= $base ?>/?r=forgot">¿Olvidaste tu contraseña?</a>
-      </div>
-
       <button type="submit" class="btn btn-primary w-100">Ingresar</button>
     </form>
   </div>
