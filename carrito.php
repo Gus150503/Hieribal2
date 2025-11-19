@@ -1,0 +1,469 @@
+<?php $base = $this->config['app']['base_url']; ?>
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Hieribal - Tienda Online</title>
+    <link rel="stylesheet" href="<?= $base ?>/assets/css/carritohomepage.css">
+</head>
+
+<body>
+
+    <!-- ========================================
+    BUSCADOR Y FILTROS DE CATEGORÍAS
+    ========================================= -->
+    <section class="search-section">
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar productos...">
+                <button type="button">🔍</button>
+            </div>
+
+            <div class="categories">
+                <button class="cat-btn active" data-category="all">✨ Todos</button>
+                <button class="cat-btn" data-category="proteinas">🌱 Proteínas</button>
+                <button class="cat-btn" data-category="tes">🍵 Tés y Aromáticas</button>
+                <button class="cat-btn" data-category="vitaminas">💊 Vitaminas</button>
+                <button class="cat-btn" data-category="organicos">🥗 Orgánicos</button>
+                <button class="cat-btn" data-category="mieles">🍯 Mieles</button>
+                <button class="cat-btn" data-category="cereales">🌾 Cereales</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================
+        CONTENEDOR PRINCIPAL (PRODUCTOS + CARRITO)
+    ========================================= -->
+    <div class="main-container">
+
+        <!-- COLUMNA DE PRODUCTOS -->
+        <div class="products-container">
+
+            <!-- ========================================
+                CATEGORÍA: PROTEÍNAS
+            ========================================= -->
+            <section class="category-section" id="proteinas">
+                <div class="category-header">
+                    <span class="emoji">🌱</span>
+                    <h2>Proteínas</h2>
+                </div>
+                <div class="products-grid">
+
+                    <div class="product-card">
+                        <img src="<?= $base ?>/assets/img/gym1.png" alt="Proteína Whey Amarilla" class="product-image">
+                        <h3>Proteína Whey Amarilla</h3>
+                        <div class="product-price">$80.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(1, 'Proteína Whey Amarilla', 80000, '<?= $base ?>/assets/img/gym1.png')">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src="<?= $base ?>/assets/img/gym2.jfif" alt="Proteína Whey Premium" class="product-image">
+                        <h3>Proteína Whey Premium</h3>
+                        <div class="product-price">$120.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(2, 'Proteína Whey Premium', 120000, '<?= $base ?>/assets/img/gym2.jfif')">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src="<?= $base ?>/assets/img/gym3.jfif" alt="Proteína Clásica" class="product-image">
+                        <h3>Proteína Clásica</h3>
+                        <div class="product-price">$90.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(3, 'Proteína Clásica', 90000, '<?= $base ?>/assets/img/gym3.jfif')">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src="<?= $base ?>/assets/img/gym4.jfif" alt="Combo de Proteínas" class="product-image">
+                        <h3>Combo de Proteínas</h3>
+                        <div class="product-price">$200.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(4, 'Combo de Proteínas', 200000, '<?= $base ?>/assets/img/gym4.jfif')">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src="<?= $base ?>/assets/img/gym5.jfif" alt="Proteína de Fresa" class="product-image">
+                        <h3>Proteína de Fresa</h3>
+                        <div class="product-price">$95.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(5, 'Proteína de Fresa', 95000, '<?= $base ?>/assets/img/gym5.jfif')">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src="<?= $base ?>/assets/img/gym6.jfif" alt="Proteína Whey Iso" class="product-image">
+                        <h3>Proteína Whey Iso</h3>
+                        <div class="product-price">$110.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(6, 'Proteína Whey Iso', 110000, '<?= $base ?>/assets/img/gym6.jfif')">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src="<?= $base ?>/assets/img/gym7.jfif" alt="Proteína Sabor Vainilla"
+                            class="product-image">
+                        <h3>Proteína Sabor Vainilla</h3>
+                        <div class="product-price">$40.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(7, 'Proteína Sabor Vainilla', 40000, '<?= $base ?>/assets/img/gym7.jfif')">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src="<?= $base ?>/assets/img/gym8.jfif" alt="Proteína Total" class="product-image">
+                        <h3>Proteína Total</h3>
+                        <div class="product-price">$80.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(8, 'Proteína Total', 80000, '<?= $base ?>/assets/img/gym8.jfif')">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ========================================
+                CATEGORÍA: TÉS Y AROMÁTICAS
+            ========================================= -->
+            <section class="category-section" id="tes">
+                <div class="category-header">
+                    <span class="emoji">🍵</span>
+                    <h2>Tés y Aromáticas</h2>
+                </div>
+                <div class="products-grid">
+
+                    <div class="product-card">
+                        <img src=""
+                            alt="Té Verde" class="product-image">
+                        <h3>Té Verde Orgánico</h3>
+                        <div class="product-price">$25.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(101, 'Té Verde Orgánico', 25000, '">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src=""
+                            alt="Té Negro" class="product-image">
+                        <h3>Té Negro Premium</h3>
+                        <div class="product-price">$28.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(102, 'Té Negro Premium', 28000, '">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src=""
+                            alt="Manzanilla" class="product-image">
+                        <h3>Manzanilla Natural</h3>
+                        <div class="product-price">$18.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(103, 'Manzanilla Natural', 18000, '">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src=""
+                            alt="Té Rojo" class="product-image">
+                        <h3>Té Rojo Pu-erh</h3>
+                        <div class="product-price">$32.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(104, 'Té Rojo Pu-erh', 32000, '">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ========================================
+                CATEGORÍA: VITAMINAS
+            ========================================= -->
+            <section class="category-section" id="vitaminas">
+                <div class="category-header">
+                    <span class="emoji">💊</span>
+                    <h2>Vitaminas</h2>
+                </div>
+                <div class="products-grid">
+
+                    <div class="product-card">
+                        <img src=""
+                            alt="Vitamina C" class="product-image">
+                        <h3>Vitamina C 1000mg</h3>
+                        <div class="product-price">$35.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(201, 'Vitamina C 1000mg', 35000, '">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src=""
+                            alt="Complejo B" class="product-image">
+                        <h3>Complejo B12</h3>
+                        <div class="product-price">$42.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(202, 'Complejo B12', 42000, '">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src=""
+                            alt="Vitamina D3" class="product-image">
+                        <h3>Vitamina D3 5000 IU</h3>
+                        <div class="product-price">$38.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(203, '">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src=""
+                            alt="Multivitamínico" class="product-image">
+                        <h3>Multivitamínico Completo</h3>
+                        <div class="product-price">$55.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(204, '">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src=""
+                            alt="Omega 3" class="product-image">
+                        <h3>Omega 3 Fish Oil</h3>
+                        <div class="product-price">$48.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(205, 'Omega 3 Fish Oil', 48000, '">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ========================================
+                CATEGORÍA: ORGÁNICOS
+            ========================================= -->
+            <section class="category-section" id="organicos">
+                <div class="category-header">
+                    <span class="emoji">🥗</span>
+                    <h2>Orgánicos</h2>
+                </div>
+                <div class="products-grid">
+
+                    <div class="product-card">
+                        <img src="" alt="Organico" class="product-image">
+                        <h3>Quinoa Orgánica 500g</h3>
+                        <div class="product-price">$22.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(301, 'Quinoa Orgánica 500g', 22000, '')">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src=""
+                            alt="Semillas de Chía" class="product-image">
+                        <h3>Semillas de Chía Orgánicas</h3>
+                        <div class="product-price">$18.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(302, 'Semillas de Chía Orgánicas', 18000, '">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src=""
+                            alt="Linaza" class="product-image">
+                        <h3>Linaza Dorada Orgánica</h3>
+                        <div class="product-price">$15.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(303, 'Linaza Dorada Orgánica', 15000, '">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src=""
+                            alt="Spirulina" class="product-image">
+                        <h3>Spirulina en Polvo 250g</h3>
+                        <div class="product-price">$45.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(304, 'Spirulina en Polvo 250g', 45000, '">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ========================================
+                CATEGORÍA: MIELES
+            ========================================= -->
+            <section class="category-section" id="mieles">
+                <div class="category-header">
+                    <span class="emoji">🍯</span>
+                    <h2>Mieles</h2>
+                </div>
+                <div class="products-grid">
+
+                    <div class="product-card">
+                        <img src="<?= $base ?>/assets/img/Miel.png" alt="Miel de Abeja" class="product-image">
+                        <h3>Miel de Abeja Pura 500g</h3>
+                        <div class="product-price">$28.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(401, 'Miel de Abeja Pura 500g', 28000, '<?= $base ?>/assets/img/Miel.png')">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src=""
+                            alt="Miel Orgánica" class="product-image">
+                        <h3>Miel Orgánica Premium</h3>
+                        <div class="product-price">$35.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(402, 'Miel Orgánica Premium', 35000, '">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src=""
+                            alt="Miel Manuka" class="product-image">
+                        <h3>Miel de Manuka UMF 15+</h3>
+                        <div class="product-price">$85.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(403, 'Miel de Manuka UMF 15+', 85000, '">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src=""
+                            alt="Propóleo" class="product-image">
+                        <h3>Propóleo Natural 30ml</h3>
+                        <div class="product-price">$32.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(404, 'Propóleo Natural 30ml', 32000, '">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ========================================
+                CATEGORÍA: CEREALES
+            ========================================= -->
+            <section class="category-section" id="cereales">
+                <div class="category-header">
+                    <span class="emoji">🌾</span>
+                    <h2>Cereales</h2>
+                </div>
+                <div class="products-grid">
+
+                    <div class="product-card">
+                        <img src=""
+                            alt="Avena" class="product-image">
+                        <h3>Avena en Hojuelas 1kg</h3>
+                        <div class="product-price">$12.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(501, 'Avena en Hojuelas 1kg', 12000, '">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src=""
+                            alt="Granola" class="product-image">
+                        <h3>Granola Artesanal 500g</h3>
+                        <div class="product-price">$20.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(502, 'Granola Artesanal 500g', 20000, '">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src=""
+                            alt="Amaranto" class="product-image">
+                        <h3>Amaranto Inflado 300g</h3>
+                        <div class="product-price">$16.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(503, 'Amaranto Inflado 300g', 16000, '">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src=""
+                            alt="Mix Cereales" class="product-image">
+                        <h3>Mix de Cereales Integrales</h3>
+                        <div class="product-price">$25.000</div>
+                        <button class="add-to-cart-btn"
+                            onclick="addToCart(504, 'Mix de Cereales Integrales', 25000, '')">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+
+        <!-- ========================================
+            CARRITO DE COMPRAS (SIDEBAR)
+        ========================================= -->
+        <aside class="cart-sidebar">
+            <div class="cart-header">
+                <h2>🛒 Carrito</h2>
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+
+            <div class="cart-items" id="cartItems">
+                <div class="cart-empty">
+                    <p>Tu carrito está vacío</p>
+                    <p style="font-size: 48px; margin-top: 20px;">🛍️</p>
+                </div>
+            </div>
+
+            <div class="cart-total">
+                <div class="cart-total-label">Total:</div>
+                <div class="cart-total-amount" id="cartTotal">$0</div>
+            </div>
+
+            <button class="checkout-btn" id="checkoutBtn" onclick="checkout()" disabled>
+                Finalizar Compra
+            </button>
+        </aside>
+
+    </div>
+
+    <!-- ========================================
+        JAVASCRIPT
+    ========================================= -->
+    <script src="<?= $base ?>/assets/js/carrito.js"></script>
+
+</body>
+
+</html>
