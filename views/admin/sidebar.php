@@ -22,7 +22,7 @@ $rol = strtolower($_SESSION['admin']['rol'] ?? 'empleado');
 
 /* ACL (Control de acceso por rol) */
 $ACL = [
-  'admin'    => ['dashboard','ventas','inventario','productos','clientes','usuarios','proveedores','configuracion','reportes'],
+  'admin'    => ['dashboard','ventas','inventario','productos','clientes','usuarios','proveedores','configuracion','ventas'],
   'cajero'   => ['dashboard','ventas','inventario.view','productos.view','clientes.view'],
   'empleado' => ['dashboard','inventario','productos','clientes.view'],
 ];
@@ -84,6 +84,16 @@ $can = function (string $perm) use ($rol, $ACL): bool {
         </a>
       </li>
     <?php endif; ?>
+
+
+    <?php if ($can('ventas')): ?>
+      <li class="<?= $active('ventas') ?>">
+        <a href="?r=admin/ventas" aria-current="<?= $sec==='ventas'?'page':'false' ?>">
+          <i class="bi bi-receipt-cutoff"></i><span class="label">Reporte Ventas</span>
+        </a>
+      </li>
+    <?php endif; ?>
+
 
 
       <?php if ($can('proveedores')): ?>

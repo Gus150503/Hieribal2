@@ -5,29 +5,6 @@ if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 $base = rtrim($this->config['app']['base_url'] ?? '', '/');
 $logeado = !empty($_SESSION['cliente']);
 ?>
-
-<?php if (!empty($_SESSION['flash_public'])):
-  $f = $_SESSION['flash_public'];
-  unset($_SESSION['flash_public']);
-?>
-<div id="alertaFlash" style="
-    margin: 20px auto;
-    max-width: 600px;
-    padding: 15px 20px;
-    border-radius: 10px;
-    background: <?= $f['type'] === 'success' ? '#d1e7dd' : '#f8d7da' ?>;
-    color: <?= $f['type'] === 'success' ? '#0f5132' : '#842029' ?>;
-    font-family: Poppins, sans-serif;
-    text-align: center;
-    box-shadow: 0 3px 10px rgba(0,0,0,.15);
-    transition: opacity .8s ease;
-    opacity: 1;
-  ">
-    <?= htmlspecialchars($f['msg']) ?>
-</div>
-<?php endif; ?>
-
-
 <!-- HERO / BIENVENIDA -->
 <section id="top" class="bienvenida">
     <div class="texto-bienvenida">
@@ -47,13 +24,13 @@ $logeado = !empty($_SESSION['cliente']);
 
     <div class="imagenes-bienvenida">
         <div class="img-card grande">
-            <img src="<?= $base ?>/assets/img/IA1.jpg" alt="Persona 1">
+            <img src="<?= $base ?>/assets/img/IA 1.jpg" alt="Persona 1">
         </div>
         <div class="img-card">
-            <img src="<?= $base ?>/assets/img/IA2.jpg" alt="Persona 2">
+            <img src="<?= $base ?>/assets/img/IA 2.jpg" alt="Persona 2">
         </div>
         <div class="img-card">
-            <img src="<?= $base ?>/assets/img/IA3.jpg" alt="Persona 3">
+            <img src="<?= $base ?>/assets/img/IA 3.jpg" alt="Persona 3">
         </div>
     </div>
 </section>
@@ -62,7 +39,7 @@ $logeado = !empty($_SESSION['cliente']);
 <main id="quienes-somos" class="main-content">
     <div class="image-section">
         <video autoplay loop playsinline controls class="video-pequeno">
-            <source src="<?= $base ?>/assets/video/Hieribal.mp4" type="video/mp4">
+            
             Tu navegador no soporta videos en HTML5.
         </video>
     </div>

@@ -9,6 +9,8 @@ use Controllers\AdminUsuariosController;
 use Controllers\AdminInventario;
 use Controllers\AdminProducto;
 use Controllers\AdminProveedores;
+use Controllers\AdminVentasController;
+
 
 /* =============================
  *  ENTORNO Y AUTOLOAD
@@ -175,6 +177,12 @@ switch ($r) {
     /* ====== Productos ====== */
     case 'admin_productos':       (new AdminProducto($config))->index(); break;
     case 'admin_productos_api':   (new AdminProducto($config))->api();   break;
+
+
+        /* ====== Ventas ====== */
+        case 'admin_ventas':      (new AdminVentasController($config))->index(); break;
+        case 'admin_ventas_api':  (new AdminVentasController($config))->api();   break;
+
 
     /* ====== Proveedores ====== */
     case 'admin_proveedores':        (new AdminProveedores($config))->index(); break;
