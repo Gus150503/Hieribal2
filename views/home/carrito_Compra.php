@@ -10,27 +10,9 @@
 </head>
 
 <body>
-
+    
     <!-- ========================================
-         HEADER - NAVEGACIÓN PRINCIPAL
-    ========================================= -->
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">
-                🌿 MI<span>HIERIBAL</span>
-            </div>
-            <div class="profile-mini">
-                <img src="<?= $base ?>/assets/img/Avatar.jfif" alt="Usuario">
-                <div>
-                    <div style="font-weight: 600;">Jose Perez</div>
-                    <div style="font-size: 13px; opacity: 0.9;">jose@gmail.com</div>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- ========================================
-         BUSCADOR Y FILTROS DE CATEGORÍAS
+        BUSCADOR Y FILTROS DE CATEGORÍAS
     ========================================= -->
     <section class="search-section">
         <div class="search-container">
