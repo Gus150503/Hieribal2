@@ -271,11 +271,11 @@
                 <div class="products-grid">
 
                     <div class="product-card">
-                        <img src="<?= $base ?>/assets/img/Aprendiz.jpg" alt="Organico" class="product-image">
+                        <img src="" alt="Organico" class="product-image">
                         <h3>Quinoa Orgánica 500g</h3>
                         <div class="product-price">$22.000</div>
                         <button class="add-to-cart-btn"
-                            onclick="addToCart(301, 'Quinoa Orgánica 500g', 22000, '<?= $base ?>/assets/img/Aprendiz.jpg')">
+                            onclick="addToCart(301, 'Quinoa Orgánica 500g', 22000, '')">
                             🛒 Añadir al carrito
                         </button>
                     </div>
