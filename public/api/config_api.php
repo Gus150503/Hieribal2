@@ -20,7 +20,7 @@ if (!$isAdmin) {
   exit;
 }
 
-// ===== Conexión PDO con tu Core\Database =====
+// ===== Conexión PDO Core\Database =====
 try {
   // Si por alguna razón $config no está disponible, lo cargamos aquí
   if (!isset($config)) {
