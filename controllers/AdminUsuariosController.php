@@ -40,15 +40,35 @@ final class AdminUsuariosController extends Controller
         $this->json(['ok' => false, 'msg' => $msg] + $extra, $status);
     }
 
-    private function ensureAdmin(): void
+    private function ensureAdmin(array $rolesPermitidos = ['Admin']): void
     {
-        if (session_status() !== \PHP_SESSION_ACTIVE) session_start();
-        if (empty($_SESSION['admin'])) {
+        if (session_status() !== \PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+
+        // ¿Existe sesión admin?
+        $user = $_SESSION['admin'] ?? null;
+
+        if (!$user) {
             $_SESSION['admin_error'] = 'Inicia sesión para continuar.';
-            header('Location: /?r=admin_login'); 
+            $base = rtrim($this->config['app']['base_url'] ?? '', '/');
+            header("Location: {$base}/?r=admin_login");
+            exit;
+        }
+
+        // Rol del usuario en minúscula para comparar
+        $rol = strtolower($user['rol'] ?? '');
+        $rolesPermitidos = array_map('strtolower', $rolesPermitidos);
+
+        // ❌ Si el rol NO está permitido → redirigir
+        if (!in_array($rol, $rolesPermitidos, true)) {
+            $_SESSION['admin_error'] = 'No tienes permisos para acceder a este módulo.';
+            $base = rtrim($this->config['app']['base_url'] ?? '', '/');
+            header("Location: {$base}/?r=dashboard"); 
             exit;
         }
     }
+
 
     /* ============================
        Vistas
@@ -56,7 +76,7 @@ final class AdminUsuariosController extends Controller
 
     public function index(): void
     {
-        $this->ensureAdmin();
+        $this->ensureAdmin(['Admin']); 
 
         $this->render('admin/usuarios/index', [
             'page_title' => 'Usuarios',
@@ -71,7 +91,7 @@ final class AdminUsuariosController extends Controller
        ============================ */
     public function api(): void
     {
-        $this->ensureAdmin();
+         $this->ensureAdmin(['Admin']); 
         header('Content-Type: application/json; charset=utf-8');
 
         try {
@@ -230,7 +250,7 @@ final class AdminUsuariosController extends Controller
 
     public function resendVerification(): void
     {
-        $this->ensureAdmin();
+           $this->ensureAdmin(['Admin']); 
         if (session_status() !== \PHP_SESSION_ACTIVE) session_start();
 
         $id = (int)($_GET['id'] ?? 0);
