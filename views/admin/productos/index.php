@@ -113,6 +113,7 @@ $base = $this->config['app']['base_url'] ?? '';
                             <label class="form-label">Stock actual</label>
                             <input type="number" class="form-control" name="stock_actual" id="stock_actual"
                                    min="0" value="0" required>
+                                   <div class="invalid-feedback">Stock Actual requerida.</div>
                         </div>
 
                         <div class="col-md-3">
@@ -134,14 +135,14 @@ $base = $this->config['app']['base_url'] ?? '';
                         <div class="col-md-3">
                             <label class="form-label">Precio Compra</label>
                             <input type="number" step="0.01" class="form-control" name="precio_compra"
-                                   id="precio_compra" min="0.01" value="0" required>
+                                   id="precio_compra" min="0.01" value="" required>
                             <div class="invalid-feedback">Precio Compra requerido.</div>
                         </div>
 
                         <div class="col-md-3">
                             <label class="form-label">Precio Venta</label>
                             <input type="number" step="0.01" class="form-control" name="precio_venta"
-                                   id="precio_venta" min="0.01" value="0" required>
+                                   id="precio_venta" min="0.01" value="" required>
                             <div class="invalid-feedback">Precio Venta requerido.</div>
                         </div>
 

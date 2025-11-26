@@ -688,7 +688,7 @@
     if (!plain.marca || !plain.marca.trim()) return 'Marca es requerida.';
     if (plain.precio_compra !== undefined && +plain.precio_compra <= 0) return 'Precio Compra debe ser mayor a 0';
     if (plain.precio_venta !== undefined && +plain.precio_venta <= 0) return 'Precio Venta debe ser mayor a 0';
-
+    if (plain.stock_actual !== undefined && +plain.stock_actual <= 0) return 'Se requiere un Stock actual';
     if (plain.f_vencimiento && !esFechaFuturaOHoy(plain.f_vencimiento)) {
       return 'La fecha de vencimiento debe ser hoy o una fecha futura.';
     }
@@ -734,6 +734,7 @@
     setValid($('#marca'), !!(plain.marca && plain.marca.trim()));
     setValid($('#precio_compra'), !(plain.precio_compra === '' || +plain.precio_compra <= 0));
     setValid($('#precio_venta'), !(plain.precio_venta === '' || +plain.precio_venta <= 0));
+    setValid($('#stock_actual'),!(plain.stock_actual === '' || +plain.stock_actual <= 0));
 
     // Fecha vencimiento (opcional pero debe ser hoy o futuro)
     const fvInput = document.getElementById('f_vencimiento');
@@ -741,6 +742,7 @@
     setValid(fvInput, fvOk, plain.f_vencimiento ? '' : 'Opcional');
 
     // Campos opcionales con “Opcional”
+    setValid($('#stock_minimo'), true,'Opcional');
     setValid($('#categoria'), true, 'Opcional');
     setValid($('#presentacion'), true, 'Opcional');
     setValid($('#descripcion'), true, 'Opcional');
