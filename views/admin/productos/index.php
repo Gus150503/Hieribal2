@@ -32,9 +32,9 @@ $base = $this->config['app']['base_url'] ?? '';
                     <th>Categoría</th>
                     <th>Marca</th>
                     <th>Presentación</th>
+                    <th>Descripción</th>
                     <th>Stock Actual</th>
                     <th>Stock Mínimo</th>
-                    <th>Descripción</th>
                     <th>Lote</th>
                     <th>Fecha de Vencimiento</th>
                     <th>Precio Compra</th>
@@ -103,6 +103,12 @@ $base = $this->config['app']['base_url'] ?? '';
                             <input class="form-control" name="presentacion" id="presentacion" maxlength="100">
                         </div>
 
+                        <div class="col-md-4">
+                            <label class="form-label">Descripción</label>
+                            <textarea class="form-control" name="descripcion" id="descripcion" rows="2"
+                            maxlength="100"></textarea>
+                        </div>
+
                         <div class="col-md-3">
                             <label class="form-label">Stock actual</label>
                             <input type="number" class="form-control" name="stock_actual" id="stock_actual"
@@ -113,12 +119,6 @@ $base = $this->config['app']['base_url'] ?? '';
                             <label class="form-label">Stock mínimo</label>
                             <input type="number" class="form-control" name="stock_minimo" id="stock_minimo"
                                    min="0" value="0" required>
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label">Descripción</label>
-                            <textarea class="form-control" name="descripcion" id="descripcion" rows="2"
-                                      maxlength="1000"></textarea>
                         </div>
 
                         <div class="col-md-3">

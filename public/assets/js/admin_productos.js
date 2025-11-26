@@ -316,10 +316,13 @@
         <td class="fw-semibold">${escapeHtml(p.nombre)}</td>
         <td>${escapeHtml(p.categoria ?? '')}</td>
         <td>${escapeHtml(p.marca ?? '')}</td>
+
+        <!-- Presentación / Descripción / Stock actual / Stock mínimo -->
         <td>${escapeHtml(p.presentacion ?? '')}</td>
+        <td class="descripcion">${escapeHtml(p.descripcion ?? '')}</td>
         <td>${fmtNumber(p.stock_actual)}</td>
         <td>${fmtNumber(p.stock_minimo)}</td>
-        <td class="descripcion">${escapeHtml(p.descripcion ?? '')}</td>
+
         <td>${escapeHtml(p.lote ?? '')}</td>
         <td>${escapeHtml(p.f_vencimiento ?? p.fecha_vencimiento ?? '')}</td>
         <td>$${fmtMoney(p.precio_compra)}</td>
@@ -345,6 +348,7 @@
           </div>
         </td>
       `;
+
       tblBody.appendChild(tr);
     }
   }

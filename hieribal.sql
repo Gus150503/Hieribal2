@@ -162,9 +162,9 @@ CREATE TABLE `productos` (
   `categoria` varchar(60) DEFAULT NULL,
   `marca` varchar(60) DEFAULT NULL,
   `presentacion` varchar(60) DEFAULT NULL,
+  `descripcion` text DEFAULT NULL,
   `stock_actual` varchar(20) DEFAULT NULL,
   `stock_minimo` int(10) UNSIGNED DEFAULT NULL,
-  `descripcion` text DEFAULT NULL,
   `lote` varchar(40) DEFAULT NULL,
   `f_vencimiento` date DEFAULT NULL,
   `precio_compra` decimal(10,2) DEFAULT NULL,
@@ -181,7 +181,7 @@ CREATE TABLE `productos` (
 -- Volcado de datos para la tabla `productos`
 --
 
-INSERT INTO `productos` (`id`, `nombre`, `categoria`, `marca`, `presentacion`, `stock_actual`, `stock_minimo`, `descripcion`, `lote`, `f_vencimiento`, `precio_compra`, `precio_venta`, `iva`, `codigo_sku`, `ubicacion`, `estado`, `imagen`, `creado`) VALUES
+INSERT INTO `productos` (`id`, `nombre`, `categoria`, `marca`, `presentacion`, `descripcion`, `stock_actual`, `stock_minimo`, `lote`, `f_vencimiento`, `precio_compra`, `precio_venta`, `iva`, `codigo_sku`, `ubicacion`, `estado`, `imagen`, `creado`) VALUES
 (2, 'Eucalipto', 'ramas', 'no se', 'fisica', '50', 40, 'eucalipto', '2', '2025-11-22', 1000.00, 2000.00, 0.00, '5342', 'ni idea', 'activo', 'http://localhost/Hieribal2/public/assets/img/prod_6918aa34e0270.png', '2025-08-27 23:37:31'),
 (3, 'Menta', NULL, NULL, NULL, '3', 12, NULL, NULL, NULL, NULL, 1200.00, 0.00, NULL, NULL, 'activo', 'menta.png\n', '2025-08-28 14:14:42'),
 (4, 'Toronjil', NULL, NULL, NULL, '4', 15, NULL, NULL, NULL, NULL, 1100.00, 0.00, NULL, NULL, 'activo', 'toronjil.png\n', '2025-08-28 14:15:14'),
