@@ -20,7 +20,7 @@ $vendedores = $vendedores ?? [];
     <div class="input-group mb-3" style="max-width:520px;">
       <span class="input-group-text"><i class="bi bi-search"></i></span>
       <input id="qVentas" type="search" class="form-control"
-             placeholder="Buscar por factura, producto, cliente o vendedor…">
+            placeholder="Buscar por factura, producto, cliente o vendedor…">
       <button id="btnBuscarVentas" class="btn btn-outline-primary">Buscar</button>
     </div>
 
