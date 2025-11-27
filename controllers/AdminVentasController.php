@@ -17,7 +17,7 @@ final class AdminVentasController extends Controller
     }
 
     /* ============================
-       Helpers JSON y sesión
+        Helpers JSON y sesión
        ============================ */
 
     private function json(array $data, int $status = 200): void
