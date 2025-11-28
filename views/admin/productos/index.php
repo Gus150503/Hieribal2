@@ -92,6 +92,7 @@ $base = $this->config['app']['base_url'] ?? '';
                         <div class="col-md-4">
                             <label class="form-label">Categoría</label>
                             <input class="form-control" name="categoria" id="categoria" maxlength="100">
+                            <div class="invalid-feedback">Categoría requerida.</div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Marca</label>
@@ -130,6 +131,7 @@ $base = $this->config['app']['base_url'] ?? '';
                         <div class="col-md-3">
                             <label class="form-label">Fecha Vencimiento</label>
                             <input type="date" class="form-control" name="f_vencimiento" id="f_vencimiento">
+                            <div class="invalid-feedback">Fecha requerida.</div>
                         </div>
 
                         <div class="col-md-3">
