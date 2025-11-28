@@ -3,7 +3,7 @@
 
     use PDO;
 
-    final class Devoluciones
+    final class AdminDevoluciones
     {
         private PDO $pdo;
 
