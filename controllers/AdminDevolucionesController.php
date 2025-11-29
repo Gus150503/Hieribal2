@@ -1,20 +1,31 @@
 <?php
-    declare(strict_types=1);
+declare(strict_types=1);
 
-    namespace Controllers;
+namespace Controllers;
 
-    use Core\Controller;
-    use Models\Devoluciones;
+use Core\Controller;
+use Core\Database;
+use Models\AdminDevoluciones;
+use PDOException;
 
-    final class AdminDevolucionesController extends Controller
+final class AdminDevolucionesController extends Controller
+{
+    private AdminDevoluciones $Devoluciones;
+
+    public function __construct(array $config)
     {
-        private Devoluciones $Devoluciones;
+        parent::__construct($config);
 
-        public function __construct(array $config)
-        {
-            parent::__construct($config);
-            $this->Devoluciones = new Devoluciones($config);
+        try {
+            // Igual que en AdminProducto
+            $pdo = Database::get($config['db']);
+            $this->Devoluciones = new AdminDevoluciones($pdo);
+        } catch (PDOException $e) {
+            die('Error de conexión a la base de datos: ' . $e->getMessage());
         }
+    }
+
+    // ... TODO LO DEMÁS IGUAL QUE YA LO TENÍAS ...
 
         /* =====================================================
         Helpers JSON + sesión admin

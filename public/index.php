@@ -10,6 +10,7 @@ use Controllers\AdminInventario;
 use Controllers\AdminProducto;
 use Controllers\AdminProveedores;
 use Controllers\AdminVentasController;
+use Controllers\AdminDevolucionesController;
 
 
 /* =============================
@@ -182,6 +183,16 @@ switch ($r) {
         /* ====== Ventas ====== */
         case 'admin_ventas':      (new AdminVentasController($config))->index(); break;
         case 'admin_ventas_api':  (new AdminVentasController($config))->api();   break;
+
+            /* ====== Devoluciones ====== */
+    case 'admin_devoluciones':
+        (new AdminDevolucionesController($config))->index();
+        break;
+
+    case 'admin_devoluciones_api':
+        (new AdminDevolucionesController($config))->api();
+        break;
+
 
 
     /* ====== Proveedores ====== */
