@@ -22,7 +22,7 @@ $rol = strtolower($_SESSION['admin']['rol'] ?? 'empleado');
 
 /* ACL (Control de acceso por rol) */
 $ACL = [
-  'admin'    => ['dashboard','ventas','inventario','productos','clientes','usuarios','proveedores','configuracion','ventas'],
+  'admin'    => ['dashboard','ventas','inventario','productos','clientes','usuarios','proveedores','configuracion','ventas','devoluciones'],
   'cajero'   => ['dashboard','ventas','inventario.view','productos.view','clientes.view'],
   'empleado' => ['dashboard','inventario','productos','clientes.view'],
 ];
@@ -121,6 +121,15 @@ $can = function (string $perm) use ($rol, $ACL): bool {
         </a>
       </li>
     <?php endif; ?>
+
+    <?php if ($can('devoluciones')): ?>
+  <li class="<?= $active('devoluciones') ?>">
+    <a href="?r=admin/devoluciones" aria-current="<?= $sec==='devoluciones'?'page':'false' ?>">
+      <i class="bi bi-arrow-counterclockwise"></i><span class="label">Devoluciones</span>
+    </a>
+  </li>
+<?php endif; ?>
+
 
     <?php if ($can('configuracion')): ?>
       <li class="<?= $active('configuracion') ?>">
