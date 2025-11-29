@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 03-10-2025 a las 03:13:48
+-- Tiempo de generación: 21-11-2025 a las 02:03:41
 -- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.0.30
+-- Versión de PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -60,6 +60,7 @@ CREATE TABLE `clientes` (
   `telefono` varchar(20) DEFAULT NULL,
   `correo` varchar(100) NOT NULL,
   `contraseña` varchar(255) NOT NULL,
+  `estado` varchar(20) NOT NULL DEFAULT 'Activo',
   `fecha_registro` datetime DEFAULT current_timestamp(),
   `verificado` tinyint(1) NOT NULL DEFAULT 0,
   `token_verificacion` varchar(64) DEFAULT NULL,
@@ -71,11 +72,9 @@ CREATE TABLE `clientes` (
 -- Volcado de datos para la tabla `clientes`
 --
 
-INSERT INTO `clientes` (`id_cliente`, `cedula`, `nombres`, `apellidos`, `telefono`, `correo`, `contraseña`, `fecha_registro`, `verificado`, `token_verificacion`, `token_recuperacion`, `recuperacion_expira`) VALUES
-(1, NULL, 'María Pérez', '', NULL, '', '', '2025-08-28 09:25:01', 0, NULL, NULL, NULL),
-(27, NULL, 'gustavo cuevas', '', '', 'gustavoalexiscuevas@gmail.com', '$2y$10$NbxIi/Xm1aEQFdHCjgfWFODabA7zTSNh5htmy1YUZeJvNpT5yELTK', '2025-08-29 20:13:32', 1, NULL, 'dbc8861aebe474f967dfa626d203f965d337f9413ef3636806e3ddcd271cdc5e', '2025-10-01 21:51:10'),
-(28, '1000078934', 'Gustavo', 'Cuevas', '3215489656', 'michel18lugo@gmail.com', '$2y$10$yGKdO161glHtDp4tx8QbT.Y/wS5ASD6mFvCvhG.tN7zB37pyJzYwy', '2025-08-29 20:15:07', 0, '7020570bec6d2a484ed48dcb1ff82bbb78dddfb7a9aba07ec22d17fcfeb66a42', '3af886de405f33ea9683ce7bedb728cfd381163ed0fc484d04b6e820ccbc280c', '2025-08-30 04:16:19'),
-(29, '1000789324', 'gustavo', 'cuevas', '3102324232', 'gustavoalexiiscuevas@gmail.com', '$2y$10$Ez.b0X1jeg3wxvxWUO8mhOK71RAgjHRz8xD5zKVP5.3ddIC44iwiS', '2025-10-01 20:52:58', 0, '7793c335a3ef13b9fd04f4fc8900d2495f4fcfc87f0aba838682710a95eef8e8', NULL, NULL);
+INSERT INTO `clientes` (`id_cliente`, `cedula`, `nombres`, `apellidos`, `telefono`, `correo`, `contraseña`, `estado`, `fecha_registro`, `verificado`, `token_verificacion`, `token_recuperacion`, `recuperacion_expira`) VALUES
+(41, '1000789324', 'Gustavo', 'Cuevas', '3145909865', 'gustavoalexiscuevas@gmail.com', '$2y$10$uW8EN8Qg4u0Tss9DsmThIeM3y/pIDK8AV7NvK0D3MFRnpFEH0j2Wy', 'Activo', '2025-11-10 20:27:11', 1, NULL, NULL, NULL),
+(43, '1223123123', 'jaiderstivenson', 'Pineda', '', 'jaiderpineda2003@gmail.com', '$2y$10$FB6kq7rjHjZCG5ctdnLxweFZgbB9aqbLGQFvGsQn9qZdlIjFGaWn2', 'Activo', '2025-11-12 18:16:18', 1, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -104,8 +103,8 @@ INSERT INTO `config` (`clave`, `valor`, `tipo`, `actualizado_en`) VALUES
 ('empresa_direccion', '', 'str', '2025-09-16 01:36:33'),
 ('empresa_nombre', 'Mi Hieribal', 'str', '2025-09-18 01:09:23'),
 ('empresa_ruc', '', 'str', '2025-09-16 01:36:33'),
-('ui_color_principal', '#198754', 'str', '2025-09-18 00:26:26'),
-('ui_tema', 'light', 'str', '2025-10-01 23:32:41');
+('ui_color_principal', '#00ff80', 'str', '2025-10-16 00:30:13'),
+('ui_tema', 'light', 'str', '2025-10-16 23:38:54');
 
 -- --------------------------------------------------------
 
@@ -149,7 +148,7 @@ INSERT INTO `inventario` (`id`, `id_producto`, `codigo_interno`, `stock`, `stock
 (17, 3, NULL, 12, 0, 0, 0, NULL, 'disponible'),
 (18, 4, NULL, 15, 0, 0, 0, NULL, 'disponible'),
 (19, 5, NULL, 10, 0, 0, 0, NULL, 'disponible'),
-(20, 6, NULL, 10, 0, 0, 0, NULL, 'disponible');
+(20, 6, '555', 10, 77, 77, 9, 'calll', 'disponible');
 
 -- --------------------------------------------------------
 
@@ -183,7 +182,7 @@ CREATE TABLE `productos` (
 --
 
 INSERT INTO `productos` (`id`, `nombre`, `categoria`, `marca`, `presentacion`, `stock_actual`, `stock_minimo`, `descripcion`, `lote`, `f_vencimiento`, `precio_compra`, `precio_venta`, `iva`, `codigo_sku`, `ubicacion`, `estado`, `imagen`, `creado`) VALUES
-(2, 'Eucalipto', 'ramas', 'no se', 'fisica', '50', 40, 'eucalipto', '2', '2025-08-31', 1000.00, 2000.00, 0.00, '5342', 'ni idea', 'activo', 'eucalipto.png\n', '2025-08-27 23:37:31'),
+(2, 'Eucalipto', 'ramas', 'no se', 'fisica', '50', 40, 'eucalipto', '2', '2025-11-22', 1000.00, 2000.00, 0.00, '5342', 'ni idea', 'activo', 'http://localhost/Hieribal2/public/assets/img/prod_6918aa34e0270.png', '2025-08-27 23:37:31'),
 (3, 'Menta', NULL, NULL, NULL, '3', 12, NULL, NULL, NULL, NULL, 1200.00, 0.00, NULL, NULL, 'activo', 'menta.png\n', '2025-08-28 14:14:42'),
 (4, 'Toronjil', NULL, NULL, NULL, '4', 15, NULL, NULL, NULL, NULL, 1100.00, 0.00, NULL, NULL, 'activo', 'toronjil.png\n', '2025-08-28 14:15:14'),
 (5, 'Manzanilla', NULL, NULL, NULL, '0', 5, NULL, NULL, NULL, NULL, 1500.00, 0.00, NULL, NULL, 'activo', 'manzanilla.png\n', '2025-08-28 14:15:56'),
@@ -219,6 +218,41 @@ CREATE TABLE `proveedores` (
   `creado` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `proveedores`
+--
+
+INSERT INTO `proveedores` (`id`, `empresa`, `nit`, `nombre_contacto`, `telefono`, `email`, `direccion`, `ciudad`, `condiciones_pago`, `estado`, `creado`) VALUES
+(3, 'ni ideaq', '123445', 'jmm', '3123214122', 'niidea@gmail.com', 'calle 80', 'bogota', 'tarjeta', 'activo', '2025-10-24 23:12:55');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `reporte_venta`
+--
+
+CREATE TABLE `reporte_venta` (
+  `id` int(11) NOT NULL,
+  `numero_factura` varchar(50) NOT NULL,
+  `producto_id` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL,
+  `precio` decimal(10,2) NOT NULL,
+  `total` decimal(10,2) NOT NULL,
+  `cliente_id` int(11) NOT NULL,
+  `vendedor_id` int(11) NOT NULL,
+  `metodo_pago` varchar(50) DEFAULT NULL,
+  `fecha` date NOT NULL,
+  `observaciones` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `reporte_venta`
+--
+
+INSERT INTO `reporte_venta` (`id`, `numero_factura`, `producto_id`, `cantidad`, `precio`, `total`, `cliente_id`, `vendedor_id`, `metodo_pago`, `fecha`, `observaciones`, `created_at`) VALUES
+(2, '2', 3, 56, 23.00, 1288.00, 43, 41, 'tarjeta', '2025-11-12', 'popocho', '2025-11-15 16:26:42');
+
 -- --------------------------------------------------------
 
 --
@@ -246,7 +280,8 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id_usuario`, `usuario`, `password`, `rol`, `nombres`, `apellidos`, `correo`, `correo_verificado`, `correo_verificacion_token`, `correo_verificacion_expira`, `fecha_creacion`, `estado`, `token_recuperacion`) VALUES
-(35, 'admin', '$2y$10$9xRKeEkag5E0xJ82iDOwtuJYXp9vsThZM7ocTJ6aBOCy6AZmHwwYO', 'Admin', 'gustavo', 'cuevas', 'gustavoalexiscuevas@gmail.com', 1, NULL, NULL, '2025-10-01 20:44:08', 'Activo', NULL);
+(41, 'Cajero', '$2y$10$r933abSbmZeZEPTPrCiCu.Aao/yyF/YstmCVAmhj./o30bQk2MS3G', 'Cajero', 'Juan Pepito', 'Martinez Hernandez', 'gustavoalexis@gmail.com', 0, '9fc34c171c710ac435f2928dc91dc195', '2025-11-20 19:15:22', '2025-11-13 20:40:29', 'Activo', NULL),
+(48, 'Admin2', '$2y$10$Lu2Vp7ehIGMrgCoFGYRQReRj7Yg3V9PFArO5lNlzKdIACJr2IrzFK', 'Admin', 'Gustavo', 'Cuevas', 'gustavoalexiscuevas@gmail.com', 1, NULL, NULL, '2025-11-19 19:44:44', 'Activo', NULL);
 
 -- --------------------------------------------------------
 
@@ -321,6 +356,15 @@ ALTER TABLE `proveedores`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indices de la tabla `reporte_venta`
+--
+ALTER TABLE `reporte_venta`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_reporte_producto` (`producto_id`),
+  ADD KEY `fk_reporte_cliente` (`cliente_id`),
+  ADD KEY `fk_reporte_vendedor` (`vendedor_id`);
+
+--
 -- Indices de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
@@ -350,7 +394,7 @@ ALTER TABLE `carrito`
 -- AUTO_INCREMENT de la tabla `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT de la tabla `historial_pedido`
@@ -362,25 +406,31 @@ ALTER TABLE `historial_pedido`
 -- AUTO_INCREMENT de la tabla `inventario`
 --
 ALTER TABLE `inventario`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT de la tabla `productos`
 --
 ALTER TABLE `productos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `proveedores`
 --
 ALTER TABLE `proveedores`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de la tabla `reporte_venta`
+--
+ALTER TABLE `reporte_venta`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT de la tabla `ventas`
@@ -404,6 +454,14 @@ ALTER TABLE `historial_pedido`
 ALTER TABLE `inventario`
   ADD CONSTRAINT `fk_inv_producto` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `inventario_ibfk_1` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `reporte_venta`
+--
+ALTER TABLE `reporte_venta`
+  ADD CONSTRAINT `fk_reporte_cliente` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id_cliente`),
+  ADD CONSTRAINT `fk_reporte_producto` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`),
+  ADD CONSTRAINT `fk_reporte_vendedor` FOREIGN KEY (`vendedor_id`) REFERENCES `usuarios` (`id_usuario`);
 
 --
 -- Filtros para la tabla `ventas`

@@ -11,6 +11,29 @@ $logeado = !empty($_SESSION['cliente']);
         <h1>¡Hola <span>somos Hieribal</span>!</h1>
         <p>Cuidarte naturalmente es la mejor forma de quererte. Hierbal lo hace posible.</p>
 
+                <?php
+        if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+
+        if (!empty($_SESSION['flash_public'])):
+            $f = $_SESSION['flash_public'];
+            unset($_SESSION['flash_public']); // Se muestra solo una vez
+        ?>
+            <div id="alertaFlash" style="
+                margin-top: 15px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 500;
+                opacity: 1;
+                transition: opacity .3s ease;
+                color: <?= $f['type'] === 'success' ? '#155724' : '#721c24' ?>;
+                background: <?= $f['type'] === 'success' ? '#d4edda' : '#f8d7da' ?>;
+                border: 1px solid <?= $f['type'] === 'success' ? '#c3e6cb' : '#f5c6cb' ?>;
+            ">
+                <?= htmlspecialchars($f['msg'], ENT_QUOTES, 'UTF-8') ?>
+            </div>
+        <?php endif; ?>
+
         <?php if (!$logeado): ?>
         <!-- ✅ Usuario NO logueado -->
         <a href="<?= $base ?>/?r=login" class="btn-ver-todo">Iniciar sesión (Cliente)</a>

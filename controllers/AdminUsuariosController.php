@@ -5,18 +5,18 @@ namespace Controllers;
 
 use Core\Controller;
 use Models\UsuarioAdmin;
-use Services\Mailer;
+use Services\ServicioCorreo;
 
 final class AdminUsuariosController extends Controller
 {
     private UsuarioAdmin $Usuario;
-    private Mailer $mailer;
+    private ServicioCorreo $correo;
 
     public function __construct(array $config)
     {
         parent::__construct($config);
         $this->Usuario = new UsuarioAdmin($config);
-        $this->mailer  = new Mailer($config);
+        $this->correo  = new ServicioCorreo($config); // 👈 usamos ServicioCorreo
     }
 
     /* ============================
@@ -40,14 +40,35 @@ final class AdminUsuariosController extends Controller
         $this->json(['ok' => false, 'msg' => $msg] + $extra, $status);
     }
 
-    private function ensureAdmin(): void
+    private function ensureAdmin(array $rolesPermitidos = ['Admin']): void
     {
-        if (session_status() !== \PHP_SESSION_ACTIVE) session_start();
-        if (empty($_SESSION['admin'])) {
+        if (session_status() !== \PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+
+        // ¿Existe sesión admin?
+        $user = $_SESSION['admin'] ?? null;
+
+        if (!$user) {
             $_SESSION['admin_error'] = 'Inicia sesión para continuar.';
-            header('Location: /?r=admin_login'); exit;
+            $base = rtrim($this->config['app']['base_url'] ?? '', '/');
+            header("Location: {$base}/?r=admin_login");
+            exit;
+        }
+
+        // Rol del usuario en minúscula para comparar
+        $rol = strtolower($user['rol'] ?? '');
+        $rolesPermitidos = array_map('strtolower', $rolesPermitidos);
+
+        // ❌ Si el rol NO está permitido → redirigir
+        if (!in_array($rol, $rolesPermitidos, true)) {
+            $_SESSION['admin_error'] = 'No tienes permisos para acceder a este módulo.';
+            $base = rtrim($this->config['app']['base_url'] ?? '', '/');
+            header("Location: {$base}/?r=dashboard"); 
+            exit;
         }
     }
+
 
     /* ============================
        Vistas
@@ -55,7 +76,7 @@ final class AdminUsuariosController extends Controller
 
     public function index(): void
     {
-        $this->ensureAdmin();
+        $this->ensureAdmin(['Admin']); 
 
         $this->render('admin/usuarios/index', [
             'page_title' => 'Usuarios',
@@ -70,7 +91,7 @@ final class AdminUsuariosController extends Controller
        ============================ */
     public function api(): void
     {
-        $this->ensureAdmin(); // si quieres permitir lectura pública, muévelo por acción
+         $this->ensureAdmin(['Admin']); 
         header('Content-Type: application/json; charset=utf-8');
 
         try {
@@ -196,7 +217,6 @@ final class AdminUsuariosController extends Controller
 
             $this->fail('Acción no válida', 400);
         } catch (\Throwable $e) {
-            // Si algo se cuela hasta aquí, manda 500 consistente
             $this->fail($e->getMessage(), 500);
         }
     }
@@ -220,16 +240,18 @@ final class AdminUsuariosController extends Controller
         $_SESSION['flash_public'] = [
             'type' => $ok ? 'success' : 'danger',
             'msg'  => $ok ? 'Correo verificado correctamente. Ya puedes ingresar.'
-                        : 'Token inválido o vencido.',
+                          : 'Token inválido o vencido.',
         ];
 
         $base = rtrim($this->config['app']['base_url'] ?? '', '/');
-        header("Location: {$base}/?r=home"); // o ?r=login, según quieras
+        header("Location: {$base}/?r=home"); // o ?r=login
         exit;
-}
+    }
+
     public function resendVerification(): void
     {
-        $this->ensureAdmin();
+           $this->ensureAdmin(['Admin']); 
+        if (session_status() !== \PHP_SESSION_ACTIVE) session_start();
 
         $id = (int)($_GET['id'] ?? 0);
         if ($id <= 0) {
@@ -252,7 +274,10 @@ final class AdminUsuariosController extends Controller
 
             $this->sendVerificationEmail($u);
 
-            $_SESSION['flash'] = ['type'=>'success','msg'=>'Correo de verificación reenviado (si el SMTP está configurado).'];
+            $_SESSION['flash'] = [
+                'type'=>'success',
+                'msg'=>'Correo de verificación reenviado (si el SMTP está configurado).'
+            ];
         } catch (\Throwable $e) {
             $_SESSION['flash'] = ['type'=>'danger','msg'=>'No se pudo reenviar la verificación.'];
         }
@@ -272,18 +297,16 @@ final class AdminUsuariosController extends Controller
         $link = $base . '/?r=admin_usuarios_verify_email&token=' . $u['correo_verificacion_token'];
 
         $nombre = trim(($u['nombres'] ?? '') . ' ' . ($u['apellidos'] ?? '')) ?: ($u['usuario'] ?? 'Usuario');
-        $html = "<p>Hola {$nombre},</p>
-                 <p>Confirma tu correo haciendo clic aquí:</p>
-                 <p><a href=\"{$link}\">Verificar correo</a></p>";
 
+        // 👉 AHORA usamos ServicioCorreo
         try {
-            $this->mailer->send($u['correo'], $nombre, 'Verifica tu correo', $html);
+            $this->correo->enviarVerificacion($u['correo'], $nombre, $link);
         } catch (\Throwable $e) {
-            // No interrumpas el flujo por fallo de correo; log si quieres
+            // opcional: loguear error
+            // error_log('Error enviando verificación: ' . $e->getMessage());
         }
     }
 
-    /** Sanitización/validación de entrada */
     private function sanitize(array $in, bool $creating): array
     {
         $nameRe = '/^[A-Za-zÁÉÍÓÚÑáéíóúñ ]{2,60}$/u';
@@ -292,7 +315,6 @@ final class AdminUsuariosController extends Controller
         $rolIn    = strtolower(trim($in['rol'] ?? 'empleado'));
         $estadoIn = strtolower(trim($in['estado'] ?? 'activo'));
 
-        // Acepta 'cajero' también
         $rolOk    = in_array($rolIn, ['admin','empleado','cajero'], true) ? $rolIn : 'empleado';
         $estadoOk = in_array($estadoIn, ['activo','inactivo'], true) ? $estadoIn : 'activo';
 
@@ -313,19 +335,18 @@ final class AdminUsuariosController extends Controller
 
         return [
             'usuario'   => $usuario,
-            'password'  => $password,        // vacío en update = no cambia
-            'rol'       => $rolLabel,        // Admin | Empleado | Cajero
+            'password'  => $password,
+            'rol'       => $rolLabel,
             'nombres'   => $nombres,
             'apellidos' => $apellidos,
             'correo'    => $correo,
-            'estado'    => $estadoLabel,     // Activo | Inactivo
+            'estado'    => $estadoLabel,
         ];
     }
 
-    /** Mapea errores de BD a mensajes amigables */
     private function friendlyDbError(\Throwable $e): string
     {
-        if ($e instanceof \PDOException && $e->getCode() === '23000') { // Unique/FK
+        if ($e instanceof \PDOException && $e->getCode() === '23000') {
             $msg = $e->getMessage();
             if (stripos($msg, 'usuario') !== false) return 'Ese usuario ya existe.';
             if (stripos($msg, 'correo')  !== false) return 'Ese correo ya está registrado.';
