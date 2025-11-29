@@ -61,14 +61,13 @@ final class AdminDevolucionesController extends Controller
 
         /* =====================================================
         Vista principal
-        ===================================================== */
-        public function index(): void
+                ===================================================== */
+            public function index(): void
         {
             $this->ensureAdmin();
 
-            // Si necesitas combos (productos, clientes)
+            // Si necesitas combos (solo productos)
             $productos = $this->Devoluciones->getProductos();
-            $clientes  = $this->Devoluciones->getClientes();
 
             $base = $this->config['app']['base_url'] ?? '';
 
@@ -77,7 +76,6 @@ final class AdminDevolucionesController extends Controller
                 'esAdmin'     => true,
 
                 'productos'   => $productos,
-                'clientes'    => $clientes,
 
                 'extra_css' => [$base . '/assets/css/admin_devoluciones.css?v=1'],
                 'extra_js'  => [$base . '/assets/js/admin_devoluciones.js?v=1'],
