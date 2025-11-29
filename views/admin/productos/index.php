@@ -32,9 +32,9 @@ $base = $this->config['app']['base_url'] ?? '';
                     <th>Categoría</th>
                     <th>Marca</th>
                     <th>Presentación</th>
+                    <th>Descripción</th>
                     <th>Stock Actual</th>
                     <th>Stock Mínimo</th>
-                    <th>Descripción</th>
                     <th>Lote</th>
                     <th>Fecha de Vencimiento</th>
                     <th>Precio Compra</th>
@@ -92,6 +92,7 @@ $base = $this->config['app']['base_url'] ?? '';
                         <div class="col-md-4">
                             <label class="form-label">Categoría</label>
                             <input class="form-control" name="categoria" id="categoria" maxlength="100">
+                            <div class="invalid-feedback">Categoría requerida.</div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Marca</label>
@@ -103,22 +104,23 @@ $base = $this->config['app']['base_url'] ?? '';
                             <input class="form-control" name="presentacion" id="presentacion" maxlength="100">
                         </div>
 
+                        <div class="col-md-4">
+                            <label class="form-label">Descripción</label>
+                            <textarea class="form-control" name="descripcion" id="descripcion" rows="2"
+                            maxlength="100"></textarea>
+                        </div>
+
                         <div class="col-md-3">
                             <label class="form-label">Stock actual</label>
                             <input type="number" class="form-control" name="stock_actual" id="stock_actual"
                                    min="0" value="0" required>
+                                   <div class="invalid-feedback">Stock Actual requerida.</div>
                         </div>
 
                         <div class="col-md-3">
                             <label class="form-label">Stock mínimo</label>
                             <input type="number" class="form-control" name="stock_minimo" id="stock_minimo"
                                    min="0" value="0" required>
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label">Descripción</label>
-                            <textarea class="form-control" name="descripcion" id="descripcion" rows="2"
-                                      maxlength="1000"></textarea>
                         </div>
 
                         <div class="col-md-3">
@@ -129,19 +131,20 @@ $base = $this->config['app']['base_url'] ?? '';
                         <div class="col-md-3">
                             <label class="form-label">Fecha Vencimiento</label>
                             <input type="date" class="form-control" name="f_vencimiento" id="f_vencimiento">
+                            <div class="invalid-feedback">Fecha requerida.</div>
                         </div>
 
                         <div class="col-md-3">
                             <label class="form-label">Precio Compra</label>
                             <input type="number" step="0.01" class="form-control" name="precio_compra"
-                                   id="precio_compra" min="0.01" value="0" required>
+                                   id="precio_compra" min="0.01" value="" required>
                             <div class="invalid-feedback">Precio Compra requerido.</div>
                         </div>
 
                         <div class="col-md-3">
                             <label class="form-label">Precio Venta</label>
                             <input type="number" step="0.01" class="form-control" name="precio_venta"
-                                   id="precio_venta" min="0.01" value="0" required>
+                                   id="precio_venta" min="0.01" value="" required>
                             <div class="invalid-feedback">Precio Venta requerido.</div>
                         </div>
 
