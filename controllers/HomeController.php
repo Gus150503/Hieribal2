@@ -27,11 +27,11 @@ final class HomeController extends Controller
             $this->redirect('/?r=login');
             return;
         }
+$this->render(
+    'home/carrito_Compra',     // ← EXACTO ASÍ
+    [ 'cliente' => $_SESSION['cliente'] ?? null ],
+    'Panel'
+);
 
-        $this->render(
-            'home/carrito',           // ← vista (string)
-            [ 'cliente' => $_SESSION['cliente'] ?? null ], // ← data (array)
-            'Panel'                      // ← título (opcional)
-        );
     }
 }
