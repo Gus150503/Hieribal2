@@ -83,39 +83,7 @@ body {
 /* ================================
    HEADER
 ================================== */
-.header {
-    background: linear-gradient(135deg, var(--verde-principal) 0%, #5da636 100%);
-    padding: 20px 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
 
-.header-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: white;
-    font-size: 28px;
-    font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-    cursor: default;
-    user-select: none;
-}
-
-.logo span {
-    color: var(--naranja);
-}
 
 /* ================================
    PERFIL DE USUARIO

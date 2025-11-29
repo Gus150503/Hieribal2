@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 21-11-2025 a las 02:03:41
+-- Tiempo de generación: 29-11-2025 a las 16:49:00
 -- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.2.12
+-- Versión de PHP: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -73,8 +73,9 @@ CREATE TABLE `clientes` (
 --
 
 INSERT INTO `clientes` (`id_cliente`, `cedula`, `nombres`, `apellidos`, `telefono`, `correo`, `contraseña`, `estado`, `fecha_registro`, `verificado`, `token_verificacion`, `token_recuperacion`, `recuperacion_expira`) VALUES
-(41, '1000789324', 'Gustavo', 'Cuevas', '3145909865', 'gustavoalexiscuevas@gmail.com', '$2y$10$uW8EN8Qg4u0Tss9DsmThIeM3y/pIDK8AV7NvK0D3MFRnpFEH0j2Wy', 'Activo', '2025-11-10 20:27:11', 1, NULL, NULL, NULL),
-(43, '1223123123', 'jaiderstivenson', 'Pineda', '', 'jaiderpineda2003@gmail.com', '$2y$10$FB6kq7rjHjZCG5ctdnLxweFZgbB9aqbLGQFvGsQn9qZdlIjFGaWn2', 'Activo', '2025-11-12 18:16:18', 1, NULL, NULL, NULL);
+(43, '1223123123', 'jaiderstivenson', 'Pineda', '', 'jaiderpineda2003@gmail.com', '$2y$10$FB6kq7rjHjZCG5ctdnLxweFZgbB9aqbLGQFvGsQn9qZdlIjFGaWn2', 'Activo', '2025-11-12 18:16:18', 1, NULL, NULL, NULL),
+(44, '1023123123', 'michel', 'lugo', '2342424242', 'michel18lugo@gmail.com', '$2y$10$i4/.yXoV9J3qrXMSH2La4exjhq8UdcxoHMFT2ZMNpZedXykcVCX/u', 'Activo', '2025-11-29 08:13:34', 0, '9ed833e59821546fa690bbbe3f406e97f9dcbb94524f7d4863be30eb6b14e5e9', NULL, NULL),
+(45, '1231231231', 'Gustavo', 'Cuevas', '3132131312', 'gustavoalexiscuevas@gmail.com', '$2y$10$F7671oqeLkeLQEwS.uc/y.Zh2vZikwpEqewW29ikm.BZHGkWfmF/i', 'Activo', '2025-11-29 08:22:52', 1, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -105,6 +106,26 @@ INSERT INTO `config` (`clave`, `valor`, `tipo`, `actualizado_en`) VALUES
 ('empresa_ruc', '', 'str', '2025-09-16 01:36:33'),
 ('ui_color_principal', '#00ff80', 'str', '2025-10-16 00:30:13'),
 ('ui_tema', 'light', 'str', '2025-10-16 23:38:54');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `devoluciones`
+--
+
+CREATE TABLE `devoluciones` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `numero_orden` varchar(50) NOT NULL,
+  `nombre_cliente` varchar(150) NOT NULL,
+  `correo` varchar(150) NOT NULL,
+  `telefono` varchar(30) NOT NULL,
+  `producto` varchar(150) NOT NULL,
+  `motivo_devolucion` text NOT NULL,
+  `fecha_compra` date NOT NULL,
+  `fecha_devolucion` date NOT NULL,
+  `estado` varchar(50) NOT NULL,
+  `observaciones` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -144,7 +165,6 @@ CREATE TABLE `inventario` (
 --
 
 INSERT INTO `inventario` (`id`, `id_producto`, `codigo_interno`, `stock`, `stock_minimo`, `stock_maximo`, `punto_reorden`, `ubicacion`, `estado`) VALUES
-(16, 2, NULL, 40, 0, 0, 0, NULL, 'disponible'),
 (17, 3, NULL, 12, 0, 0, 0, NULL, 'disponible'),
 (18, 4, NULL, 15, 0, 0, 0, NULL, 'disponible'),
 (19, 5, NULL, 10, 0, 0, 0, NULL, 'disponible'),
@@ -181,8 +201,12 @@ CREATE TABLE `productos` (
 -- Volcado de datos para la tabla `productos`
 --
 
+
+INSERT INTO `productos` (`id`, `nombre`, `categoria`, `marca`, `presentacion`, `stock_actual`, `stock_minimo`, `descripcion`, `lote`, `f_vencimiento`, `precio_compra`, `precio_venta`, `iva`, `codigo_sku`, `ubicacion`, `estado`, `imagen`, `creado`) VALUES
+
 INSERT INTO `productos` (`id`, `nombre`, `categoria`, `marca`, `presentacion`, `descripcion`, `stock_actual`, `stock_minimo`, `lote`, `f_vencimiento`, `precio_compra`, `precio_venta`, `iva`, `codigo_sku`, `ubicacion`, `estado`, `imagen`, `creado`) VALUES
 (2, 'Eucalipto', 'ramas', 'no se', 'fisica', '50', 40, 'eucalipto', '2', '2025-11-22', 1000.00, 2000.00, 0.00, '5342', 'ni idea', 'activo', 'http://localhost/Hieribal2/public/assets/img/prod_6918aa34e0270.png', '2025-08-27 23:37:31'),
+
 (3, 'Menta', NULL, NULL, NULL, '3', 12, NULL, NULL, NULL, NULL, 1200.00, 0.00, NULL, NULL, 'activo', 'menta.png\n', '2025-08-28 14:14:42'),
 (4, 'Toronjil', NULL, NULL, NULL, '4', 15, NULL, NULL, NULL, NULL, 1100.00, 0.00, NULL, NULL, 'activo', 'toronjil.png\n', '2025-08-28 14:15:14'),
 (5, 'Manzanilla', NULL, NULL, NULL, '0', 5, NULL, NULL, NULL, NULL, 1500.00, 0.00, NULL, NULL, 'activo', 'manzanilla.png\n', '2025-08-28 14:15:56'),
@@ -280,7 +304,7 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id_usuario`, `usuario`, `password`, `rol`, `nombres`, `apellidos`, `correo`, `correo_verificado`, `correo_verificacion_token`, `correo_verificacion_expira`, `fecha_creacion`, `estado`, `token_recuperacion`) VALUES
-(41, 'Cajero', '$2y$10$r933abSbmZeZEPTPrCiCu.Aao/yyF/YstmCVAmhj./o30bQk2MS3G', 'Cajero', 'Juan Pepito', 'Martinez Hernandez', 'gustavoalexis@gmail.com', 0, '9fc34c171c710ac435f2928dc91dc195', '2025-11-20 19:15:22', '2025-11-13 20:40:29', 'Activo', NULL),
+(41, 'Cajero', '$2y$10$wU7zQDAO0N38v1mEkYvkeORKQE6/1DP2.GfHK/RnbkrVAjZuNDSy2', 'Cajero', 'Juan Pepito', 'Martinez Hernandezz', 'gustavoalexis@gmail.com', 0, '9fc34c171c710ac435f2928dc91dc195', '2025-11-20 19:15:22', '2025-11-13 20:40:29', 'Activo', NULL),
 (48, 'Admin2', '$2y$10$Lu2Vp7ehIGMrgCoFGYRQReRj7Yg3V9PFArO5lNlzKdIACJr2IrzFK', 'Admin', 'Gustavo', 'Cuevas', 'gustavoalexiscuevas@gmail.com', 1, NULL, NULL, '2025-11-19 19:44:44', 'Activo', NULL);
 
 -- --------------------------------------------------------
@@ -327,6 +351,12 @@ ALTER TABLE `clientes`
 --
 ALTER TABLE `config`
   ADD PRIMARY KEY (`clave`);
+
+--
+-- Indices de la tabla `devoluciones`
+--
+ALTER TABLE `devoluciones`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `historial_pedido`
@@ -394,7 +424,13 @@ ALTER TABLE `carrito`
 -- AUTO_INCREMENT de la tabla `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+
+--
+-- AUTO_INCREMENT de la tabla `devoluciones`
+--
+ALTER TABLE `devoluciones`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `historial_pedido`
