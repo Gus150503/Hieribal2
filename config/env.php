@@ -26,7 +26,7 @@ return [
    'google' => [
     'client_id'     => '78844207545-tf7tbie9fejdt2k6pericg7hvmemhgur.apps.googleusercontent.com',
     'client_secret' => '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',
-    'redirect_uri'  => 'http://localhost:8080/Hieribal2/public/?r=google_callback',
+    'redirect_uri'  => 'http://localhost/Hieribal2/public/?r=google_callback',
 ],
 
 
