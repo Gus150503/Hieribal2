@@ -226,9 +226,9 @@ final class AdminProducto extends Controller
         $categoria      = trim($in['categoria'] ?? '');
         $marca          = trim($in['marca'] ?? '');
         $presentacion   = trim($in['presentacion'] ?? '');
+        $descripcion    = trim($in['descripcion'] ?? '');
         $stock_actual   = is_numeric($in['stock_actual'] ?? null) ? (int)$in['stock_actual'] : 0;
         $stock_minimo   = is_numeric($in['stock_minimo'] ?? null) ? (int)$in['stock_minimo'] : 0;
-        $descripcion    = trim($in['descripcion'] ?? '');
         $lote           = trim($in['lote'] ?? '');
         $f_vencimiento  = trim($in['f_vencimiento'] ?? '');
         $precio_compra  = is_numeric($in['precio_compra'] ?? null) ? (float)$in['precio_compra'] : 0.0;
@@ -260,9 +260,9 @@ final class AdminProducto extends Controller
             'categoria'      => $categoria,
             'marca'          => $marca,
             'presentacion'   => $presentacion,
+            'descripcion'    => $descripcion,
             'stock_actual'   => $stock_actual,
             'stock_minimo'   => $stock_minimo,
-            'descripcion'    => $descripcion,
             'lote'           => $lote,
             'f_vencimiento'  => $f_vencimiento,
             'precio_compra'  => $precio_compra,
