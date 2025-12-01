@@ -42,13 +42,14 @@
       transform: scale(1.05);
     }
 
-    .header nav ul {
-      list-style: none;
-      display: flex;
-      gap: 25px;
-      margin: 10px;
-      padding: 0;
-    }
+   .header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 2px;
+    margin: 10px;
+    padding: 0;
+    margin-left: 400px;
+}
 
     .header nav ul li a {
       color: #333;
@@ -442,3 +443,13 @@
 
 
 
+.menu-publico {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+    padding: 0;
+    margin: 0;
+    align-items: center;
+    justify-content: flex-end; /* empuja el menú a la derecha */
+    width: 100%;
+}
