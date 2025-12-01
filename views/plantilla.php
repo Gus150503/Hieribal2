@@ -120,7 +120,7 @@ $ui_tema_fallback = $ui_tema ?? 'light';
           <img src="<?= $asset('assets/img/logo1.png') ?>" alt="Logo MI HIERBAL" style="height:50px;">
         </a>
         <nav aria-label="Navegación principal">
-          <ul style="list-style:none;display:flex;gap:2px;margin-left: 1010px;;padding:0;align-items:center;">
+          <ul class="menu-publico">
             <li><a href="<?= htmlspecialchars($base) ?>/?r=home#top">Inicio</a></li>
             <li><a href="<?= htmlspecialchars($base) ?>/?r=home#quienes-somos">Quiénes Somos</a></li>
             <?php if (!empty($_SESSION['cliente'])): ?>
