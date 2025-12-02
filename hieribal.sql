@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 29-11-2025 a las 16:49:00
+-- Tiempo de generación: 02-12-2025 a las 01:13:04
 -- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.0.30
+-- Versión de PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -73,6 +73,7 @@ CREATE TABLE `clientes` (
 --
 
 INSERT INTO `clientes` (`id_cliente`, `cedula`, `nombres`, `apellidos`, `telefono`, `correo`, `contraseña`, `estado`, `fecha_registro`, `verificado`, `token_verificacion`, `token_recuperacion`, `recuperacion_expira`) VALUES
+(1, '4123123132', 'ni idea', 'como quieras', NULL, 'holaa', '', 'Activo', '2025-12-01 19:12:27', 0, NULL, NULL, NULL),
 (43, '1223123123', 'jaiderstivenson', 'Pineda', '', 'jaiderpineda2003@gmail.com', '$2y$10$FB6kq7rjHjZCG5ctdnLxweFZgbB9aqbLGQFvGsQn9qZdlIjFGaWn2', 'Activo', '2025-11-12 18:16:18', 1, NULL, NULL, NULL),
 (44, '1023123123', 'michel', 'lugo', '2342424242', 'michel18lugo@gmail.com', '$2y$10$i4/.yXoV9J3qrXMSH2La4exjhq8UdcxoHMFT2ZMNpZedXykcVCX/u', 'Activo', '2025-11-29 08:13:34', 0, '9ed833e59821546fa690bbbe3f406e97f9dcbb94524f7d4863be30eb6b14e5e9', NULL, NULL),
 (45, '1231231231', 'Gustavo', 'Cuevas', '3132131312', 'gustavoalexiscuevas@gmail.com', '$2y$10$F7671oqeLkeLQEwS.uc/y.Zh2vZikwpEqewW29ikm.BZHGkWfmF/i', 'Activo', '2025-11-29 08:22:52', 1, NULL, NULL, NULL);
@@ -167,7 +168,7 @@ CREATE TABLE `inventario` (
 INSERT INTO `inventario` (`id`, `id_producto`, `codigo_interno`, `stock`, `stock_minimo`, `stock_maximo`, `punto_reorden`, `ubicacion`, `estado`) VALUES
 (17, 3, NULL, 12, 0, 0, 0, NULL, 'disponible'),
 (18, 4, NULL, 15, 0, 0, 0, NULL, 'disponible'),
-(19, 5, NULL, 10, 0, 0, 0, NULL, 'disponible'),
+(19, 5, NULL, 10, 23, 0, 0, NULL, 'disponible'),
 (20, 6, '555', 10, 77, 77, 9, 'calll', 'disponible');
 
 -- --------------------------------------------------------
@@ -201,16 +202,12 @@ CREATE TABLE `productos` (
 -- Volcado de datos para la tabla `productos`
 --
 
-
-INSERT INTO `productos` (`id`, `nombre`, `categoria`, `marca`, `presentacion`, `stock_actual`, `stock_minimo`, `descripcion`, `lote`, `f_vencimiento`, `precio_compra`, `precio_venta`, `iva`, `codigo_sku`, `ubicacion`, `estado`, `imagen`, `creado`) VALUES
-
 INSERT INTO `productos` (`id`, `nombre`, `categoria`, `marca`, `presentacion`, `descripcion`, `stock_actual`, `stock_minimo`, `lote`, `f_vencimiento`, `precio_compra`, `precio_venta`, `iva`, `codigo_sku`, `ubicacion`, `estado`, `imagen`, `creado`) VALUES
-(2, 'Eucalipto', 'ramas', 'no se', 'fisica', '50', 40, 'eucalipto', '2', '2025-11-22', 1000.00, 2000.00, 0.00, '5342', 'ni idea', 'activo', 'http://localhost/Hieribal2/public/assets/img/prod_6918aa34e0270.png', '2025-08-27 23:37:31'),
-
-(3, 'Menta', NULL, NULL, NULL, '3', 12, NULL, NULL, NULL, NULL, 1200.00, 0.00, NULL, NULL, 'activo', 'menta.png\n', '2025-08-28 14:14:42'),
-(4, 'Toronjil', NULL, NULL, NULL, '4', 15, NULL, NULL, NULL, NULL, 1100.00, 0.00, NULL, NULL, 'activo', 'toronjil.png\n', '2025-08-28 14:15:14'),
-(5, 'Manzanilla', NULL, NULL, NULL, '0', 5, NULL, NULL, NULL, NULL, 1500.00, 0.00, NULL, NULL, 'activo', 'manzanilla.png\n', '2025-08-28 14:15:56'),
-(6, 'Diente de leon', NULL, NULL, NULL, '0', 5, NULL, NULL, NULL, NULL, 1500.00, 0.00, NULL, NULL, 'activo', 'leon.png', '2025-08-28 14:15:56');
+(2, 'Eucalipto', 'ramas', 'no se', 'fisica', '', '40', 100, '2', '2025-11-22', 1000.00, 2000.00, 0.00, '5342', 'ni idea', 'activo', 'http://localhost/Hieribal2/public/assets/img/prod_6918aa34e0270.png', '2025-08-27 23:37:31'),
+(3, 'Menta', NULL, NULL, NULL, '', '12', 100, NULL, NULL, NULL, 1200.00, 0.00, NULL, NULL, 'activo', 'menta.png', '2025-08-28 14:14:42'),
+(4, 'Toronjil', NULL, NULL, NULL, '', '15', 100, NULL, NULL, NULL, 1100.00, 0.00, NULL, NULL, 'activo', 'toronjil.png', '2025-08-28 14:15:14'),
+(5, 'Manzanilla', NULL, NULL, NULL, '', '5', 100, NULL, NULL, NULL, 1500.00, 0.00, NULL, NULL, 'activo', 'manzanilla.png', '2025-08-28 14:15:56'),
+(6, 'Diente de leon', NULL, NULL, NULL, '', '5', 100, NULL, NULL, NULL, 1500.00, 0.00, NULL, NULL, 'activo', 'leon.png', '2025-08-28 14:15:56');
 
 --
 -- Disparadores `productos`
@@ -336,7 +333,9 @@ INSERT INTO `ventas` (`id_venta`, `id_carrito`, `total`, `fecha_venta`, `metodo_
 -- Indices de la tabla `carrito`
 --
 ALTER TABLE `carrito`
-  ADD PRIMARY KEY (`id_carrito`);
+  ADD PRIMARY KEY (`id_carrito`),
+  ADD KEY `fk_carrito_productos` (`id_producto`),
+  ADD KEY `fk_carrito_clientes` (`id_cliente`);
 
 --
 -- Indices de la tabla `clientes`
@@ -479,6 +478,13 @@ ALTER TABLE `ventas`
 --
 
 --
+-- Filtros para la tabla `carrito`
+--
+ALTER TABLE `carrito`
+  ADD CONSTRAINT `fk_carrito_clientes` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id_cliente`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_carrito_productos` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id`) ON UPDATE CASCADE;
+
+--
 -- Filtros para la tabla `historial_pedido`
 --
 ALTER TABLE `historial_pedido`
@@ -503,7 +509,8 @@ ALTER TABLE `reporte_venta`
 -- Filtros para la tabla `ventas`
 --
 ALTER TABLE `ventas`
-  ADD CONSTRAINT `fk_carrito` FOREIGN KEY (`id_carrito`) REFERENCES `carrito` (`id_carrito`);
+  ADD CONSTRAINT `fk_carrito` FOREIGN KEY (`id_carrito`) REFERENCES `carrito` (`id_carrito`),
+  ADD CONSTRAINT `fk_ventas_carrito` FOREIGN KEY (`id_carrito`) REFERENCES `carrito` (`id_carrito`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
