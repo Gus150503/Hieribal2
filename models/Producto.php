@@ -11,30 +11,23 @@ final class Producto {
         $this->pdo = Database::get($config['db']);
     }
 
-    /** KPI: total activos (case-insensitive por si guardas 'Activo' o 'activo') */
+    /** Total productos activos */
     public function totalActivos(): int {
-        $st = $this->pdo->query("SELECT COUNT(*) FROM productos WHERE LOWER(estado)='activo'");
+        $st = $this->pdo->query("SELECT COUNT(*) FROM productos WHERE LOWER(estado) = 'activo'");
         return (int)$st->fetchColumn();
     }
 
-    /**
-     * Carrusel: destacados
-     * Usa inventario: suma el stock por producto y ordena de mayor a menor.
-     */
+    /** Inventario destacado (mayor stock_actual) */
     public function destacados(int $limit = 10): array {
         $sql = "
             SELECT 
-                p.id,
-                p.nombre,
-                p.imagen AS img,
-                COALESCE(SUM(i.stock), 0) AS stock
-            FROM productos p
-            LEFT JOIN inventario i 
-                ON i.id_producto = p.id 
-               AND (i.estado IS NULL OR i.estado = 'disponible')
-            WHERE LOWER(p.estado) = 'activo'
-            GROUP BY p.id, p.nombre, p.imagen
-            ORDER BY stock DESC, p.nombre ASC
+                id,
+                nombre,
+                imagen AS img,
+                stock_actual AS stock
+            FROM productos
+            WHERE LOWER(estado) = 'activo'
+            ORDER BY stock_actual DESC, nombre ASC
             LIMIT :lim
         ";
         $st = $this->pdo->prepare($sql);
@@ -43,25 +36,18 @@ final class Producto {
         return $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
-    /**
-     * Carrusel: agotados
-     * Productos cuyo stock total (inventario) es 0 o menor.
-     */
+    /** Agotados (stock_actual = 0) */
     public function agotados(int $limit = 10): array {
         $sql = "
             SELECT 
-                p.id,
-                p.nombre,
-                p.imagen AS img,
-                COALESCE(SUM(i.stock), 0) AS stock
-            FROM productos p
-            LEFT JOIN inventario i 
-                ON i.id_producto = p.id 
-               AND (i.estado IS NULL OR i.estado = 'disponible')
-            WHERE LOWER(p.estado) = 'activo'
-            GROUP BY p.id, p.nombre, p.imagen
-            HAVING stock <= 0
-            ORDER BY p.nombre ASC
+                id,
+                nombre,
+                imagen AS img,
+                stock_actual AS stock
+            FROM productos
+            WHERE LOWER(estado) = 'activo'
+              AND stock_actual <= 0
+            ORDER BY nombre ASC
             LIMIT :lim
         ";
         $st = $this->pdo->prepare($sql);
@@ -70,24 +56,17 @@ final class Producto {
         return $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
-    /**
-     * Chart: por acabarse
-     * Productos con stock total > 0 y <= 5 (umbral), usando inventario.
-     * Devuelve [labels, values]
-     */
+    /** Productos por acabarse (stock_actual entre 1 y umbral) */
     public function porAcabarse(int $limit = 10, int $umbral = 5): array {
         $sql = "
             SELECT 
-                p.nombre,
-                COALESCE(SUM(i.stock), 0) AS stock
-            FROM productos p
-            LEFT JOIN inventario i 
-                ON i.id_producto = p.id 
-               AND (i.estado IS NULL OR i.estado = 'disponible')
-            WHERE LOWER(p.estado) = 'activo'
-            GROUP BY p.id, p.nombre
-            HAVING stock > 0 AND stock <= :u
-            ORDER BY stock ASC, p.nombre ASC
+                nombre,
+                stock_actual AS stock
+            FROM productos
+            WHERE LOWER(estado) = 'activo'
+              AND stock_actual > 0 
+              AND stock_actual <= :u
+            ORDER BY stock_actual ASC, nombre ASC
             LIMIT :lim
         ";
         $st = $this->pdo->prepare($sql);
@@ -98,47 +77,39 @@ final class Producto {
 
         return [
             array_column($rows, 'nombre'),
-            array_map('intval', array_column($rows, 'stock')),
+            array_map('intval', array_column($rows, 'stock'))
         ];
     }
 
-    /**
-     * Chart: por pedir
-     * Usa inventario.stock_minimo vs SUM(inventario.stock)
-     * Devuelve [labels, values] donde value = faltante.
-     */
-public function porPedir(int $limit = 10): array {
-    $sql = "
-        SELECT 
-            p.nombre,
-            COALESCE(SUM(i.stock), 0) AS stock,
-            COALESCE(MIN(i.stock_minimo), 0) AS stock_minimo,
-            COALESCE(MIN(i.stock_minimo), 0) - COALESCE(SUM(i.stock), 0) AS faltante
-        FROM productos p
-        LEFT JOIN inventario i 
-            ON i.id_producto = p.id 
-           AND (i.estado IS NULL OR i.estado = 'disponible')
-        WHERE LOWER(p.estado) = 'activo'
-        GROUP BY p.id, p.nombre
-        HAVING stock_minimo > 0 AND stock < stock_minimo
-        ORDER BY faltante DESC, p.nombre ASC
-        LIMIT :lim
-    ";
-    $st = $this->pdo->prepare($sql);
-    $st->bindValue(':lim', $limit, PDO::PARAM_INT);
-    $st->execute();
-    $rows = $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    /** Productos por pedir (stock_actual < stock_minimo) */
+    public function porPedir(int $limit = 10): array {
+        $sql = "
+            SELECT 
+                nombre,
+                stock_actual,
+                stock_minimo,
+                (stock_minimo - stock_actual) AS faltante
+            FROM productos
+            WHERE LOWER(estado) = 'activo'
+              AND stock_minimo > 0
+              AND stock_actual < stock_minimo
+            ORDER BY faltante DESC, nombre ASC
+            LIMIT :lim
+        ";
+        $st = $this->pdo->prepare($sql);
+        $st->bindValue(':lim', $limit, PDO::PARAM_INT);
+        $st->execute();
 
-    $labels   = [];
-    $faltante = [];
+        $rows = $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
-    foreach ($rows as $row) {
-        $labels[]   = $row['nombre'];
-        // aseguramos que no vaya número negativo
-        $faltante[] = max(0, (int)$row['faltante']);
+        $labels   = [];
+        $faltante = [];
+
+        foreach ($rows as $row) {
+            $labels[]   = $row['nombre'];
+            $faltante[] = max(0, (int)$row['faltante']);
+        }
+
+        return [$labels, $faltante];
     }
-
-    return [$labels, $faltante];
-}
-
 }
