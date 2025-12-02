@@ -1,4 +1,4 @@
-// assets/js/admin_proveedores.js
+// assets/js/admin_proveedores.js 
 (function () {
   if (window.__PROVEEDORES_JS_BOUND__) return;
   window.__PROVEEDORES_JS_BOUND__ = true;
@@ -199,7 +199,7 @@
     if (!tblBody) return;
     if (on) {
       tblBody.innerHTML = `<tr><td colspan="12" class="py-4 text-center">
-        <div class="spinner-border spinner-border-sm me-2"></div> Cargando…
+        <div class="spinner-border spinner-border-sm me-2"></div> Cargando… 
       </td></tr>`;
     }
   }
@@ -460,7 +460,112 @@
     if (!p.nit || !p.nit.trim())                  return 'El NIT es obligatorio.';
     if (!p.nombre_contacto || !p.nombre_contacto.trim()) return 'El nombre de contacto es obligatorio.';
     if (!p.email || !/.+@.+\..+/.test(p.email))   return 'El email es inválido.';
+
+    // Reglas adicionales solicitadas:
+    // empresa y nombre_contacto no deben tener números
+    if (p.empresa && /[0-9]/.test(p.empresa)) return 'La empresa no debe contener números.';
+    if (p.nombre_contacto && /[0-9]/.test(p.nombre_contacto)) return 'El nombre de contacto no debe contener números.';
+
+    // nit y telefono solo números
+    if (p.nit && /[^0-9]/.test(p.nit)) return 'El NIT solo debe contener números.';
+    if (p.telefono && /[^0-9]/.test(p.telefono)) return 'El teléfono solo debe contener números.';
+
+    // ciudad y condiciones_pago no deben tener números
+    if (p.ciudad && /[0-9]/.test(p.ciudad)) return 'La ciudad no debe contener números.';
+    if (p.condiciones_pago && /[0-9]/.test(p.condiciones_pago)) return 'El método de pago no debe contener números.';
+
     return '';
+  }
+
+  // ---------- realtime input cleaners + setValid using existing setValid ----------
+  function onlyLettersClean(v) {
+    // permite letras acentuadas, Ñ, espacios
+    return v.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ\s]/g, '');
+  }
+  function onlyDigitsClean(v) {
+    return v.replace(/[^0-9]/g, '');
+  }
+
+  // attach listeners but only if form and fields exist
+  if (frm) {
+    // empresa (no números)
+    if (frm.empresa) {
+      frm.empresa.addEventListener('input', (e) => {
+        const cleaned = onlyLettersClean(e.target.value);
+        if (cleaned !== e.target.value) {
+          const pos = e.target.selectionStart - (e.target.value.length - cleaned.length);
+          e.target.value = cleaned;
+          e.target.setSelectionRange(pos, pos);
+        }
+        setValid(e.target, cleaned.trim() !== '');
+      });
+    }
+
+    // nombre_contacto (no números)
+    if (frm.nombre_contacto) {
+      frm.nombre_contacto.addEventListener('input', (e) => {
+        const cleaned = onlyLettersClean(e.target.value);
+        if (cleaned !== e.target.value) {
+          const pos = e.target.selectionStart - (e.target.value.length - cleaned.length);
+          e.target.value = cleaned;
+          e.target.setSelectionRange(pos, pos);
+        }
+        setValid(e.target, cleaned.trim() !== '');
+      });
+    }
+
+    // ciudad (no números)
+    if (frm.ciudad) {
+      frm.ciudad.addEventListener('input', (e) => {
+        const cleaned = onlyLettersClean(e.target.value);
+        if (cleaned !== e.target.value) {
+          const pos = e.target.selectionStart - (e.target.value.length - cleaned.length);
+          e.target.value = cleaned;
+          e.target.setSelectionRange(pos, pos);
+        }
+        setValid(e.target, cleaned.trim() !== '');
+      });
+    }
+
+    // condiciones_pago (métodos de pago) (no números)
+    if (frm.condiciones_pago) {
+      frm.condiciones_pago.addEventListener('input', (e) => {
+        const cleaned = onlyLettersClean(e.target.value);
+        if (cleaned !== e.target.value) {
+          const pos = e.target.selectionStart - (e.target.value.length - cleaned.length);
+          e.target.value = cleaned;
+          e.target.setSelectionRange(pos, pos);
+        }
+        setValid(e.target, cleaned.trim() !== '');
+      });
+    }
+
+    // telefono (solo dígitos)
+    if (frm.telefono) {
+      frm.telefono.addEventListener('input', (e) => {
+        const cleaned = onlyDigitsClean(e.target.value);
+        if (cleaned !== e.target.value) {
+          const pos = e.target.selectionStart - (e.target.value.length - cleaned.length);
+          e.target.value = cleaned;
+          e.target.setSelectionRange(pos, pos);
+        }
+        // si está vacío, no marcar inválido todavía; se maneja en submit
+        setValid(e.target, cleaned.trim() !== '');
+      });
+    }
+
+    // nit (solo dígitos)
+    if (frm.nit) {
+      frm.nit.addEventListener('input', (e) => {
+        const cleaned = onlyDigitsClean(e.target.value);
+        if (cleaned !== e.target.value) {
+          const pos = e.target.selectionStart - (e.target.value.length - cleaned.length);
+          e.target.value = cleaned;
+          e.target.setSelectionRange(pos, pos);
+        }
+        setValid(e.target, cleaned.trim() !== '');
+      });
+    }
   }
 
   frm?.addEventListener('submit', async (e) => {
@@ -472,14 +577,16 @@
     const plain = Object.fromEntries(fd.entries());
     const isUpdate = !!id;
 
-    setValid($('#empresa'),          !!plain.empresa && plain.empresa.trim() !== '');
-    setValid($('#nit'),              !!plain.nit && plain.nit.trim() !== '');
-    setValid($('#nombre_contacto'),  !!plain.nombre_contacto && plain.nombre_contacto.trim() !== '');
+    // reemplazé los setValid anteriores para que reflejen validaciones reales
+    setValid($('#empresa'),          !!plain.empresa && plain.empresa.trim() !== '' && !(/[0-9]/.test(plain.empresa)));
+    setValid($('#nit'),              !!plain.nit && plain.nit.trim() !== '' && !(/[^0-9]/.test(plain.nit)));
+    setValid($('#nombre_contacto'),  !!plain.nombre_contacto && plain.nombre_contacto.trim() !== '' && !(/[0-9]/.test(plain.nombre_contacto)));
     setValid($('#email'),            !!plain.email && /.+@.+\..+/.test(plain.email));
-    setValid($('#telefono'), true);
-    setValid($('#direccion'), true);
-    setValid($('#ciudad'), true);
-    setValid($('#condiciones_pago'), true);
+    // telefono ahora validado: solo dígitos y no vacío
+    setValid($('#telefono'),true,'OPCIONAL');
+    setValid($('#direccion'),        !!plain.direccion && plain.direccion.trim() !== '');
+    setValid($('#ciudad'),true,'OPCIONAL');
+    setValid($('#condiciones_pago'), true,'OPCIONAL');
 
     const err = validatePlain(plain);
     if (err) { uiToast(`⚠ ${err}`, 'warning'); return; }
