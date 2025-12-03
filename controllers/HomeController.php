@@ -2,10 +2,11 @@
 namespace Controllers;
 
 use Core\Controller;
+use Models\Producto;
 
 final class HomeController extends Controller
 {
-    /** Home público (no requiere sesión) */
+    /** Home público */
     public function index(): void
     {
         $base = rtrim((string)($this->config['app']['base_url'] ?? ''), '/');
@@ -14,15 +15,14 @@ final class HomeController extends Controller
             'home/index',
             [
                 'extra_css' => [$base . '/assets/css/home.css'],
-                // 'extra_js'  => [$base . '/assets/js/home.js'],
             ],
             'Inicio'
         );
     }
 
+    /** Panel con productos (carrito visual) */
     public function dashboard(): void
     {
-        // Asegúrate de que la sesión esté iniciada en algún punto global
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
         }
@@ -32,17 +32,24 @@ final class HomeController extends Controller
             return;
         }
 
+        // Cargar productos desde el modelo
+        $productoModel = new Producto($this->config);
+        $productos = $productoModel->todos(); // ESTA ES LA FUNCIÓN QUE CREAMOS
+
         $base = rtrim((string)($this->config['app']['base_url'] ?? ''), '/');
 
         $this->render(
             'home/carrito_Compra',
             [
-                'cliente'   => $_SESSION['cliente'] ?? null,
+                'cliente'   => $_SESSION['cliente'],
+                'productos' => $productos,
                 'extra_css' => [
-                    $base . '/assets/css/home.css',            // estilos del header
-                    $base . '/assets/css/carritohomepage.css' // estilos del carrito
+                    $base . '/assets/css/home.css',
+                    $base . '/assets/css/carritohomepage.css'
                 ],
-                'extra_js'  => [$base . '/assets/js/carrito.js'],
+                'extra_js'  => [
+                    $base . '/assets/js/carrito.js'
+                ],
             ],
             'Mi carrito'
         );
