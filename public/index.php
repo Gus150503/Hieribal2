@@ -184,6 +184,14 @@ switch ($r) {
         case 'admin_ventas':      (new AdminVentasController($config))->index(); break;
         case 'admin_ventas_api':  (new AdminVentasController($config))->api();   break;
 
+        /* ====== Carrito Admin ====== */
+        case 'admin_carrito_guardar':
+            (new \Controllers\CarritoAdminController($config))->guardar(); break;
+
+        case 'admin_carrito_listar':
+            (new \Controllers\CarritoAdminController($config))->listar(); break;
+
+
             /* ====== Devoluciones ====== */
     case 'admin_devoluciones':
         (new AdminDevolucionesController($config))->index();
