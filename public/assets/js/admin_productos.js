@@ -195,7 +195,7 @@
     }
 
     // =====================================
-    // Validación visual
+    // Validación visual (NO se toca diseño)
     // =====================================
     function ensureFieldStyles() {
         if ($('#_prod_field_css')) return;
@@ -287,6 +287,55 @@
     function fmtNumber(n) {
         const v = Number(n || 0);
         return isNaN(v) ? '0' : v.toString();
+    }
+
+    // 🔹 VALIDACIONES NUEVAS (helpers)
+    function soloLetrasEspacios(str) {
+        if (!str) return true;
+        return /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]+$/.test(str.trim());
+    }
+
+    function soloNumeros(str) {
+        if (!str) return true;
+        return /^[0-9]+$/.test(str.trim());
+    }
+
+    // obtener código de barras desde plain (soporta ambos nombres)
+    function getCodigoBarrasFromPlain(plain) {
+        return (plain.codigo_barras ?? plain.codigo_sku ?? '').toString();
+    }
+
+    // 🔹 Referencias a campos para validar EN TIEMPO REAL
+    const inputDescripcion = $('#descripcion');
+    const inputCategoria = $('#categoria');
+    const inputMarca = $('#marca');
+    const inputCodigoBarras =
+        document.getElementById('codigo_barras') ||
+        document.getElementById('codigo_sku');
+
+    // 🔹 Listeners para limpiar entrada mientras escribe
+    if (inputCategoria) {
+        inputCategoria.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]/g, '');
+        });
+    }
+
+    if (inputMarca) {
+        inputMarca.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]/g, '');
+        });
+    }
+
+    if (inputDescripcion) {
+        inputDescripcion.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]/g, '');
+        });
+    }
+
+    if (inputCodigoBarras) {
+        inputCodigoBarras.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
     }
 
     // =====================================
@@ -653,120 +702,13 @@
     });
 
     // =====================================
-    // Acciones de fila (editar / eliminar / toggle)
-    // =====================================
-    tblBody?.addEventListener('click', async (e) => {
-        const btn = e.target.closest('button');
-        if (!btn) return;
-
-        const id = btn.dataset.edit || btn.dataset.del || btn.dataset.toggle;
-        if (!id) return;
-
-        // Editar
-        if (btn.dataset.edit) {
-            try {
-                const r = await fetch(api(`action=get&id=${id}`));
-                const j = await r.json();
-                const d = j.data;
-                if (!d) return uiToast('Producto no encontrado', 'warning');
-
-                if (frm) {
-                    for (const [k, v] of Object.entries(d)) {
-                        if (frm[k]) frm[k].value = v ?? '';
-                    }
-                }
-
-                if (d.imagen && d.imagen.trim()) {
-                    if (tipoURL) tipoURL.checked = true;
-                    seccionURL.style.display = 'block';
-                    seccionArchivo.style.display = 'none';
-                    inputImagenURL.value = d.imagen;
-                    imgPreview.src = d.imagen;
-                    previewWrap.style.display = 'block';
-                } else {
-                    previewWrap.style.display = 'none';
-                    imgPreview.src = '';
-                }
-
-                uiToast('Modo edición', 'info');
-                openEditor('Editar producto');
-            } catch {
-                uiToast('Error al cargar el producto', 'danger');
-            }
-            return;
-        }
-
-        // Eliminar
-        if (btn.dataset.del) {
-            const ok = await uiConfirm({
-                title: 'Eliminar producto',
-                body: '¿Seguro que deseas eliminar este producto?\nEsta acción no se puede deshacer.',
-                confirmText: 'Sí, eliminar',
-                variant: 'danger',
-            });
-            if (!ok) return;
-
-            try {
-                const r = await fetch(api('action=delete'), {
-                    method: 'POST',
-                    body: (() => {
-                        const fd = new FormData();
-                        fd.append('id', id);
-                        return fd;
-                    })(),
-                });
-                const j = await r.json();
-                if (!j.ok) throw new Error(j.msg || 'No se pudo eliminar');
-
-                uiToast('Eliminado exitosamente', 'danger');
-                listar(state.page);
-            } catch (err) {
-                uiToast(err.message || 'Error al eliminar', 'danger');
-            }
-            return;
-        }
-
-        // Toggle activar/inactivar
-        if (btn.dataset.toggle) {
-            const ok = await uiConfirm({
-                title: 'Cambiar estado',
-                body: '¿Seguro que deseas activar/inactivar este producto?',
-                confirmText: 'Sí, continuar',
-                variant: 'success',
-            });
-            if (!ok) return;
-
-            try {
-                const r = await fetch(api('action=toggle'), {
-                    method: 'POST',
-                    body: (() => {
-                        const fd = new FormData();
-                        fd.append('id', id);
-                        return fd;
-                    })(),
-                });
-                const j = await r.json();
-                if (!j.ok) throw new Error(j.msg || 'No se pudo cambiar el estado');
-
-                uiToast(j.msg || 'Estado actualizado', 'info');
-                listar(state.page);
-            } catch (err) {
-                uiToast(err.message || 'Error al cambiar estado', 'danger');
-            }
-            return;
-        }
-    });
-
-    // =====================================
     // Fecha de vencimiento: hoy o futura (OBLIGATORIA)
     // =====================================
     function esFechaFuturaOHoy(valor) {
-        // 🔥 ahora es obligatorio: si no hay valor, es inválido
         if (!valor) return false;
 
         let d, m, y;
 
-        // Soporta dd/mm/aaaa y yyyy-mm-dd
         if (valor.includes('/')) {
             const partes = valor.split('/');
             if (partes.length !== 3) return false;
@@ -804,7 +746,6 @@
         inp.addEventListener('change', () => {
             const v = inp.value.trim();
 
-            // 🔥 ahora obligatorio
             if (!v) {
                 setValid(inp, false);
                 uiToast('La fecha de vencimiento es obligatoria.', 'warning');
@@ -835,6 +776,23 @@
         if (!plain.categoria || !plain.categoria.trim())
             return 'Categoría es requerida.';
 
+        // 🔹 Marca sin números
+        if (!soloLetrasEspacios(plain.marca))
+            return 'La marca solo debe contener letras y espacios.';
+
+        // 🔹 Categoría sin números
+        if (!soloLetrasEspacios(plain.categoria))
+            return 'La categoría solo debe contener letras y espacios.';
+
+        // 🔹 Descripción sin números ni caracteres especiales
+        if (plain.descripcion && plain.descripcion.trim() && !soloLetrasEspacios(plain.descripcion))
+            return 'La descripción solo debe contener letras y espacios.';
+
+        // 🔹 Código de barras solo números (codigo_barras o codigo_sku)
+        const codBar = getCodigoBarrasFromPlain(plain);
+        if (codBar && !soloNumeros(codBar))
+            return 'El código de barras solo debe contener números.';
+
         if (
             plain.precio_compra !== undefined &&
             +plain.precio_compra <= 0
@@ -853,7 +811,6 @@
         )
             return 'Se requiere un Stock actual';
 
-        // 🔥 Fecha de vencimiento obligatoria
         if (!plain.f_vencimiento || !plain.f_vencimiento.trim())
             return 'Fecha de vencimiento es requerida.';
 
@@ -891,39 +848,61 @@
 
         const plain = Object.fromEntries(fd.entries());
 
+        // Normalizar código de barras dentro de plain
+        const codBar = getCodigoBarrasFromPlain(plain);
+        if (codBar) {
+            plain.codigo_barras = codBar;
+            plain.codigo_sku = codBar;
+        }
+
         // Validación básica
         const err = validatePlain(plain);
 
-        // Marcar campos clave
+        // Marcar campos clave (incluyendo las nuevas reglas)
+        const nombreOK = !!(plain.nombre && plain.nombre.trim());
+        setValid($('#nombre'), nombreOK);
+
+        const categoriaOK =
+            !!(plain.categoria && plain.categoria.trim()) &&
+            soloLetrasEspacios(plain.categoria);
+        setValid($('#categoria'), categoriaOK);
+
+        const marcaOK =
+            !!(plain.marca && plain.marca.trim()) &&
+            soloLetrasEspacios(plain.marca);
+        setValid($('#marca'), marcaOK);
+
+        const precioCompraOK =
+            !(plain.precio_compra === '' || +plain.precio_compra <= 0);
+        setValid($('#precio_compra'), precioCompraOK);
+
+        const precioVentaOK =
+            !(plain.precio_venta === '' || +plain.precio_venta <= 0);
+        setValid($('#precio_venta'), precioVentaOK);
+
+        const stockActualOK =
+            !(plain.stock_actual === '' || +plain.stock_actual <= 0);
+        setValid($('#stock_actual'), stockActualOK);
+
+        // 🔹 Descripción: opcional pero solo letras/espacios si se llena
+        const descOK =
+            !plain.descripcion ||
+            soloLetrasEspacios(plain.descripcion);
         setValid(
-            $('#nombre'),
-            !!(plain.nombre && plain.nombre.trim())
+            $('#descripcion'),
+            descOK,
+            plain.descripcion ? '' : 'Opcional'
         );
+
+        // 🔹 Código de barras: opcional pero solo números si se llena
+        const codOK = !codBar || soloNumeros(codBar);
+        const campoCodigoDom =
+            document.getElementById('codigo_barras') ||
+            document.getElementById('codigo_sku');
         setValid(
-            $('#categoria'),
-            !!(plain.categoria && plain.categoria.trim())
-        );
-        setValid($('#marca'), !!(plain.marca && plain.marca.trim()));
-        setValid(
-            $('#precio_compra'),
-            !(
-                plain.precio_compra === '' ||
-                +plain.precio_compra <= 0
-            )
-        );
-        setValid(
-            $('#precio_venta'),
-            !(
-                plain.precio_venta === '' ||
-                +plain.precio_venta <= 0
-            )
-        );
-        setValid(
-            $('#stock_actual'),
-            !(
-                plain.stock_actual === '' ||
-                +plain.stock_actual <= 0
-            )
+            campoCodigoDom,
+            codOK,
+            codBar ? '' : 'Opcional'
         );
 
         // Fecha vencimiento (OBLIGATORIA y hoy/futuro)
@@ -933,12 +912,10 @@
             esFechaFuturaOHoy(plain.f_vencimiento);
         setValid(fvInput, fvOk);
 
-        // Campos opcionales
+        // Campos opcionales restantes
         setValid($('#stock_minimo'), true, 'Opcional');
         setValid($('#presentacion'), true, 'Opcional');
-        setValid($('#descripcion'), true, 'Opcional');
         setValid($('#lote'), true, 'Opcional');
-        setValid($('#codigo_sku'), true, 'Opcional');
         setValid($('#ubicacion'), true, 'Opcional');
         setValid($('#iva'), true, 'Opcional');
 

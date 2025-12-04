@@ -10,7 +10,9 @@ use Controllers\AdminInventario;
 use Controllers\AdminProducto;
 use Controllers\AdminProveedores;
 use Controllers\AdminVentasController;
-use Controllers\AdminDevolucionesController;
+use Controllers\AdminDevolucionesController;  
+use Controllers\CarritoAdminController;       
+use Controllers\AdminCajeroController;  
 
 
 /* =============================
@@ -184,6 +186,14 @@ switch ($r) {
         case 'admin_ventas':      (new AdminVentasController($config))->index(); break;
         case 'admin_ventas_api':  (new AdminVentasController($config))->api();   break;
 
+        /* ====== Carrito Admin ====== */
+        case 'admin_carrito_guardar':
+            (new \Controllers\CarritoAdminController($config))->guardar(); break;
+
+        case 'admin_carrito_listar':
+            (new \Controllers\CarritoAdminController($config))->listar(); break;
+
+
             /* ====== Devoluciones ====== */
     case 'admin_devoluciones':
         (new AdminDevolucionesController($config))->index();
@@ -193,11 +203,23 @@ switch ($r) {
         (new AdminDevolucionesController($config))->api();
         break;
 
-
-
     /* ====== Proveedores ====== */
     case 'admin_proveedores':        (new AdminProveedores($config))->index(); break;
     case 'admin_proveedores_api':    (new AdminProveedores($config))->api();   break; 
+
+
+    case 'admin_cajero':
+        (new AdminCajeroController($config))->index();
+        break;
+
+    case 'admin_cajero_api':
+        (new AdminCajeroController($config))->api();
+        break;
+
+    case 'admin_cajero_factura':
+        (new AdminCajeroController($config))->factura();
+        break;
+
 
     /* ====== Compat ====== */
     case 'usuarioadmin':
