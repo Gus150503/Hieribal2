@@ -226,10 +226,6 @@ switch ($r) {
         header('Location: ' . (($config['app']['base_url'] ?? '') . '/?r=admin_usuarios'), true, 302);
         exit;
 
-    case 'admin_configuracion':
-        $adminD->configuracion();
-        break;
-
     case 'admin_config_api':
         require __DIR__ . '/../controllers/AdminConfigApiController.php';
         (new \Controllers\AdminConfigApiController())->handle();

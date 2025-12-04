@@ -5,6 +5,12 @@
 
   'use strict';
 
+  // =========================
+  // Rol actual (viene del <body data-rol="...">)
+  // =========================
+  const ROL = (document.body.dataset.rol || 'empleado').toLowerCase();
+  const PUEDE_GESTIONAR_CLIENTES = (ROL === 'admin'); // sólo admin puede crear/editar/eliminar
+
   // ===== Base y endpoints =====
   const base = location.pathname.replace(/\/public\/?$/, '') + '/public';
   const api  = (params = '') => `${base}/?r=admin_clientes_api&${params}`;
@@ -136,7 +142,8 @@
   function setLoading(on) {
     if (!tbl) return;
     if (on) {
-      tbl.innerHTML = `<tr><td colspan="8" class="py-4 text-center">
+      const colspan = PUEDE_GESTIONAR_CLIENTES ? 8 : 7;
+      tbl.innerHTML = `<tr><td colspan="${colspan}" class="py-4 text-center">
         <div class="spinner-border spinner-border-sm me-2"></div> Cargando…
       </td></tr>`;
     }
@@ -202,7 +209,8 @@
       if (state.total > 0 && state.page > pages) return listar(pages);
 
       if (!items.length) {
-        tbl.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-3">Sin resultados</td></tr>`;
+        const colspan = PUEDE_GESTIONAR_CLIENTES ? 8 : 7;
+        tbl.innerHTML = `<tr><td colspan="${colspan}" class="text-center text-muted py-3">Sin resultados</td></tr>`;
         renderPager(); updateTotal(); return;
       }
 
@@ -211,7 +219,8 @@
       updateTotal();
     } catch (e) {
       if (mySeq !== __LIST_REQ_SEQ__) return;
-      tbl.innerHTML = `<tr><td colspan="8" class="text-center text-danger py-3">No se pudo cargar.</td></tr>`;
+      const colspan = PUEDE_GESTIONAR_CLIENTES ? 8 : 7;
+      tbl.innerHTML = `<tr><td colspan="${colspan}" class="text-center text-danger py-3">No se pudo cargar.</td></tr>`;
       uiToast('No se pudieron cargar los clientes.', 'danger');
     }
   }
@@ -223,6 +232,9 @@
       : '<span class="badge bg-secondary-subtle text-secondary border">Inactivo</span>';
   }
 
+  // =========================
+  // Pintar tabla (respeta el rol)
+  // =========================
   function renderTabla(items) {
     if (!tbl) return;
     tbl.innerHTML = '';
@@ -232,14 +244,10 @@
 
       const isActive = String(c.estado || '').toLowerCase().startsWith('activo');
 
-      tr.innerHTML = `
-        <td>${c.id_cliente}</td>
-        <td>${escapeHtml(c.cedula ?? '')}</td>
-        <td class="fw-semibold">${escapeHtml(c.nombres ?? '')} ${escapeHtml(c.apellidos ?? '')}</td>
-        <td>${escapeHtml(c.telefono || '-')}</td>
-        <td>${escapeHtml(c.correo ?? '')}</td>
-        <td data-col="estado">${htmlBadgeEstado(c.estado)}</td>
-        <td>${escapeHtml(c.fecha_registro ?? '')}</td>
+      // Si el rol NO es admin, no pintamos columna de acciones
+      let accionesHtml = '';
+      if (PUEDE_GESTIONAR_CLIENTES) {
+        accionesHtml = `
         <td class="text-end">
           <div class="btn-group btn-group-sm" role="group">
             <button class="btn btn-outline-primary" title="Editar" data-editar="${c.id_cliente}">
@@ -255,7 +263,18 @@
               <i class="bi ${isActive ? 'bi-toggle-on' : 'bi-toggle-off'}"></i>
             </button>
           </div>
-        </td>
+        </td>`;
+      }
+
+      tr.innerHTML = `
+        <td>${c.id_cliente}</td>
+        <td>${escapeHtml(c.cedula ?? '')}</td>
+        <td class="fw-semibold">${escapeHtml(c.nombres ?? '')} ${escapeHtml(c.apellidos ?? '')}</td>
+        <td>${escapeHtml(c.telefono || '-')}</td>
+        <td>${escapeHtml(c.correo ?? '')}</td>
+        <td data-col="estado">${htmlBadgeEstado(c.estado)}</td>
+        <td>${escapeHtml(c.fecha_registro ?? '')}</td>
+        ${accionesHtml}
       `;
       tbl.appendChild(tr);
     }
@@ -329,18 +348,26 @@
     if (bsModal) {
       bsModal.show();
       setTimeout(() => frm?.querySelector('#cedula')?.focus(), 120);
-    } else {
+    } else if (modalEl) {
       modalEl.style.display = 'block';
     }
   }
   function closeEditor(){ if (bsModal) bsModal.hide(); ensureHidden(); }
 
-  btnNuevo?.addEventListener('click', () => openEditor({}, 'Nuevo cliente'));
+  // Si el rol no puede gestionar clientes, el botón Nuevo ni existe (lo oculta PHP),
+  // pero por si acaso, el listener es seguro porque usa ?.
+  btnNuevo?.addEventListener('click', () => {
+    if (!PUEDE_GESTIONAR_CLIENTES) return;
+    openEditor({}, 'Nuevo cliente');
+  });
 
   // =========================
   // Acciones de tabla
   // =========================
   tbl?.addEventListener('click', async (e) => {
+    // Si no puede gestionar clientes, ignoramos eventos (defensa extra)
+    if (!PUEDE_GESTIONAR_CLIENTES) return;
+
     const btn = e.target.closest('button'); if (!btn) return;
     const id  = +btn.dataset.editar || +btn.dataset.eliminar || +btn.dataset.toggle;
 
@@ -391,11 +418,12 @@
         const j = await resToJsonSafe(r);
         if (!j.ok) throw new Error(j.msg || 'No se pudo cambiar el estado');
 
-        // Actualización optimista
         applyToggleToRow(id, j.estado);
-        uiToast(j.msg || (String(j.estado).toLowerCase().startsWith('activo') ? 'Cliente activado.' : 'Cliente inactivado.'), 'success');
+        uiToast(
+          j.msg || (String(j.estado).toLowerCase().startsWith('activo') ? 'Cliente activado.' : 'Cliente inactivado.'),
+          'success'
+        );
 
-        // Refrescar listado para mantener sync (ajusta si cambió de página por filtros)
         listar(state.page);
       } catch (err) { uiToast(err.message || 'Error al cambiar estado', 'danger'); }
       return;
@@ -437,6 +465,8 @@
 
   frm?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (!PUEDE_GESTIONAR_CLIENTES) return; // defensa extra
+
     const fd   = new FormData(frm);
     const id   = +fd.get('id_cliente');
     const isUpdate = id > 0;
@@ -492,4 +522,3 @@
   window.addEventListener('pageshow', (e) => { if (e.persisted) boot(); });
 
 })();
-  
