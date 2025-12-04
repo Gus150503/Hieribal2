@@ -10,7 +10,9 @@ use Controllers\AdminInventario;
 use Controllers\AdminProducto;
 use Controllers\AdminProveedores;
 use Controllers\AdminVentasController;
-use Controllers\AdminDevolucionesController;
+use Controllers\AdminDevolucionesController;  
+use Controllers\CarritoAdminController;       
+use Controllers\AdminCajeroController;  
 
 
 /* =============================
@@ -201,11 +203,20 @@ switch ($r) {
         (new AdminDevolucionesController($config))->api();
         break;
 
-
-
     /* ====== Proveedores ====== */
     case 'admin_proveedores':        (new AdminProveedores($config))->index(); break;
     case 'admin_proveedores_api':    (new AdminProveedores($config))->api();   break; 
+
+
+    case 'admin_cajero':
+        (new AdminCajeroController($config))->index();
+        break;
+
+    case 'admin_cajero_api':
+        (new AdminCajeroController($config))->api();
+        break;
+
+        
 
     /* ====== Compat ====== */
     case 'usuarioadmin':
