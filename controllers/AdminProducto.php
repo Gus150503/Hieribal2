@@ -8,6 +8,8 @@ use Core\Controller;
 use Core\Database;
 use Models\UsuarioProducto;
 use PDOException;
+use Models\Categoria;   // ← NUEVO
+
 
 final class AdminProducto extends Controller
 {
