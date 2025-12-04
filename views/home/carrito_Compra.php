@@ -1,91 +1,144 @@
 <?php
 $base = rtrim((string)($this->config['app']['base_url'] ?? ''), '/');
-?>
+$productos = $productos ?? [];
 
-<!-- ========================================
-    BUSCADOR Y FILTROS DE CATEGORÍAS
-========================================= -->
+/* =======================================
+   Construir categorías dinámicas
+======================================= */
+$categorias = [];
+
+foreach ($productos as $p) {
+    $cat = strtolower(trim($p['categoria'] ?? 'otros'));
+    if (!isset($categorias[$cat])) {
+        $categorias[$cat] = [];
+    }
+    $categorias[$cat][] = $p;
+}
+
+/* =======================================
+   Función para resolver imágenes
+======================================= */
+function resolverImagen(string $img, string $base): string {
+    // Si NO es URL → generar ruta normal
+    if (!filter_var($img, FILTER_VALIDATE_URL)) {
+        return $base . "/assets/img/" . ltrim($img, '/');
+    }
+    // Si ya es URL → devolverla
+    return $img;
+}
+?>
+<!-- ============================
+          BUSCADOR + CATEGORÍAS
+============================= -->
 <section class="search-section">
     <div class="search-container">
+
+        <!-- Buscador -->
         <div class="search-box">
             <input type="text" id="searchInput" placeholder="Buscar productos...">
             <button type="button">🔍</button>
         </div>
 
+        <!-- Categorías dinámicas -->
         <div class="categories">
             <button class="cat-btn active" data-category="all">✨ Todos</button>
-            <button class="cat-btn" data-category="proteinas">🌱 Proteínas</button>
-            <button class="cat-btn" data-category="tes">🍵 Tés y Aromáticas</button>
-            <button class="cat-btn" data-category="vitaminas">💊 Vitaminas</button>
-            <button class="cat-btn" data-category="organicos">🥗 Orgánicos</button>
-            <button class="cat-btn" data-category="mieles">🍯 Mieles</button>
-            <button class="cat-btn" data-category="cereales">🌾 Cereales</button>
+
+            <?php foreach ($categorias as $catNombre => $items): ?>
+                <button class="cat-btn" data-category="<?= $catNombre ?>">
+                    <?= ucfirst($catNombre) ?>
+                </button>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>
 
-<!-- ========================================
-     CONTENEDOR PRINCIPAL (PRODUCTOS + CARRITO)
-========================================= -->
+<!-- ============================
+        CONTENEDOR PRINCIPAL
+============================= -->
 <div class="main-container">
 
-    <!-- COLUMNA DE PRODUCTOS -->
     <div class="products-container">
 
-        <!-- PROTEÍNAS -->
-        <section class="category-section" id="proteinas">
+        <?php foreach ($categorias as $catNombre => $items): ?>
+        <section class="category-section" data-category="<?= $catNombre ?>">
+
             <div class="category-header">
-                <span class="emoji">🌱</span>
-                <h2>Proteínas</h2>
+                <span class="emoji">📦</span>
+                <h2><?= ucfirst($catNombre) ?></h2>
             </div>
+
             <div class="products-grid">
 
-                <div class="product-card">
-                    <img src="<?= $base ?>/assets/img/gym1.png" alt="Proteína Whey Amarilla" class="product-image">
-                    <h3>Proteína Whey Amarilla</h3>
-                    <div class="product-price">$80.000</div>
-                    <button class="add-to-cart-btn"
-                        onclick="addToCart(1, 'Proteína Whey Amarilla', 80000, '<?= $base ?>/assets/img/gym1.png')">
-                        🛒 Añadir al carrito
-                    </button>
-                </div>
+                <?php foreach ($items as $prod): ?>
 
-                <!-- ... TODO el resto de tus product-card tal cual los tienes ... -->
+                    <?php
+                    // Obtener la imagen final lista para mostrar
+                    $imgFinal = resolverImagen($prod['imagen'], $base);
+                    ?>
+
+                    <div class="product-card">
+
+                        <!-- Imagen -->
+                        <img src="<?= $imgFinal ?>"
+                             alt="<?= htmlspecialchars($prod['nombre']) ?>"
+                             class="product-image"
+                             onerror="this.src='<?= $base ?>/assets/img/no-image.png'">
+
+                        <!-- Nombre -->
+                        <h3><?= htmlspecialchars($prod['nombre']) ?></h3>
+
+                        <!-- Precio -->
+                        <div class="product-price">
+                            $<?= number_format($prod['precio_venta'], 0, ',', '.') ?>
+                        </div>
+
+                        <!-- Botón Carrito -->
+                        <button onclick="addToCart(
+                            <?= $prod['id'] ?>,
+                            '<?= addslashes($prod['nombre']) ?>',
+                            <?= $prod['precio_venta'] ?>,
+                            '<?= $imgFinal ?>'
+                        )">
+                            🛒 Añadir al carrito
+                        </button>
+                    </div>
+
+                <?php endforeach; ?>
 
             </div>
         </section>
-
-        <!-- ... TODAS LAS DEMÁS SECCIONES (tés, vitaminas, orgánicos, etc.) IGUAL ... -->
+        <?php endforeach; ?>
 
     </div>
 
-    <!-- ========================================
-         CARRITO DE COMPRAS (SIDEBAR)
-    ========================================= -->
+    <!-- ============================
+           SIDEBAR DEL CARRITO
+     =============================== -->
     <aside class="cart-sidebar">
+
         <div class="cart-header">
             <h2>🛒 Carrito</h2>
-            <span class="cart-count" id="cartCount">0</span>
+            <span id="cartCount">0</span>
         </div>
 
         <div class="cart-items" id="cartItems">
             <div class="cart-empty">
                 <p>Tu carrito está vacío</p>
-                <p style="font-size: 48px; margin-top: 20px;">🛍️</p>
+                <p style="font-size:48px;margin-top:20px;">🛍️</p>
             </div>
         </div>
 
         <div class="cart-total">
-            <div class="cart-total-label">Total:</div>
-            <div class="cart-total-amount" id="cartTotal">$0</div>
+            <strong>Total:</strong>
+            <span id="cartTotal">$0</span>
         </div>
 
         <button class="checkout-btn" id="checkoutBtn" onclick="checkout()" disabled>
             Finalizar Compra
         </button>
+
     </aside>
 
 </div>
 
-<!-- Si tu layout NO inyecta JS extra y quieres cargarlo aquí: -->
-<script src="<?= htmlspecialchars($base) ?>/assets/js/carrito.js"></script>
+<script src="<?= $base ?>/assets/js/carrito.js"></script>
