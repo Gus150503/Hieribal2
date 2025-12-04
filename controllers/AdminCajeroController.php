@@ -4,7 +4,10 @@ declare(strict_types=1);
 namespace Controllers;
 
 use Core\Controller;
-use Models\CajeroAdmin; 
+use Models\CajeroAdmin;
+
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 final class AdminCajeroController extends Controller
 {
@@ -38,7 +41,7 @@ final class AdminCajeroController extends Controller
     }
 
     /** Solo permite Admin y Cajero dentro del panel admin */
-    private function ensureCajero(array $rolesPermitidos = ['Admin','Cajero']): void
+    private function ensureCajero(array $rolesPermitidos = ['Admin', 'Cajero']): void
     {
         if (session_status() !== \PHP_SESSION_ACTIVE) {
             session_start();
@@ -71,7 +74,9 @@ final class AdminCajeroController extends Controller
             session_start();
         }
         $user = $_SESSION['admin'] ?? null;
-        return (int)($user['id_usuario'] ?? 0);
+
+        // Intentamos varias claves típicas: id_usuario, id, id_admin
+        return (int)($user['id_usuario'] ?? $user['id'] ?? $user['id_admin'] ?? 0);
     }
 
     private function friendlyDbError(\Throwable $e): string
@@ -93,22 +98,22 @@ final class AdminCajeroController extends Controller
        ============================ */
 
     /** Vista principal del módulo cajero (POS) */
-public function index(): void
-{
-    $this->ensureCajero();
+    public function index(): void
+    {
+        $this->ensureCajero();
 
-    $base = rtrim($this->config['app']['base_url'] ?? '', '/');
+        $base = rtrim($this->config['app']['base_url'] ?? '', '/');
 
-    $this->render(
-        'admin/cajero/index',
-        [
-            'page_title' => 'Cajero',
-            'esAdmin'    => true, // 👈 esto fuerza el layout del panel admin
-            'extra_css'  => [$base . '/assets/css/admin_cajero.css?v=1'],
-            'extra_js'   => [$base . '/assets/js/admin_cajero.js?v=1'],
-        ]
-    );
-}
+        $this->render(
+            'admin/cajero/index',
+            [
+                'page_title' => 'Cajero',
+                'esAdmin'    => true, // 👈 esto fuerza el layout del panel admin
+                'extra_css'  => [$base . '/assets/css/admin_cajero.css?v=1'],
+                'extra_js'   => [$base . '/assets/js/admin_cajero.js?v=1'],
+            ]
+        );
+    }
 
     /* ============================
        API Cajero
@@ -134,7 +139,7 @@ public function index(): void
                 return;
             }
 
-            /* LISTAR CLIENTES (para el combo) */
+            /* LISTAR CLIENTES (para el combo) - por ahora no se usa, pero se deja */
             if ($m === 'GET' && $action === 'clientes') {
                 try {
                     $items = $this->Cajero->listarClientes();
@@ -144,7 +149,6 @@ public function index(): void
                 }
                 return;
             }
-
 
             /* BUSCAR PRODUCTOS (autocompletar) */
             if ($m === 'GET' && $action === 'buscar_producto') {
@@ -159,32 +163,60 @@ public function index(): void
             }
 
             /* CREAR VENTA */
-            if ($m === 'POST' && $action === 'crear_venta') {
-                try {
-                    $idUsuario = $this->currentAdminId();
-                    if ($idUsuario <= 0) {
-                        $this->fail('Usuario no válido', 401);
-                        return;
-                    }
+if ($m === 'POST' && $action === 'crear_venta') {
+    try {
+        $idUsuario = $this->currentAdminId();
+        if ($idUsuario <= 0) {
+            $this->fail('Usuario no válido', 401);
+            return;
+        }
 
-                    $idCliente = (int)($_POST['id_cliente'] ?? 0);
-                    $itemsJson = $_POST['items'] ?? '[]';
-                    $items     = json_decode($itemsJson, true) ?: [];
+        // Datos del cliente mostrador
+        $cliNombre   = trim((string)($_POST['cli_nombre']   ?? ''));
+        $cliApellido = trim((string)($_POST['cli_apellido'] ?? ''));
+        $cliCedula   = trim((string)($_POST['cli_cedula']   ?? ''));
 
-                    if (empty($items)) {
-                        $this->fail('No hay productos en la venta');
-                        return;
-                    }
+        if ($cliNombre === '' || $cliCedula === '') {
+            $this->fail('Nombre y cédula del cliente son obligatorios.');
+            return;
+        }
 
-                    $pagoEfectivo = (float)($_POST['pago_efectivo'] ?? 0);
-                    $idVenta      = $this->Cajero->crearVenta($idUsuario, $idCliente, $items, $pagoEfectivo);
+        $metodoPago = trim((string)($_POST['metodo_pago'] ?? 'efectivo'));
+        if ($metodoPago === '') {
+            $metodoPago = 'efectivo';
+        }
 
-                    $this->ok(['id_venta' => $idVenta], 201);
-                } catch (\Throwable $e) {
-                    $this->fail($this->friendlyDbError($e), 500);
-                }
-                return;
-            }
+        $itemsJson = $_POST['items'] ?? '[]';
+        $items     = json_decode($itemsJson, true) ?: [];
+
+        if (empty($items)) {
+            $this->fail('No hay productos en la venta');
+            return;
+        }
+
+        $pagoEfectivo = (float)($_POST['pago_efectivo'] ?? 0);
+
+        $idVenta = $this->Cajero->crearVenta(
+            $idUsuario,
+            $items,
+            $pagoEfectivo,
+            $metodoPago,
+            $cliNombre,
+            $cliApellido,
+            $cliCedula
+        );
+
+        $this->ok(['id_venta' => $idVenta], 201);
+
+    } catch (\RuntimeException $e) {
+        // 💡 errores lógicos (stock insuficiente, etc.)
+        $this->fail($e->getMessage(), 400);
+    } catch (\Throwable $e) {
+        $this->fail($this->friendlyDbError($e), 500);
+    }
+    return;
+}
+
 
             /* HISTORIAL DEL CAJERO */
             if ($m === 'GET' && $action === 'historial') {
@@ -229,5 +261,149 @@ public function index(): void
         } catch (\Throwable $e) {
             $this->fail($e->getMessage(), 500);
         }
+    }
+
+    /* ============================
+       FACTURA PDF
+       ============================ */
+    public function factura(): void
+    {
+        $this->ensureCajero();
+
+        $idVenta = (int)($_GET['id_venta'] ?? 0);
+        if ($idVenta <= 0) {
+            http_response_code(400);
+            echo 'ID de venta inválido.';
+            return;
+        }
+
+        $venta   = $this->Cajero->obtenerVenta($idVenta);
+        $detalle = $this->Cajero->obtenerDetalleVenta($idVenta);
+
+        if (!$venta) {
+            http_response_code(404);
+            echo 'Venta no encontrada.';
+            return;
+        }
+
+        $clienteNombre = trim(
+            ($venta['nombre_cliente'] ?? '') . ' ' . ($venta['apellido_cliente'] ?? '')
+        ) ?: 'Cliente mostrador';
+
+        $cedula   = $venta['cedula_cliente'] ?? '';
+        $fecha    = $venta['fecha_venta'] ?? '';
+        $total    = (float)($venta['total'] ?? 0);
+        $pagoCon  = (float)($venta['pago_con'] ?? 0);
+        $cambio   = (float)($venta['cambio'] ?? max(0, $pagoCon - $total));
+        $metodo   = $venta['metodo_pago'] ?? 'efectivo';
+
+        $money = fn($v) => '$' . number_format((float)$v, 0, ',', '.');
+
+        ob_start();
+        ?>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #333; }
+                .factura-box { width: 100%; padding: 10px 15px; }
+                h1,h2,h3,h4 { margin: 0; padding: 0; }
+                .f-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 10px;
+                    border-bottom: 1px solid #ccc;
+                    padding-bottom: 8px;
+                }
+                .f-header-left { font-size: 14px; font-weight: bold; }
+                .f-header-right { text-align: right; font-size: 11px; }
+                .f-info { margin-top: 10px; margin-bottom: 10px; font-size: 11px; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { border: 1px solid #ddd; padding: 4px 6px; }
+                th { background: #f0f0f0; font-weight: bold; }
+                .text-right { text-align: right; }
+                .mt-2 { margin-top: 8px; }
+                .mt-3 { margin-top: 12px; }
+                .small { font-size: 10px; }
+            </style>
+        </head>
+        <body>
+        <div class="factura-box">
+            <div class="f-header">
+                <div class="f-header-left">
+                    Mi Hieribal<br>
+                    <span class="small">Punto de venta</span>
+                </div>
+                <div class="f-header-right">
+                    <strong>Factura #<?= htmlspecialchars((string)$idVenta) ?></strong><br>
+                    Fecha: <?= htmlspecialchars($fecha) ?>
+                </div>
+            </div>
+
+            <div class="f-info">
+                <strong>Cliente:</strong> <?= htmlspecialchars($clienteNombre) ?><br>
+                <?php if ($cedula): ?>
+                    <strong>Cédula:</strong> <?= htmlspecialchars($cedula) ?><br>
+                <?php endif; ?>
+                <strong>Método de pago:</strong> <?= htmlspecialchars(ucfirst($metodo)) ?><br>
+            </div>
+
+            <table class="mt-2">
+                <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th style="width:60px;">Cant.</th>
+                    <th style="width:90px;">Precio</th>
+                    <th style="width:100px;">Subtotal</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($detalle as $item): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($item['nombre_producto'] ?? '') ?></td>
+                        <td class="text-right"><?= htmlspecialchars((string)($item['cantidad'] ?? 0)) ?></td>
+                        <td class="text-right"><?= $money($item['precio_unitario'] ?? 0) ?></td>
+                        <td class="text-right"><?= $money($item['subtotal'] ?? 0) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+
+            <table class="mt-2" style="width: 45%; margin-left:auto;">
+                <tr>
+                    <th>Total</th>
+                    <td class="text-right"><?= $money($total) ?></td>
+                </tr>
+                <tr>
+                    <th>Paga con</th>
+                    <td class="text-right"><?= $money($pagoCon) ?></td>
+                </tr>
+                <tr>
+                    <th>Cambio</th>
+                    <td class="text-right"><?= $money($cambio) ?></td>
+                </tr>
+            </table>
+
+            <p class="mt-3 small">
+                ¡Gracias por tu compra!<br>
+                Este documento es generado automáticamente por el sistema de punto de venta.
+            </p>
+        </div>
+        </body>
+        </html>
+        <?php
+        $html = ob_get_clean();
+
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html, 'UTF-8');
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        $filename = 'Factura_' . $idVenta . '.pdf';
+        $dompdf->stream($filename, ['Attachment' => true]);
     }
 }

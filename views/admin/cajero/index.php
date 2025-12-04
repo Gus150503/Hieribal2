@@ -27,6 +27,45 @@ $base = $this->config['app']['base_url'] ?? '';
               <i class="bi bi-bag-plus me-2 text-primary"></i> Nueva venta
             </h5>
 
+            <!-- DATOS DEL CLIENTE MOSTRADOR -->
+            <div class="row g-2 mb-3">
+              <div class="col-md-4">
+                <label class="form-label small">Nombre cliente <span class="text-danger">*</span></label>
+                <input type="text"
+                       id="cliNombre"
+                       class="form-control form-control-sm"
+                       placeholder="Ej: Juan">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small">Apellido cliente</label>
+                <input type="text"
+                       id="cliApellido"
+                       class="form-control form-control-sm"
+                       placeholder="Ej: Pérez">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small">Cédula <span class="text-danger">*</span></label>
+                <input type="text"
+                       id="cliCedula"
+                       class="form-control form-control-sm"
+                       placeholder="Ej: 1012345678">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small">Método de pago</label>
+              <select id="metodoPago" class="form-select form-select-sm">
+                <option value="efectivo">Efectivo</option>
+                <option value="tarjeta">Tarjeta</option>
+                <option value="transferencia">Transferencia</option>
+              </select>
+              <div class="form-text small">
+                Este valor aparecerá en la factura.
+              </div>
+            </div>
+
+            <hr>
+
             <!-- SELECT PRODUCTO (DROP DOWN) -->
             <div class="mb-3">
               <label class="form-label">Producto</label>
@@ -79,7 +118,6 @@ $base = $this->config['app']['base_url'] ?? '';
           </div>
         </div>
       </div>
-
 
       <!-- ==============================
            COLUMNA DERECHA (HISTORIAL)
@@ -172,7 +210,6 @@ $base = $this->config['app']['base_url'] ?? '';
     </div>
   </div>
 </div>
-
 
 <!-- Toasts -->
 <div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>

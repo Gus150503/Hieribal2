@@ -23,6 +23,13 @@
   const $  = (s) => document.querySelector(s);
   const $$ = (s) => Array.from(document.querySelectorAll(s));
 
+  // Campos cliente
+  const inpCliNombre   = $('#cliNombre');
+  const inpCliApellido = $('#cliApellido');
+  const inpCliCedula   = $('#cliCedula');
+  const selMetodoPago  = $('#metodoPago');
+
+  // Campos venta
   const selProducto   = $('#productoSelect');
   const inpCantidad   = $('#cantidadProducto');
   const btnAgregar    = $('#btnAgregarProducto');
@@ -112,45 +119,6 @@
   }
 
   // =====================================================
-  // Confirm genérico (si tienes modal bootstrap, lo usa; si no, confirm nativo)
-  // =====================================================
-  function uiConfirm(opts = {}) {
-    const modalEl = document.getElementById('confirmModal');
-    if (!modalEl || !window.bootstrap) {
-      return Promise.resolve(confirm(opts.body || '¿Seguro?')); // fallback nativo
-    }
-    const title = modalEl.querySelector('#confirmTitle');
-    const body  = modalEl.querySelector('#confirmBody');
-    const btnOk = modalEl.querySelector('#btnOkConfirm');
-
-    title.textContent = opts.title || 'Confirmar acción';
-    body.innerHTML = escapeHtml(String(opts.body || '¿Seguro?')).replace(/\n/g,'<br>');
-    btnOk.textContent = opts.confirmText || 'Sí, continuar';
-
-    btnOk.className = 'btn ' + (
-      opts.variant === 'danger'  ? 'btn-outline-danger' :
-      opts.variant === 'warning' ? 'btn-outline-secondary' :
-      opts.variant === 'success' ? 'btn-success' :
-                                   'btn-success'
-    );
-
-    return new Promise(resolve => {
-      const bs = new bootstrap.Modal(modalEl, { backdrop: 'static' });
-
-      const onOk = () => { cleanup(); bs.hide(); resolve(true); };
-      const onHide = () => { cleanup(); resolve(false); };
-      const cleanup = () => {
-        btnOk.removeEventListener('click', onOk);
-        modalEl.removeEventListener('hidden.bs.modal', onHide);
-      };
-
-      btnOk.addEventListener('click', onOk);
-      modalEl.addEventListener('hidden.bs.modal', onHide, { once:true });
-      bs.show();
-    });
-  }
-
-  // =====================================================
   // Utils
   // =====================================================
   function escapeHtml(s) {
@@ -186,6 +154,31 @@
     input.addEventListener('input', (e) => {
       let v = String(e.target.value || '').replace(/[^\d]/g, '');
       if (v === '' || v === '0') v = '1';
+      e.target.value = v;
+    });
+  }
+
+  // Solo letras y espacios (para nombre / apellido)
+  function soloLetras(input){
+    if (!input) return;
+    input.addEventListener('input', (e) => {
+      let v = String(e.target.value || '');
+      v = v.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+      e.target.value = v;
+    });
+  }
+
+  // Solo números, máximo 10 dígitos (para cédula)
+  function configurarCedula(input){
+    if (!input) return;
+    input.addEventListener('keydown', (e) => {
+      if (e.key === '-' || e.key === 'e' || e.key === 'E' || e.key === '.' || e.key === ',') {
+        e.preventDefault();
+      }
+    });
+    input.addEventListener('input', (e) => {
+      let v = String(e.target.value || '').replace(/\D/g, '');
+      if (v.length > 10) v = v.slice(0, 10);
       e.target.value = v;
     });
   }
@@ -299,18 +292,17 @@
       selProducto.innerHTML = '<option value="">Seleccione un producto…</option>';
 
       for (const p of items) {
-        // Soportar distintos nombres de columnas
         const id = p.id ?? p.id_producto ?? p.ID ?? null;
         const nombre = p.nombre ?? p.nombre_producto ?? p.descripcion ?? 'Producto sin nombre';
         const precio = Number(
           (p.precio_venta ?? p.precio ?? p.precio_unitario ?? 0)
         );
 
-        if (!id || !precio) continue; // si algo viene roto, lo saltamos
+        if (!id || !precio) continue;
 
         const opt = document.createElement('option');
         opt.value = id;
-        opt.textContent = `${nombre} - ${money(precio)}`;   // nombre + precio
+        opt.textContent = `${nombre} - ${money(precio)}`;
         opt.dataset.nombre = nombre;
         opt.dataset.precio = String(precio);
         selProducto.appendChild(opt);
@@ -449,6 +441,53 @@
     }
   }
 
+  // ================================
+  // Validar datos del cliente
+  // ================================
+  function validarCliente() {
+    if (!inpCliNombre || !inpCliCedula) return { ok: true };
+
+    const nombre   = (inpCliNombre.value || '').trim();
+    const apellido = (inpCliApellido?.value || '').trim();
+    const cedula   = (inpCliCedula.value || '').trim();
+
+    inpCliNombre.classList.remove('is-invalid');
+    inpCliApellido?.classList.remove('is-invalid');
+    inpCliCedula.classList.remove('is-invalid');
+
+    if (!nombre) {
+      inpCliNombre.classList.add('is-invalid');
+      uiToast('El nombre del cliente es obligatorio.', 'warning');
+      return { ok: false };
+    }
+    const reNombre = /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]+$/;
+    if (!reNombre.test(nombre)) {
+      inpCliNombre.classList.add('is-invalid');
+      uiToast('El nombre solo debe contener letras y espacios.', 'warning');
+      return { ok: false };
+    }
+
+    if (apellido && !reNombre.test(apellido)) {
+      inpCliApellido.classList.add('is-invalid');
+      uiToast('El apellido solo debe contener letras y espacios.', 'warning');
+      return { ok: false };
+    }
+
+    if (!cedula) {
+      inpCliCedula.classList.add('is-invalid');
+      uiToast('La cédula es obligatoria.', 'warning');
+      return { ok: false };
+    }
+    const reCedula = /^\d{1,10}$/;
+    if (!reCedula.test(cedula)) {
+      inpCliCedula.classList.add('is-invalid');
+      uiToast('La cédula debe tener solo números (máx. 10).', 'warning');
+      return { ok: false };
+    }
+
+    return { ok: true, nombre, apellido, cedula };
+  }
+
   // =====================================================
   // Guardar venta (usando modal de pago)
   // =====================================================
@@ -458,16 +497,25 @@
       return;
     }
 
+    // Validar datos de cliente
+    const valCli = validarCliente();
+    if (!valCli.ok) return;
+
+    const nombre   = valCli.nombre;
+    const apellido = valCli.apellido || '';
+    const cedula   = valCli.cedula;
+
+    const metodoPago = selMetodoPago?.value || 'efectivo';
+
     const total = carrito.reduce((acc, it) => acc + it.cantidad * it.precio, 0);
 
     const resumen = carrito
       .map(it => `• ${it.nombre} x ${it.cantidad} = ${money(it.cantidad * it.precio)}`)
       .join('\n');
 
-    // Modal bonito para pedir con cuánto paga el cliente
+    // Modal para pedir con cuánto paga
     const pagoInfo = await pedirPagoEnModal(total, resumen);
     if (!pagoInfo) {
-      // canceló o valor inválido
       return;
     }
 
@@ -475,7 +523,11 @@
 
     const fd = new FormData();
     fd.append('items', JSON.stringify(carrito));
-    fd.append('pago_efectivo', String(pago)); // backend ya lo espera
+    fd.append('pago_efectivo', String(pago));
+    fd.append('cli_nombre', nombre);
+    fd.append('cli_apellido', apellido);
+    fd.append('cli_cedula', cedula);
+    fd.append('metodo_pago', metodoPago);
 
     try {
       if (btnGuardar) {
@@ -488,20 +540,33 @@
         method: 'POST',
         body: fd
       });
+
       if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
+        const jErr = await resToJsonSafe(res);
+        const msg = jErr.msg || jErr.error || `HTTP ${res.status}`;
+        throw new Error(msg);
       }
+
       const j = await resToJsonSafe(res);
 
       if (j.ok === false) {
         throw new Error(j.msg || 'No se pudo guardar la venta');
       }
 
+      const idVenta = j.id_venta ?? j.id ?? null;
+
       uiToast('Venta registrada correctamente.', 'success');
       carrito.splice(0, carrito.length);
       renderCarrito();
       setMsg(`Venta guardada con éxito. Cambio: ${money(cambio)}.`, true);
       cargarHistorial(1);
+
+      // 🔹 Abrir factura en PDF en nueva pestaña
+      if (idVenta) {
+        const urlFactura = `${base}/?r=admin_cajero_factura&id_venta=${encodeURIComponent(idVenta)}`;
+        window.open(urlFactura, '_blank');
+      }
+
     } catch (err) {
       console.error('Error guardar venta:', err);
       uiToast(err.message || 'Error al guardar venta', 'danger');
@@ -574,6 +639,11 @@
   // =====================================================
   function boot() {
     ensureToastCSS();
+
+    // Validaciones de campos cliente
+    soloLetras(inpCliNombre);
+    soloLetras(inpCliApellido);
+    configurarCedula(inpCliCedula);
 
     if (selProducto) {
       cargarProductos();
