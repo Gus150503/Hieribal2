@@ -16,7 +16,7 @@
   const api  = (params = '') => `${base}/?r=admin_cajero_api&${params}`;
 
   // ===== Estado =====
-  const carrito = []; // [{id_producto, nombre, precio, cantidad}]
+  const carrito   = []; // [{id_producto, nombre, precio, cantidad}]
   const histState = { page: 1, per: 20, total: 0 };
 
   // ===== Selectores =====
@@ -33,7 +33,7 @@
   const tbodyHist     = $('#tablaHistorial tbody');
 
   // =====================================================
-  // Toasts reutilizables (igual estilo que admin_usuarios)
+  // Toasts
   // =====================================================
   function ensureToastCSS() {
     if (document.getElementById('_cajero_toast_css')) return;
@@ -94,7 +94,6 @@
     return host;
   }
 
-  /** uiToast('mensaje', 'success'|'danger'|'warning'|'info', ms=3500) */
   function uiToast(msg, variant='info', ms=3500){
     const host = ensureToastHost();
     const t = document.createElement('div');
@@ -113,12 +112,12 @@
   }
 
   // =====================================================
-  // Confirm genérico (reutiliza #confirmModal si existe)
+  // Confirm genérico (si tienes modal bootstrap, lo usa; si no, confirm nativo)
   // =====================================================
   function uiConfirm(opts = {}) {
     const modalEl = document.getElementById('confirmModal');
     if (!modalEl || !window.bootstrap) {
-      return Promise.resolve(confirm(opts.body || '¿Seguro?')); // fallback
+      return Promise.resolve(confirm(opts.body || '¿Seguro?')); // fallback nativo
     }
     const title = modalEl.querySelector('#confirmTitle');
     const body  = modalEl.querySelector('#confirmBody');
@@ -176,13 +175,108 @@
     msgBox.className = ok ? 'text-success small' : 'text-danger small';
   }
 
+  // Impedir "-" y "e" en inputs numéricos (sólo 1 en adelante)
+  function bloquearMinusYExponente(input){
+    if (!input) return;
+    input.addEventListener('keydown', (e) => {
+      if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+        e.preventDefault();
+      }
+    });
+    input.addEventListener('input', (e) => {
+      let v = String(e.target.value || '').replace(/[^\d]/g, '');
+      if (v === '' || v === '0') v = '1';
+      e.target.value = v;
+    });
+  }
+
+  // =====================================================
+  // Modal de pago / cambio
+  // =====================================================
+  function pedirPagoEnModal(total, resumenTexto) {
+    const modalEl   = document.getElementById('ventaModal');
+    if (!modalEl || !window.bootstrap) {
+      // Fallback por si falta el modal alguna vez
+      let pagoStr = prompt(
+        `Total a pagar: ${money(total)}\n\n` +
+        '¿Con cuánto paga el cliente? (solo números, sin puntos ni comas)'
+      );
+      if (pagoStr === null) return Promise.resolve(null);
+      pagoStr = pagoStr.trim().replace(/[^\d]/g, '');
+      const pago = parseFloat(pagoStr || '0');
+      if (!pago || pago < total) return Promise.resolve(null);
+      return Promise.resolve({ pago, cambio: pago - total });
+    }
+
+    const lblTotal   = modalEl.querySelector('#vmTotal');
+    const inpPagaCon = modalEl.querySelector('#vmPagaCon');
+    const lblCambio  = modalEl.querySelector('#vmCambio');
+    const divResumen = modalEl.querySelector('#vmResumen');
+    const btnOk      = modalEl.querySelector('#vmBtnConfirmar');
+
+    lblTotal.textContent   = money(total);
+    lblCambio.textContent  = '$0';
+    inpPagaCon.value       = '';
+    inpPagaCon.classList.remove('is-invalid');
+    divResumen.innerHTML   = resumenTexto.replace(/\n/g, '<br>');
+
+    const bs = new bootstrap.Modal(modalEl, { backdrop: 'static' });
+
+    const calcCambio = () => {
+      const raw = String(inpPagaCon.value || '').replace(/[^\d]/g, '');
+      inpPagaCon.value = raw;
+      const pago = parseFloat(raw || '0');
+      if (!pago || pago < total) {
+        lblCambio.textContent = '$0';
+        inpPagaCon.classList.toggle('is-invalid', !!raw);
+        return;
+      }
+      const cambio = pago - total;
+      lblCambio.textContent = money(cambio);
+      inpPagaCon.classList.remove('is-invalid');
+    };
+
+    const p = new Promise(resolve => {
+      const onConfirm = () => {
+        const pago = parseFloat(inpPagaCon.value || '0');
+        if (!pago || pago < total) {
+          inpPagaCon.classList.add('is-invalid');
+          return;
+        }
+        const cambio = pago - total;
+        cleanup();
+        bs.hide();
+        resolve({ pago, cambio });
+      };
+
+      const onHidden = () => {
+        cleanup();
+        resolve(null); // canceló
+      };
+
+      const cleanup = () => {
+        btnOk.removeEventListener('click', onConfirm);
+        modalEl.removeEventListener('hidden.bs.modal', onHidden);
+        inpPagaCon.removeEventListener('input', calcCambio);
+      };
+
+      btnOk.addEventListener('click', onConfirm);
+      modalEl.addEventListener('hidden.bs.modal', onHidden, { once:true });
+      inpPagaCon.addEventListener('input', calcCambio);
+
+      bs.show();
+      setTimeout(() => inpPagaCon.focus(), 250);
+    });
+
+    return p;
+  }
+
   // =====================================================
   // Productos -> dropdown
   // =====================================================
   async function cargarProductos() {
     if (!selProducto) return;
 
-    // placeholder de carga
     selProducto.innerHTML = '<option value="">Cargando productos…</option>';
 
     try {
@@ -192,7 +286,6 @@
       }
       const j = await resToJsonSafe(res);
 
-      // si viene {ok:false, msg:...}
       if (j.ok === false) {
         throw new Error(j.msg || 'Error de API al cargar productos');
       }
@@ -206,11 +299,18 @@
       selProducto.innerHTML = '<option value="">Seleccione un producto…</option>';
 
       for (const p of items) {
+        // Soportar distintos nombres de columnas
+        const id = p.id ?? p.id_producto ?? p.ID ?? null;
+        const nombre = p.nombre ?? p.nombre_producto ?? p.descripcion ?? 'Producto sin nombre';
+        const precio = Number(
+          (p.precio_venta ?? p.precio ?? p.precio_unitario ?? 0)
+        );
+
+        if (!id || !precio) continue; // si algo viene roto, lo saltamos
+
         const opt = document.createElement('option');
-        opt.value = p.id_producto;
-        const nombre = p.nombre_producto || p.nombre || '';
-        const precio = Number(p.precio_venta || p.precio || 0);
-        opt.textContent = `${nombre} (${money(precio)})`;
+        opt.value = id;
+        opt.textContent = `${nombre} - ${money(precio)}`;   // nombre + precio
         opt.dataset.nombre = nombre;
         opt.dataset.precio = String(precio);
         selProducto.appendChild(opt);
@@ -268,6 +368,10 @@
       `;
       tbodyCarrito.appendChild(tr);
     }
+
+    // bloquear "-" y "e" en cantidades del carrito
+    tbodyCarrito.querySelectorAll('.cj-cant').forEach(bloquearMinusYExponente);
+
     actualizarTotal();
   }
 
@@ -312,7 +416,7 @@
   }
 
   function onCarritoClick(e) {
-    const btnDel = e.target.closest('.cj-del');
+    const btnDel    = e.target.closest('.cj-del');
     const inputCant = e.target.closest('.cj-cant');
 
     // Eliminar
@@ -338,6 +442,7 @@
 
       let nueva = parseFloat(inputCant.value || '1');
       if (!nueva || nueva <= 0) nueva = 1;
+      inputCant.value = String(nueva);
       it.cantidad = nueva;
       renderCarrito();
       return;
@@ -345,7 +450,7 @@
   }
 
   // =====================================================
-  // Guardar venta
+  // Guardar venta (usando modal de pago)
   // =====================================================
   async function guardarVenta() {
     if (!carrito.length) {
@@ -354,21 +459,23 @@
     }
 
     const total = carrito.reduce((acc, it) => acc + it.cantidad * it.precio, 0);
+
     const resumen = carrito
       .map(it => `• ${it.nombre} x ${it.cantidad} = ${money(it.cantidad * it.precio)}`)
       .join('\n');
 
-    const ok = await uiConfirm({
-      title: 'Confirmar venta',
-      body: `Total: ${money(total)}\n\n${resumen}\n\n¿Registrar esta venta?`,
-      confirmText: 'Sí, registrar venta',
-      variant: 'success'
-    });
-    if (!ok) return;
+    // Modal bonito para pedir con cuánto paga el cliente
+    const pagoInfo = await pedirPagoEnModal(total, resumen);
+    if (!pagoInfo) {
+      // canceló o valor inválido
+      return;
+    }
+
+    const { pago, cambio } = pagoInfo;
 
     const fd = new FormData();
     fd.append('items', JSON.stringify(carrito));
-    // Si luego manejas cliente, aquí iría fd.append('id_cliente', idCliente);
+    fd.append('pago_efectivo', String(pago)); // backend ya lo espera
 
     try {
       if (btnGuardar) {
@@ -377,7 +484,6 @@
           '<span class="spinner-border spinner-border-sm me-1"></span>Guardando…';
       }
 
-      // 👈 usar el action correcto según el controlador (crear_venta)
       const res = await fetch(api('action=crear_venta'), {
         method: 'POST',
         body: fd
@@ -394,7 +500,7 @@
       uiToast('Venta registrada correctamente.', 'success');
       carrito.splice(0, carrito.length);
       renderCarrito();
-      setMsg('Venta guardada con éxito.', true);
+      setMsg(`Venta guardada con éxito. Cambio: ${money(cambio)}.`, true);
       cargarHistorial(1);
     } catch (err) {
       console.error('Error guardar venta:', err);
@@ -472,6 +578,9 @@
     if (selProducto) {
       cargarProductos();
     }
+    if (inpCantidad) {
+      bloquearMinusYExponente(inpCantidad);
+    }
     if (tbodyCarrito) {
       renderCarrito();
       tbodyCarrito.addEventListener('click', onCarritoClick);
@@ -485,6 +594,12 @@
     }
     if (tbodyHist) {
       cargarHistorial(1);
+    }
+
+    // bloquear "-" y "e" en el input del modal de pago
+    const inpModalPago = document.getElementById('vmPagaCon');
+    if (inpModalPago) {
+      bloquearMinusYExponente(inpModalPago);
     }
   }
 
