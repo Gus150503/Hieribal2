@@ -1,59 +1,95 @@
-<?php
-// home/index.php (o la ruta que uses)
-if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hieribal - Droguería Naturista</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
 
-$base = rtrim($this->config['app']['base_url'] ?? '', '/');
-$logeado = !empty($_SESSION['cliente']);
-?>
 <!-- HERO / BIENVENIDA -->
 <section id="top" class="bienvenida">
     <div class="texto-bienvenida">
         <h1>¡Hola <span>somos Hieribal</span>!</h1>
         <p>Cuidarte naturalmente es la mejor forma de quererte. Hierbal lo hace posible.</p>
 
-                <?php
-        if (session_status() !== PHP_SESSION_ACTIVE) session_start();
-
-        if (!empty($_SESSION['flash_public'])):
-            $f = $_SESSION['flash_public'];
-            unset($_SESSION['flash_public']); // Se muestra solo una vez
-        ?>
-            <div id="alertaFlash" style="
-                margin-top: 15px;
-                padding: 15px 20px;
-                border-radius: 8px;
-                font-size: 16px;
-                font-weight: 500;
-                opacity: 1;
-                transition: opacity .3s ease;
-                color: <?= $f['type'] === 'success' ? '#155724' : '#721c24' ?>;
-                background: <?= $f['type'] === 'success' ? '#d4edda' : '#f8d7da' ?>;
-                border: 1px solid <?= $f['type'] === 'success' ? '#c3e6cb' : '#f5c6cb' ?>;
-            ">
-                <?= htmlspecialchars($f['msg'], ENT_QUOTES, 'UTF-8') ?>
-            </div>
-        <?php endif; ?>
-
-        <?php if (!$logeado): ?>
-        <!-- ✅ Usuario NO logueado -->
-        <a href="<?= $base ?>/?r=login" class="btn-ver-todo">Iniciar sesión (Cliente)</a>
-        <a href="<?= $base ?>/?r=admin_login" class="btn-ver-todo">Modo Administrador</a>
-        <?php else: ?>
-        <!-- ✅ Usuario logueado -->
-        <a href="<?= $base ?>/?r=dashboard" class="btn-ver-todo">Ir a mi panel</a>
-        <a href="<?= $base ?>/?r=logout" class="btn-ver-todo" style="background:#444;">Cerrar sesión</a>
-        <?php endif; ?>
+        <!-- Usuario NO logueado -->
+        <a href="?r=login" class="btn-ver-todo">Iniciar sesión (Cliente)</a>
+        <a href="?r=admin_login" class="btn-ver-todo">Modo Administrador</a>
+        
+        <!-- Si está logueado, cambiar por estos botones:
+        <a href="?r=dashboard" class="btn-ver-todo">Ir a mi panel</a>
+        <a href="?r=logout" class="btn-ver-todo" style="background:#444;">Cerrar sesión</a>
+        -->
     </div>
 
     <div class="imagenes-bienvenida">
         <div class="img-card grande">
-            <img src="<?= $base ?>/assets/img/IA 1.jpg" alt="Persona 1">
+            <img src="assets/img/IA 1.jpg" alt="Persona 1">
         </div>
         <div class="img-card">
-            <img src="<?= $base ?>/assets/img/IA 2.jpg" alt="Persona 2">
+            <img src="assets/img/IA 2.jpg" alt="Persona 2">
         </div>
         <div class="img-card">
-            <img src="<?= $base ?>/assets/img/IA 3.jpg" alt="Persona 3">
+            <img src="assets/img/IA 3.jpg" alt="Persona 3">
+        </div>
+    </div>
+</section>
+
+<!-- ✨ SECCIÓN DE ESTADÍSTICAS -->
+<section class="stats-section">
+    <div class="stats-container">
+        <div class="stat-box">
+            <div class="stat-icon">🌿</div>
+            <h3 class="stat-number" data-target="500">0</h3>
+            <p class="stat-label">Productos Naturales</p>
+        </div>
+        <div class="stat-box">
+            <div class="stat-icon">😊</div>
+            <h3 class="stat-number" data-target="1000">0</h3>
+            <p class="stat-label">Clientes Satisfechos</p>
+        </div>
+        <div class="stat-box">
+            <div class="stat-icon">⭐</div>
+            <h3 class="stat-number" data-target="15">0</h3>
+            <p class="stat-label">Años de Experiencia</p>
+        </div>
+        <div class="stat-box">
+            <div class="stat-icon">✅</div>
+            <h3 class="stat-number" data-target="100">0</h3>
+            <p class="stat-label">% Calidad Garantizada</p>
+        </div>
+    </div>
+</section>
+
+<!-- ✨ BENEFICIOS / CARACTERÍSTICAS -->
+<section class="beneficios-section">
+    <div class="beneficios-header">
+        <span class="section-badge">¿Por qué elegirnos?</span>
+        <h2>Ventajas de comprar con nosotros</h2>
+    </div>
+    <div class="beneficios-grid">
+        <div class="beneficio-card">
+            <div class="beneficio-icon">🍃</div>
+            <h3>100% Natural</h3>
+            <p>Todos nuestros productos son de origen natural, sin químicos ni conservantes artificiales.</p>
+        </div>
+        <div class="beneficio-card">
+            <div class="beneficio-icon">🔬</div>
+            <h3>Certificados de Calidad</h3>
+            <p>Productos certificados y avalados por las autoridades sanitarias correspondientes.</p>
+        </div>
+        <div class="beneficio-card">
+            <div class="beneficio-icon">🚚</div>
+            <h3>Envío Seguro</h3>
+            <p>Entregamos tus productos de forma segura y rápida a cualquier parte del país.</p>
+        </div>
+        <div class="beneficio-card">
+            <div class="beneficio-icon">💚</div>
+            <h3>Asesoría Personalizada</h3>
+            <p>Contamos con expertos que te guiarán para encontrar el producto ideal para ti.</p>
         </div>
     </div>
 </section>
@@ -62,7 +98,7 @@ $logeado = !empty($_SESSION['cliente']);
 <main id="quienes-somos" class="main-content">
     <div class="image-section">
         <video autoplay loop playsinline controls class="video-pequeno">
-            
+            <source src="assets/video/presentacion.mp4" type="video/mp4">
             Tu navegador no soporta videos en HTML5.
         </video>
     </div>
@@ -84,6 +120,57 @@ $logeado = !empty($_SESSION['cliente']);
     </section>
 </main>
 
+<!-- ✨ CATEGORÍAS DE PRODUCTOS -->
+<section class="categorias-section">
+    <div class="categorias-header">
+        <h2>Explora Nuestras Categorías</h2>
+        <p>Encuentra el producto perfecto para tus necesidades</p>
+    </div>
+    <div class="categorias-grid">
+        <div class="categoria-card">
+            <div class="categoria-imagen">
+                <img src="" alt="Suplementos" onerror="this.src='">
+                <div class="categoria-overlay">
+                    <h3>Suplementos</h3>
+                    <p>Vitaminas y minerales</p>
+                    <a href="?r=productos&cat=suplementos" class="btn-categoria">Ver productos</a>
+                </div>
+            </div>
+        </div>
+        <div class="categoria-card">
+            <div class="categoria-imagen">
+                <img src="" alt="Plantas Medicinales" onerror="this.src='">
+                <div class="categoria-overlay">
+                    <h3>Plantas Medicinales</h3>
+                    <p>Hierbas y extractos</p>
+                    <a href="?r=productos&cat=plantas" class="btn-categoria">Ver productos</a>
+                </div>
+            </div>
+        </div>
+        <div class="categoria-card">
+            <div class="categoria-imagen">
+                <img src="" alt="Cosméticos Naturales" onerror="this.src='">
+                <div class="categoria-overlay">
+                    <h3>Cosmética Natural</h3>
+                    <p>Cuidado personal</p>
+                    <a href="?r=productos&cat=cosmeticos" class="btn-categoria">Ver productos</a>
+                </div>
+            </div>
+        </div>
+        <div class="categoria-card">
+            <div class="categoria-imagen">
+                <img src="" alt="Tés e Infusiones" onerror="this.src='">
+                <div class="categoria-overlay">
+                    <h3>Tés e Infusiones</h3>
+                    <p>Bebidas saludables</p>
+                    <a href="?r=productos&cat=tes" class="btn-categoria">Ver productos</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MISIÓN, VISIÓN Y COMPROMISO -->
 <section id="nosotros" class="nosotros-section">
     <div class="nosotros-about-section">
         <div>
@@ -96,19 +183,151 @@ $logeado = !empty($_SESSION['cliente']);
                 <p>Ser la droguería naturista líder en la zona...</p>
             </div>
         </div>
-        <div>
-            <div class="commitment-card">
-                <h3>Compromiso</h3>
-                <p>Nuestro lema es ser comprometidos de una manera eficiente con nuestros clientes.</p>
+    </div>
+</section>
+
+<!-- ✨ TESTIMONIOS -->
+<section class="testimonios-section">
+    <div class="testimonios-header">
+        <span class="section-badge">Testimonios</span>
+        <h2>Lo que dicen nuestros clientes</h2>
+    </div>
+    <div class="testimonios-slider">
+        <div class="testimonio-card">
+            <div class="testimonio-rating">⭐⭐⭐⭐⭐</div>
+            <p class="testimonio-texto">
+                "Excelente atención y productos de calidad. He notado una gran mejora en mi salud desde que consumo sus suplementos naturales."
+            </p>
+            <div class="testimonio-autor">
+                <div class="autor-avatar">M</div>
+                <div class="autor-info">
+                    <h4>María González</h4>
+                    <p>Cliente frecuente</p>
+                </div>
+            </div>
+        </div>
+        <div class="testimonio-card">
+            <div class="testimonio-rating">⭐⭐⭐⭐⭐</div>
+            <p class="testimonio-texto">
+                "La mejor droguería naturista de la zona. Siempre encuentro lo que necesito y me asesoran muy bien sobre cada producto."
+            </p>
+            <div class="testimonio-autor">
+                <div class="autor-avatar">J</div>
+                <div class="autor-info">
+                    <h4>Juan Pérez</h4>
+                    <p>Cliente desde 2020</p>
+                </div>
+            </div>
+        </div>
+        <div class="testimonio-card">
+            <div class="testimonio-rating">⭐⭐⭐⭐⭐</div>
+            <p class="testimonio-texto">
+                "Productos naturales de excelente calidad. El envío fue rápido y todo llegó en perfecto estado. Muy recomendado."
+            </p>
+            <div class="testimonio-autor">
+                <div class="autor-avatar">A</div>
+                <div class="autor-info">
+                    <h4>Ana Martínez</h4>
+                    <p>Compra online</p>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
+<!-- ✨ BLOG / CONSEJOS -->
+<section class="blog-section">
+    <div class="blog-header">
+        <h2>Consejos de Salud Natural</h2>
+        <p>Aprende más sobre bienestar y vida saludable</p>
+    </div>
+    <div class="blog-grid">
+        <article class="blog-card">
+            <div class="blog-imagen">
+                <img src="assets/img/blog-1.jpg" alt="Artículo 1" onerror="this.src='https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400'">
+                <span class="blog-categoria">Nutrición</span>
+            </div>
+            <div class="blog-contenido">
+                <h3>Beneficios de los Superalimentos</h3>
+                <p>Descubre cómo los superalimentos pueden transformar tu salud y bienestar diario...</p>
+                <a href="#" class="blog-link">Leer más →</a>
+            </div>
+        </article>
+        <article class="blog-card">
+            <div class="blog-imagen">
+                <img src="assets/img/blog-2.jpg" alt="Artículo 2" onerror="this.src='https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400'">
+                <span class="blog-categoria">Bienestar</span>
+            </div>
+            <div class="blog-contenido">
+                <h3>Plantas para Mejorar el Sueño</h3>
+                <p>Conoce las mejores plantas medicinales que te ayudarán a descansar mejor cada noche...</p>
+                <a href="#" class="blog-link">Leer más →</a>
+            </div>
+        </article>
+        <article class="blog-card">
+            <div class="blog-imagen">
+                <img src="assets/img/blog-3.jpg" alt="Artículo 3" onerror="this.src='https://images.unsplash.com/photo-1505576399279-565b52d4ac71?w=400'">
+                <span class="blog-categoria">Salud</span>
+            </div>
+            <div class="blog-contenido">
+                <h3>Refuerza tu Sistema Inmune</h3>
+                <p>Tips naturales y efectivos para fortalecer tus defensas de manera natural...</p>
+                <a href="#" class="blog-link">Leer más →</a>
+            </div>
+        </article>
+    </div>
+</section>
+
+<!-- ✨ PREGUNTAS FRECUENTES -->
+<section class="faq-section">
+    <div class="faq-header">
+        <h2>Preguntas Frecuentes</h2>
+        <p>Resolvemos tus dudas más comunes</p>
+    </div>
+    <div class="faq-container">
+        <div class="faq-item">
+            <button class="faq-pregunta">
+                ¿Los productos son 100% naturales?
+                <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-respuesta">
+                <p>Sí, todos nuestros productos son de origen natural y están certificados. No utilizamos químicos artificiales ni conservantes dañinos.</p>
+            </div>
+        </div>
+        <div class="faq-item">
+            <button class="faq-pregunta">
+                ¿Realizan envíos a todo el país?
+                <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-respuesta">
+                <p>Sí, realizamos envíos seguros a toda Colombia. El tiempo de entrega varía según la ciudad de destino.</p>
+            </div>
+        </div>
+        <div class="faq-item">
+            <button class="faq-pregunta">
+                ¿Ofrecen asesoría para elegir productos?
+                <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-respuesta">
+                <p>Por supuesto. Contamos con personal capacitado que te orientará para elegir el producto más adecuado según tus necesidades.</p>
+            </div>
+        </div>
+        <div class="faq-item">
+            <button class="faq-pregunta">
+                ¿Cuáles son los métodos de pago?
+                <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-respuesta">
+                <p>Aceptamos transferencias bancarias, pagos con tarjeta de crédito/débito y pago contra entrega en algunas zonas.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- NEWSLETTER / SUSCRIPCIÓN -->
 <section class="call-to-action-section">
     <h2>Únete a Nuestra Comunidad Saludable</h2>
-    <p>Recibe las últimas noticias, ofertas exclusivas y consejos de bienestar directamente en tu bandeja de entrada.
-    </p>
+    <p>Recibe las últimas noticias, ofertas exclusivas y consejos de bienestar directamente en tu bandeja de entrada.</p>
     <div class="form-container">
         <input type="text" placeholder="Tu Nombre" />
         <input type="email" placeholder="Tu Correo Electrónico" />
@@ -117,6 +336,61 @@ $logeado = !empty($_SESSION['cliente']);
 </section>
 
 <script>
+// Animación de números contadores
+const animateCounters = () => {
+    const counters = document.querySelectorAll('.stat-number');
+    counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        const duration = 2000;
+        const step = target / (duration / 16);
+        let current = 0;
+        
+        const updateCounter = () => {
+            current += step;
+            if (current < target) {
+                counter.textContent = Math.floor(current) + '+';
+                requestAnimationFrame(updateCounter);
+            } else {
+                counter.textContent = target + '+';
+            }
+        };
+        updateCounter();
+    });
+};
+
+// Observer para animar cuando sea visible
+const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            animateCounters();
+            statsObserver.unobserve(entry.target);
+        }
+    });
+});
+
+const statsSection = document.querySelector('.stats-section');
+if (statsSection) {
+    statsObserver.observe(statsSection);
+}
+
+// FAQ Accordion
+document.querySelectorAll('.faq-pregunta').forEach(button => {
+    button.addEventListener('click', () => {
+        const faqItem = button.parentElement;
+        const isActive = faqItem.classList.contains('active');
+        
+        // Cerrar todos los FAQ
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        // Abrir el clickeado si no estaba activo
+        if (!isActive) {
+            faqItem.classList.add('active');
+        }
+    });
+});
+
 // Desvanecer y eliminar el mensaje después de unos segundos
 window.addEventListener('DOMContentLoaded', () => {
     const alerta = document.getElementById('alertaFlash');
@@ -128,3 +402,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
+
+</body>
+</html>

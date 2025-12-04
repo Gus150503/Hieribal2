@@ -645,4 +645,241 @@
 
   window.addEventListener('pageshow', (e) => { if (e.persisted) boot(); });
 
+  // ======================================================================
+//  MÓDULO: PRODUCTOS QUE MANEJA EL PROVEEDOR
+// ======================================================================
+
+// Elementos del modal secundario
+const mpModalEl   = document.getElementById('modalProductosProveedor');
+const mpProvNombre= document.getElementById('mpProvNombre');
+const mpCatalogo  = document.getElementById('mpProductoCatalogo');
+const mpTablaBody = document.querySelector('#mpTablaProductos tbody');
+const mpBtnAgregar= document.getElementById('mpBtnAgregarProducto');
+const mpBtnGuardar= document.getElementById('mpBtnGuardar');
+
+let mpModal = null;
+let currentProveedorId = 0;
+
+// Inicializar modal BS
+if (mpModalEl && bootstrap.Modal) {
+  mpModal = new bootstrap.Modal(mpModalEl, { backdrop: 'static' });
+}
+
+// ----------------------------------------------------
+// 1. Abrir modal de productos del proveedor
+// ----------------------------------------------------
+document.getElementById('btnProductosProveedor')?.addEventListener('click', async () => {
+  const id = frm.idProveedor.value;
+
+  if (!id) {
+    uiToast("Primero guarda el proveedor antes de asignar productos.", "warning");
+    return;
+  }
+
+  currentProveedorId = id;
+  mpProvNombre.textContent = frm.empresa.value;
+
+  await cargarCatalogo();
+  await cargarProductosProveedor(id);
+
+  mpModal.show();
+});
+
+// ----------------------------------------------------
+// 2. Cargar catálogo de productos (para el select)
+// ----------------------------------------------------
+async function cargarCatalogo() {
+  mpCatalogo.innerHTML = '<option value="">Cargando…</option>';
+
+  try {
+    const r = await fetch(api("action=productos_catalogo"));
+    const j = await r.json();
+
+    mpCatalogo.innerHTML = '<option value="">-- Selecciona un producto --</option>';
+
+    (j.items || j.data || []).forEach(p => {
+      let base = p.precio_compra ?? p.precio_base ?? 0;
+      if (base === null || base === undefined || base === '') base = 0;
+
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = `${p.nombre} (Base: $${Number(base).toFixed(2)})`;
+      opt.dataset.base = base;
+      opt.dataset.nombre = p.nombre;
+      mpCatalogo.appendChild(opt);
+    });
+
+  } catch {
+    uiToast("Error cargando catálogo de productos", "danger");
+  }
+}
+
+// ----------------------------------------------------
+// 3. Cargar productos asignados al proveedor
+// ----------------------------------------------------
+async function cargarProductosProveedor(idProveedor) {
+  mpTablaBody.innerHTML = `
+    <tr><td colspan="5" class="text-center py-3">
+      <div class="spinner-border spinner-border-sm"></div> Cargando…
+    </td></tr>`;
+
+  try {
+    const r = await fetch(api(`action=productos_proveedor&id_proveedor=${idProveedor}`));
+    const j = await r.json();
+
+    const items = j.items || j.data || [];
+
+    if (!items.length) {
+      mpTablaBody.innerHTML = `
+        <tr class="mp-empty-row">
+          <td colspan="5" class="text-center text-muted py-3">
+            No hay productos asignados
+          </td>
+        </tr>`;
+      return;
+    }
+
+    mpTablaBody.innerHTML = "";
+
+    items.forEach(p =>
+      agregarFilaProducto(
+        p.producto_id,
+        p.nombre,
+        p.precio_base,
+        p.precio_compra,
+        p.activo
+      )
+    );
+
+  } catch {
+    uiToast("No se pudieron cargar los productos del proveedor", "danger");
+  }
+}
+
+// ----------------------------------------------------
+// 4. Agregar fila a la tabla
+// ----------------------------------------------------
+function agregarFilaProducto(id, nombre, precioBase, precioProv = "", activo = 1) {
+  // si había la fila "No hay productos asignados", la quitamos
+  const emptyRow = mpTablaBody.querySelector('.mp-empty-row');
+  if (emptyRow) emptyRow.remove();
+
+  let base = Number(precioBase ?? 0);
+  let prov = (precioProv !== null && precioProv !== undefined && precioProv !== "")
+    ? Number(precioProv)
+    : base;
+
+  const tr = document.createElement("tr");
+  tr.dataset.id = id;
+
+  tr.innerHTML = `
+    <td>${nombre}</td>
+    <td>$${base.toFixed(2)}</td>
+    <td>
+      <input type="number" class="form-control form-control-sm"
+             value="${prov}" min="0" step="0.01">
+    </td>
+    <td class="text-center">
+      <input type="checkbox" ${activo ? "checked" : ""}>
+    </td>
+    <td class="text-end">
+      <button class="btn btn-sm btn-outline-danger mp-remove">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </td>
+  `;
+
+  mpTablaBody.appendChild(tr);
+}
+
+// ----------------------------------------------------
+// 5. Botón agregar producto desde el catálogo
+// ----------------------------------------------------
+mpBtnAgregar?.addEventListener("click", () => {
+  const opt = mpCatalogo.selectedOptions[0];
+  if (!opt) return;
+
+  const id    = opt.value;
+  const nombre= opt.dataset.nombre;
+  const base  = opt.dataset.base;
+
+  // Ver si ya existe
+  if (mpTablaBody.querySelector(`tr[data-id="${id}"]`)) {
+    uiToast("Este producto ya está agregado.", "warning");
+    return;
+  }
+
+  agregarFilaProducto(id, nombre, base);
+});
+
+// ----------------------------------------------------
+// 6. Quitar producto
+// ----------------------------------------------------
+mpTablaBody?.addEventListener("click", (e) => {
+  if (!e.target.closest(".mp-remove")) return;
+  e.target.closest("tr")?.remove();
+
+  // si se quedó vacío, mostramos nuevamente el mensaje
+  if (!mpTablaBody.querySelector('tr')) {
+    mpTablaBody.innerHTML = `
+      <tr class="mp-empty-row">
+        <td colspan="5" class="text-center text-muted py-3">
+          No hay productos asignados
+        </td>
+      </tr>`;
+  }
+});
+
+// ----------------------------------------------------
+// 7. Guardar productos del proveedor
+// ----------------------------------------------------
+mpBtnGuardar?.addEventListener("click", async () => {
+  const items = [];
+
+  mpTablaBody.querySelectorAll("tr").forEach(tr => {
+    const id        = tr.dataset.id;
+    const inpPrecio = tr.querySelector("input[type=number]");
+    const chk       = tr.querySelector("input[type=checkbox]");
+
+    // saltar filas sin inputs (como la de "No hay productos asignados")
+    if (!id || !inpPrecio || !chk) return;
+
+    const precio = inpPrecio.value;
+    const activo = chk.checked ? 1 : 0;
+
+    items.push({
+      producto_id: id,
+      precio_compra: precio,
+      activo
+    });
+  });
+
+  if (!items.length) {
+    uiToast("Agrega al menos un producto.", "warning");
+    return;
+  }
+
+  try {
+    const r = await fetch(api("action=productos_save"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id_proveedor: currentProveedorId,
+        items
+      })
+    });
+
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.msg || "Error al guardar productos");
+
+    uiToast("Productos guardados correctamente", "success");
+    mpModal.hide();
+
+  } catch (err) {
+    uiToast(err.message || "Error al guardar productos", "danger");
+  }
+});
+
+
+
 })();

@@ -130,24 +130,37 @@ $normFotoProd = function (array $row) use ($base): string {
     </article>
 
     <!-- Héroe 4: 1 año en la empresa -->
-    <article class="hero panel">
-      <h5 class="hero-title">🎉 1 año en la empresa</h5>
-      <div class="slider slider--hero" data-slider data-autoplay="4000">
-        <div class="slider-track" data-track>
-          <?php if (!empty($aniversario1Año)): foreach ($aniversario1Año as $e): $foto = $normFoto($e); ?>
-            <div class="hero-card">
-              <img class="hero-avatar" src="<?= $base ?>/assets/img/avatars/<?= htmlspecialchars($foto) ?>" alt="<?= htmlspecialchars($e['nombre'] ?? 'Empleado') ?>">
-              <div class="hero-text">
-                <div class="hero-name"><?= htmlspecialchars($e['nombre'] ?? 'Empleado') ?></div>
-                <div class="hero-sub">Desde: <?= htmlspecialchars($e['desde'] ?? '') ?></div>
-              </div>
+<!-- Héroe 4: 1 año en la empresa -->
+<article class="hero panel">
+  <h5 class="hero-title">🎉 1 año en la empresa</h5>
+  <div class="slider slider--hero" data-slider data-autoplay="4000">
+    <div class="slider-track" data-track>
+      <?php if (!empty($aniversario1Año)): ?>
+        <?php foreach ($aniversario1Año as $e): ?>
+          <?php
+            $nombre = $e['nombre'] ?? 'Empleado';
+            $desde  = $e['desde']  ?? '';
+
+            // Ruta COMPLETA al placeholder (ajusta a .png si tu archivo es .png)
+            $foto   = $base . '/assets/img/placeholder.jpg';
+          ?>
+          <div class="hero-card">
+            <img class="hero-avatar"
+                 src="<?= htmlspecialchars($foto) ?>"
+                 alt="<?= htmlspecialchars($nombre) ?>">
+            <div class="hero-text">
+              <div class="hero-name"><?= htmlspecialchars($nombre) ?></div>
+              <div class="hero-sub">Desde: <?= htmlspecialchars($desde) ?></div>
             </div>
-          <?php endforeach; else: ?>
-            <div class="hero-card hero-empty">Sin datos</div>
-          <?php endif; ?>
-        </div>
-      </div>
-    </article>
+          </div>
+        <?php endforeach; ?>
+      <?php else: ?>
+        <div class="hero-card hero-empty">Sin datos</div>
+      <?php endif; ?>
+    </div>
+  </div>
+</article>
+
   </section><!-- /hero-grid -->
 
   <!-- ===== CHARTS ===== -->

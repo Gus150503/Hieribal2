@@ -70,7 +70,9 @@ $base = $this->config['app']['base_url'] ?? '';
   </div>
 </section>
 
-<!-- Modal -->
+<!-- =========================================================
+     MODAL PRINCIPAL: CREAR / EDITAR PROVEEDOR
+========================================================= -->
 <div class="modal fade" id="modalProveedor" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -142,12 +144,23 @@ $base = $this->config['app']['base_url'] ?? '';
             </div>
           </div>
 
-          <div class="modal-footer border-0 pt-3">
-            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-success">
-              <i class="bi bi-check2-circle me-1"></i> Guardar
+          <div class="modal-footer border-0 pt-3 d-flex justify-content-between">
+            <!-- 🔹 Botón para abrir gestión de productos de este proveedor -->
+            <button type="button"
+                    class="btn btn-outline-warning"
+                    id="btnProductosProveedor">
+              <i class="bi bi-box-seam me-1"></i>
+              Productos que maneja
             </button>
+
+            <div>
+              <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-success">
+                <i class="bi bi-check2-circle me-1"></i> Guardar
+              </button>
+            </div>
           </div>
+
         </form>
       </div>
 
@@ -155,9 +168,76 @@ $base = $this->config['app']['base_url'] ?? '';
   </div>
 </div>
 
+<!-- =========================================================
+     MODAL SECUNDARIO: PRODUCTOS DEL PROVEEDOR
+========================================================= -->
+<div class="modal fade" id="modalProductosProveedor" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          Productos que maneja el proveedor
+          <span class="text-muted small" id="mpProvNombre"></span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- selector para agregar productos -->
+        <div class="row g-2 align-items-end mb-3">
+          <div class="col-md-8">
+            <label class="form-label">Agregar producto</label>
+            <select id="mpProductoCatalogo" class="form-select form-select-sm">
+              <option value="">-- Selecciona producto --</option>
+              <!-- opciones se llenan por JS -->
+            </select>
+          </div>
+          <div class="col-md-4 d-grid">
+            <button type="button" class="btn btn-warning btn-sm" id="mpBtnAgregarProducto">
+              <i class="bi bi-plus-lg me-1"></i> Agregar
+            </button>
+          </div>
+        </div>
+
+        <div class="table-responsive border rounded-3">
+          <table class="table table-sm align-middle mb-0" id="mpTablaProductos">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 40%;">Producto</th>
+                <th style="width: 20%;">Precio base</th>
+                <th style="width: 20%;">Precio compra prov.</th>
+                <th style="width: 10%;">Activo</th>
+                <th style="width: 10%;" class="text-end">Quitar</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- filas dinámicas -->
+            </tbody>
+          </table>
+        </div>
+
+        <small class="text-muted d-block mt-2">
+          * El <strong>precio base</strong> es el precio_compra registrado en la tabla de productos.
+          Puedes ajustar el <strong>precio compra prov.</strong> si este proveedor maneja un costo distinto.
+        </small>
+      </div>
+
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-success" id="mpBtnGuardar">
+          <i class="bi bi-save me-1"></i> Guardar productos
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-  // Solo definir la URL de la API; el JS se encarga del resto
+  // URLs para la API de Proveedores
   window.PROVEEDOR_API = '<?= $base ?>/public/?r=admin_proveedores_api';
+
+  // Por si quieres tenerlas separadas (son la misma ruta con distinto action)
+  window.PROVEEDOR_API_PRODUCTOS = window.PROVEEDOR_API; // productos_proveedor / productos_catalogo / productos_save
 </script>
 
-<script src="<?= $base ?>/assets/js/admin_proveedores.js?v=5" defer></script>
+<script src="<?= $base ?>/assets/js/admin_proveedores.js?v=6" defer></script>
