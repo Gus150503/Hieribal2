@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 02-12-2025 a las 01:13:04
+-- Tiempo de generación: 04-12-2025 a las 23:56:46
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -116,17 +116,27 @@ INSERT INTO `config` (`clave`, `valor`, `tipo`, `actualizado_en`) VALUES
 
 CREATE TABLE `devoluciones` (
   `id` int(10) UNSIGNED NOT NULL,
+  `cliente_id` int(11) DEFAULT NULL,
+  `proveedor_id` int(11) DEFAULT NULL,
+  `producto_id` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL DEFAULT 1,
   `numero_orden` varchar(50) NOT NULL,
-  `nombre_cliente` varchar(150) NOT NULL,
-  `correo` varchar(150) NOT NULL,
-  `telefono` varchar(30) NOT NULL,
-  `producto` varchar(150) NOT NULL,
   `motivo_devolucion` text NOT NULL,
+  `origen` enum('cliente','interno') NOT NULL DEFAULT 'cliente',
   `fecha_compra` date NOT NULL,
   `fecha_devolucion` date NOT NULL,
-  `estado` varchar(50) NOT NULL,
+  `estado` enum('pendiente','aprobada','rechazada') NOT NULL DEFAULT 'pendiente',
   `observaciones` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `devoluciones`
+--
+
+INSERT INTO `devoluciones` (`id`, `cliente_id`, `proveedor_id`, `producto_id`, `cantidad`, `numero_orden`, `motivo_devolucion`, `origen`, `fecha_compra`, `fecha_devolucion`, `estado`, `observaciones`) VALUES
+(1, 44, NULL, 6, 1, 'ni idea', 'ni idea', 'cliente', '2025-12-05', '2025-12-13', 'aprobada', 'no viene bien'),
+(3, NULL, 3, 2, 1, 'ni idea', 'esta en mal estado', '', '2025-12-05', '2025-12-18', 'aprobada', NULL),
+(5, NULL, 4, 5, 1, 'ni idea', 'se daño', 'interno', '2025-12-05', '2025-12-06', 'pendiente', NULL);
 
 -- --------------------------------------------------------
 
@@ -203,11 +213,11 @@ CREATE TABLE `productos` (
 --
 
 INSERT INTO `productos` (`id`, `nombre`, `categoria`, `marca`, `presentacion`, `descripcion`, `stock_actual`, `stock_minimo`, `lote`, `f_vencimiento`, `precio_compra`, `precio_venta`, `iva`, `codigo_sku`, `ubicacion`, `estado`, `imagen`, `creado`) VALUES
-(2, 'Eucalipto', 'ramas', 'no se', 'fisica', '', '40', 100, '2', '2025-11-22', 1000.00, 2000.00, 0.00, '5342', 'ni idea', 'activo', 'http://localhost/Hieribal2/public/assets/img/prod_6918aa34e0270.png', '2025-08-27 23:37:31'),
-(3, 'Menta', NULL, NULL, NULL, '', '12', 100, NULL, NULL, NULL, 1200.00, 0.00, NULL, NULL, 'activo', 'menta.png', '2025-08-28 14:14:42'),
-(4, 'Toronjil', NULL, NULL, NULL, '', '15', 100, NULL, NULL, NULL, 1100.00, 0.00, NULL, NULL, 'activo', 'toronjil.png', '2025-08-28 14:15:14'),
-(5, 'Manzanilla', NULL, NULL, NULL, '', '5', 100, NULL, NULL, NULL, 1500.00, 0.00, NULL, NULL, 'activo', 'manzanilla.png', '2025-08-28 14:15:56'),
-(6, 'Diente de leon', NULL, NULL, NULL, '', '5', 100, NULL, NULL, NULL, 1500.00, 0.00, NULL, NULL, 'activo', 'leon.png', '2025-08-28 14:15:56');
+(2, 'Eucalipto', 'ramas', 'no se', 'fisica', '', '36', 100, '2', '2025-11-22', 1000.00, 2000.00, 0.00, '5342', 'ni idea', 'activo', 'http://localhost/Hieribal2/public/assets/img/prod_6918aa34e0270.png', '2025-08-27 23:37:31'),
+(3, 'Menta', NULL, NULL, NULL, '', '1', 100, NULL, NULL, 1000.00, 1200.00, 0.00, NULL, NULL, 'activo', 'menta.png', '2025-08-28 14:14:42'),
+(4, 'Toronjil', NULL, NULL, NULL, '', '15', 100, NULL, NULL, 1000.00, 1100.00, 0.00, NULL, NULL, 'activo', 'toronjil.png', '2025-08-28 14:15:14'),
+(5, 'Manzanilla', NULL, NULL, NULL, '', '4', 100, NULL, NULL, 1000.00, 1500.00, 0.00, NULL, NULL, 'activo', 'manzanilla.png', '2025-08-28 14:15:56'),
+(6, 'Diente de leon', NULL, NULL, NULL, '', '5', 100, NULL, NULL, 1000.00, 1500.00, 0.00, NULL, NULL, 'activo', 'leon.png', '2025-08-28 14:15:56');
 
 --
 -- Disparadores `productos`
@@ -244,7 +254,32 @@ CREATE TABLE `proveedores` (
 --
 
 INSERT INTO `proveedores` (`id`, `empresa`, `nit`, `nombre_contacto`, `telefono`, `email`, `direccion`, `ciudad`, `condiciones_pago`, `estado`, `creado`) VALUES
-(3, 'ni ideaq', '123445', 'jmm', '3123214122', 'niidea@gmail.com', 'calle 80', 'bogota', 'tarjeta', 'activo', '2025-10-24 23:12:55');
+(3, 'ni ideaq', '123445', 'jmm', '3123214122', 'niidea@gmail.com', 'calle 80', 'bogota', 'tarjeta', 'activo', '2025-10-24 23:12:55'),
+(4, 'hieribal', '123445', 'jmm', '3123214122', 'niidea@gmail.com', 'calle 80', 'bogota', 'tarjeta', 'activo', '2025-12-04 21:58:51');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `proveedor_producto`
+--
+
+CREATE TABLE `proveedor_producto` (
+  `id` int(11) NOT NULL,
+  `proveedor_id` int(11) NOT NULL,
+  `producto_id` int(11) NOT NULL,
+  `precio_compra` decimal(10,2) DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1,
+  `creado` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `proveedor_producto`
+--
+
+INSERT INTO `proveedor_producto` (`id`, `proveedor_id`, `producto_id`, `precio_compra`, `activo`, `creado`) VALUES
+(3, 3, 2, 2000.00, 1, '2025-12-04 21:16:52'),
+(5, 4, 5, 100000.00, 1, '2025-12-04 22:55:15'),
+(6, 4, 3, 5000.00, 1, '2025-12-04 22:55:15');
 
 -- --------------------------------------------------------
 
@@ -259,7 +294,7 @@ CREATE TABLE `reporte_venta` (
   `cantidad` int(11) NOT NULL,
   `precio` decimal(10,2) NOT NULL,
   `total` decimal(10,2) NOT NULL,
-  `cliente_id` int(11) NOT NULL,
+  `cliente_id` int(11) DEFAULT NULL,
   `vendedor_id` int(11) NOT NULL,
   `metodo_pago` varchar(50) DEFAULT NULL,
   `fecha` date NOT NULL,
@@ -272,7 +307,10 @@ CREATE TABLE `reporte_venta` (
 --
 
 INSERT INTO `reporte_venta` (`id`, `numero_factura`, `producto_id`, `cantidad`, `precio`, `total`, `cliente_id`, `vendedor_id`, `metodo_pago`, `fecha`, `observaciones`, `created_at`) VALUES
-(2, '2', 3, 56, 23.00, 1288.00, 43, 41, 'tarjeta', '2025-11-12', 'popocho', '2025-11-15 16:26:42');
+(3, '5005', 2, 1, 2000.00, 2000.00, NULL, 48, 'efectivo', '2025-12-04', NULL, '2025-12-04 15:46:08'),
+(4, '5006', 3, 3, 1200.00, 3600.00, NULL, 48, 'efectivo', '2025-12-04', NULL, '2025-12-04 15:49:12'),
+(5, '5007', 5, 1, 1500.00, 1500.00, NULL, 48, 'efectivo', '2025-12-04', NULL, '2025-12-04 16:02:58'),
+(6, '5008', 2, 3, 2000.00, 6000.00, NULL, 48, 'efectivo', '2025-12-04', NULL, '2025-12-04 16:30:28');
 
 -- --------------------------------------------------------
 
@@ -301,7 +339,7 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id_usuario`, `usuario`, `password`, `rol`, `nombres`, `apellidos`, `correo`, `correo_verificado`, `correo_verificacion_token`, `correo_verificacion_expira`, `fecha_creacion`, `estado`, `token_recuperacion`) VALUES
-(41, 'Cajero', '$2y$10$wU7zQDAO0N38v1mEkYvkeORKQE6/1DP2.GfHK/RnbkrVAjZuNDSy2', 'Cajero', 'Juan Pepito', 'Martinez Hernandezz', 'gustavoalexis@gmail.com', 0, '9fc34c171c710ac435f2928dc91dc195', '2025-11-20 19:15:22', '2025-11-13 20:40:29', 'Activo', NULL),
+(41, 'Cajero', '$2y$10$9hDp8g0u3I5S8nkwnNFP0OFDY3lj.V3ovQmj5joKke2nWRjIhMB6y', 'Cajero', 'Juan Pepito', 'Martinez Hernandezz', 'gustavoalexis@gmail.com', 0, '9fc34c171c710ac435f2928dc91dc195', '2025-11-20 19:15:22', '2024-12-04 20:40:29', 'Activo', NULL),
 (48, 'Admin2', '$2y$10$Lu2Vp7ehIGMrgCoFGYRQReRj7Yg3V9PFArO5lNlzKdIACJr2IrzFK', 'Admin', 'Gustavo', 'Cuevas', 'gustavoalexiscuevas@gmail.com', 1, NULL, NULL, '2025-11-19 19:44:44', 'Activo', NULL);
 
 -- --------------------------------------------------------
@@ -312,18 +350,27 @@ INSERT INTO `usuarios` (`id_usuario`, `usuario`, `password`, `rol`, `nombres`, `
 
 CREATE TABLE `ventas` (
   `id_venta` int(11) NOT NULL,
-  `id_carrito` int(11) NOT NULL,
+  `id_carrito` int(11) DEFAULT NULL,
   `total` decimal(10,2) NOT NULL,
+  `pago_con` decimal(10,2) DEFAULT NULL,
+  `cambio` decimal(10,2) DEFAULT NULL,
   `fecha_venta` timestamp NOT NULL DEFAULT current_timestamp(),
-  `metodo_pago` varchar(50) DEFAULT 'Efectivo'
+  `metodo_pago` varchar(50) DEFAULT 'Efectivo',
+  `nombre_cliente` varchar(100) DEFAULT NULL,
+  `apellido_cliente` varchar(100) DEFAULT NULL,
+  `cedula_cliente` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `ventas`
 --
 
-INSERT INTO `ventas` (`id_venta`, `id_carrito`, `total`, `fecha_venta`, `metodo_pago`) VALUES
-(5002, 3001, 8000.00, '2025-08-28 14:27:37', 'efectivo');
+INSERT INTO `ventas` (`id_venta`, `id_carrito`, `total`, `pago_con`, `cambio`, `fecha_venta`, `metodo_pago`, `nombre_cliente`, `apellido_cliente`, `cedula_cliente`) VALUES
+(5002, 3001, 8000.00, NULL, NULL, '2025-08-28 14:27:37', 'efectivo', NULL, NULL, NULL),
+(5005, NULL, 2000.00, 50000.00, 48000.00, '2025-12-04 15:46:08', 'efectivo', 'gustavo', 'cuevas', '1000789324'),
+(5006, NULL, 3600.00, 50000.00, 46400.00, '2025-12-04 15:49:12', 'efectivo', 'gustavo', 'cuevas', '1000789324'),
+(5007, NULL, 1500.00, 60000.00, 58500.00, '2025-12-04 16:02:58', 'efectivo', 'gustavo', 'cuevas', '1000789324'),
+(5008, NULL, 6000.00, 50000.00, 44000.00, '2025-12-04 16:30:28', 'efectivo', 'gustavo', 'cuevas', '1000789324');
 
 --
 -- Índices para tablas volcadas
@@ -355,7 +402,10 @@ ALTER TABLE `config`
 -- Indices de la tabla `devoluciones`
 --
 ALTER TABLE `devoluciones`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_devol_producto` (`producto_id`),
+  ADD KEY `fk_devoluciones_proveedor` (`proveedor_id`),
+  ADD KEY `fk_devol_cliente` (`cliente_id`);
 
 --
 -- Indices de la tabla `historial_pedido`
@@ -383,6 +433,14 @@ ALTER TABLE `productos`
 --
 ALTER TABLE `proveedores`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `proveedor_producto`
+--
+ALTER TABLE `proveedor_producto`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_pp_proveedor` (`proveedor_id`),
+  ADD KEY `idx_pp_producto` (`producto_id`);
 
 --
 -- Indices de la tabla `reporte_venta`
@@ -429,7 +487,7 @@ ALTER TABLE `clientes`
 -- AUTO_INCREMENT de la tabla `devoluciones`
 --
 ALTER TABLE `devoluciones`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `historial_pedido`
@@ -453,13 +511,19 @@ ALTER TABLE `productos`
 -- AUTO_INCREMENT de la tabla `proveedores`
 --
 ALTER TABLE `proveedores`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT de la tabla `proveedor_producto`
+--
+ALTER TABLE `proveedor_producto`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `reporte_venta`
 --
 ALTER TABLE `reporte_venta`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
@@ -471,7 +535,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `ventas`
 --
 ALTER TABLE `ventas`
-  MODIFY `id_venta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5003;
+  MODIFY `id_venta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5009;
 
 --
 -- Restricciones para tablas volcadas
@@ -485,6 +549,14 @@ ALTER TABLE `carrito`
   ADD CONSTRAINT `fk_carrito_productos` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id`) ON UPDATE CASCADE;
 
 --
+-- Filtros para la tabla `devoluciones`
+--
+ALTER TABLE `devoluciones`
+  ADD CONSTRAINT `fk_devol_cliente` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id_cliente`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_devol_producto` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`),
+  ADD CONSTRAINT `fk_devoluciones_proveedor` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`);
+
+--
 -- Filtros para la tabla `historial_pedido`
 --
 ALTER TABLE `historial_pedido`
@@ -496,6 +568,13 @@ ALTER TABLE `historial_pedido`
 ALTER TABLE `inventario`
   ADD CONSTRAINT `fk_inv_producto` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `inventario_ibfk_1` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `proveedor_producto`
+--
+ALTER TABLE `proveedor_producto`
+  ADD CONSTRAINT `fk_pp_producto` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`),
+  ADD CONSTRAINT `fk_pp_proveedor` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`);
 
 --
 -- Filtros para la tabla `reporte_venta`

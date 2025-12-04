@@ -13,107 +13,121 @@ final class AdminDevoluciones
     }
 
     /* ============================================================
-       Combos: Productos / Clientes
-       ============================================================ */
-
-    /**
-     * Devuelve lista de productos para el combo
-     * productos (id, nombre, img, ...)
-     */
+       LISTAS PARA COMBOS (PRODUCTOS / CLIENTES / PROVEEDORES)
+    ============================================================ */
     public function getProductos(): array
     {
         $sql = "SELECT id, nombre 
                 FROM productos
                 ORDER BY nombre ASC";
-
-        $st = $this->pdo->query($sql);
-        return $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        return $this->pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
-    /**
-     * Devuelve lista de clientes para el combo
-     * clientes (id, nombre, correo, telefono, ...)
-     */
     public function getClientes(): array
     {
-        $sql = "SELECT id, nombre, correo, telefono
+        $sql = "SELECT
+                    id_cliente AS id,
+                    nombres,
+                    apellidos,
+                    correo,
+                    telefono
                 FROM clientes
-                ORDER BY nombre ASC";
+                ORDER BY nombres ASC";
+        return $this->pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
 
+    public function getProveedores(): array
+    {
+        $sql = "SELECT id, empresa
+                FROM proveedores
+                WHERE estado = 'activo'
+                ORDER BY empresa ASC";
         $st = $this->pdo->query($sql);
         return $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
     /* ============================================================
-       LISTAR (con búsqueda + paginación)
-       ============================================================ */
-
-    /**
-     * Lista devoluciones con filtro opcional y paginación.
-     *
-     * Estructura esperada por el controlador:
-     * [
-     *   'data'  => [...registros...],
-     *   'total' => 123,
-     *   'page'  => 1,
-     *   'per'   => 10
-     * ]
-     */
+       LISTAR CON BÚSQUEDA Y PAGINACIÓN
+    ============================================================ */
     public function listar(string $q, int $page, int $per): array
     {
-        $where  = '';
+        $where  = "";
         $params = [];
 
-        if ($q !== '') {
+        if ($q !== "") {
             $where = "WHERE 
-                nombre_cliente    LIKE :q OR
-                correo            LIKE :q OR
-                numero_orden      LIKE :q OR
-                telefono          LIKE :q OR
-                producto          LIKE :q OR
-                motivo_devolucion LIKE :q";
-            $params[':q'] = '%' . $q . '%';
+                COALESCE(CONCAT(c.nombres,' ',c.apellidos), pr.empresa, '') LIKE :q
+                OR COALESCE(c.correo,'') LIKE :q
+                OR d.numero_orden LIKE :q
+                OR p.nombre LIKE :q
+                OR d.motivo_devolucion LIKE :q";
+
+            $params[':q'] = "%{$q}%";
         }
 
         $offset = ($page - 1) * $per;
 
-        // 1) Total de registros
-        $sqlCount = "SELECT COUNT(*) FROM devoluciones {$where}";
-        $stCount  = $this->pdo->prepare($sqlCount);
+        // -------- TOTAL ----------
+        $sqlCount = "
+            SELECT COUNT(*)
+            FROM devoluciones d
+            LEFT JOIN clientes     c  ON c.id_cliente = d.cliente_id
+            LEFT JOIN proveedores  pr ON pr.id        = d.proveedor_id
+            JOIN productos         p  ON p.id         = d.producto_id
+            {$where}
+        ";
+        $st = $this->pdo->prepare($sqlCount);
         foreach ($params as $k => $v) {
-            $stCount->bindValue($k, $v, PDO::PARAM_STR);
+            $st->bindValue($k, $v);
         }
-        $stCount->execute();
-        $total = (int) $stCount->fetchColumn();
+        $st->execute();
+        $total = (int) $st->fetchColumn();
 
-        // 2) Datos paginados
-        $sqlData = "SELECT 
-                        id,
-                        nombre_cliente,
-                        correo,
-                        numero_orden,
-                        telefono,
-                        producto,
-                        motivo_devolucion,
-                        fecha_compra,
-                        fecha_devolucion,
-                        observaciones,
-                        estado
-                    FROM devoluciones
-                    {$where}
-                    ORDER BY fecha_devolucion DESC, id DESC
-                    LIMIT :per OFFSET :off";
+        // -------- DATA ----------
+ $sqlData = "
+    SELECT
+        d.id,
+        d.numero_orden,
+        d.cantidad,
+        d.motivo_devolucion,
+        d.fecha_compra,
+        d.fecha_devolucion,
+        d.estado,
+        d.observaciones,
+        d.origen,
 
-        $stData = $this->pdo->prepare($sqlData);
+        d.cliente_id,
+        c.nombres  AS cliente_nombres,
+        c.apellidos AS cliente_apellidos,
+        c.correo   AS cliente_correo,
+        c.telefono AS cliente_telefono,
 
+        d.proveedor_id,
+        pr.empresa AS proveedor_empresa,
+        pr.email   AS proveedor_correo,
+        pr.telefono AS proveedor_telefono,
+
+        p.id       AS producto_id,
+        p.nombre   AS producto_nombre
+    FROM devoluciones d
+    LEFT JOIN clientes     c  ON c.id_cliente = d.cliente_id   -- 👈 OJO acá
+    LEFT JOIN proveedores  pr ON pr.id = d.proveedor_id
+    JOIN productos         p  ON p.id  = d.producto_id
+    {$where}
+    ORDER BY d.fecha_devolucion DESC, d.id DESC
+    LIMIT :per OFFSET :off
+";
+
+
+        $st = $this->pdo->prepare($sqlData);
         foreach ($params as $k => $v) {
-            $stData->bindValue($k, $v, PDO::PARAM_STR);
+            $st->bindValue($k, $v);
         }
-        $stData->bindValue(':per',  $per,    PDO::PARAM_INT);
-        $stData->bindValue(':off',  $offset, PDO::PARAM_INT);
+        $st->bindValue(':per', $per, PDO::PARAM_INT);
+        $st->bindValue(':off', $offset, PDO::PARAM_INT);
+        $st->execute();
 
-        $stData->execute();
-        $rows = $stData->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        $rows = $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
         return [
             'data'  => $rows,
@@ -124,187 +138,194 @@ final class AdminDevoluciones
     }
 
     /* ============================================================
-       OBTENER UNO
-       ============================================================ */
+       OBTENER UNA DEVOLUCIÓN
+    ============================================================ */
     public function obtener(int $id): ?array
-    {
-        $sql = "SELECT 
-                    id,
-                    nombre_cliente,
-                    correo,
-                    numero_orden,
-                    telefono,
-                    producto,
-                    motivo_devolucion,
-                    fecha_compra,
-                    fecha_devolucion,
-                    observaciones,
-                    estado
-                FROM devoluciones
-                WHERE id = :id
-                LIMIT 1";
-
-        $st = $this->pdo->prepare($sql);
-        $st->bindValue(':id', $id, PDO::PARAM_INT);
-        $st->execute();
-
-        $row = $st->fetch(PDO::FETCH_ASSOC);
-        return $row ?: null;
-    }
+{
+    $sql = "
+        SELECT
+            d.*,
+            c.nombres   AS cliente_nombres,
+            c.apellidos AS cliente_apellidos,
+            c.correo    AS cliente_correo,
+            c.telefono  AS cliente_telefono,
+            pr.empresa  AS proveedor_empresa,
+            p.nombre    AS producto_nombre
+        FROM devoluciones d
+        LEFT JOIN clientes    c  ON c.id_cliente = d.cliente_id
+        LEFT JOIN proveedores pr ON pr.id        = d.proveedor_id
+        JOIN productos        p  ON p.id         = d.producto_id
+        WHERE d.id = :id
+        LIMIT 1
+    ";
+    $st = $this->pdo->prepare($sql);
+    $st->bindValue(':id', $id, PDO::PARAM_INT);
+    $st->execute();
+    return $st->fetch(PDO::FETCH_ASSOC) ?: null;
+}
 
     /* ============================================================
        CREAR
-       ============================================================ */
+    ============================================================ */
     public function crear(array $d): int
-    {
-        $sql = "INSERT INTO devoluciones (
-                    nombre_cliente,
-                    correo,
-                    numero_orden,
-                    telefono,
-                    producto,
-                    motivo_devolucion,
-                    fecha_compra,
-                    fecha_devolucion,
-                    observaciones,
-                    estado
-                ) VALUES (
-                    :nombre_cliente,
-                    :correo,
-                    :numero_orden,
-                    :telefono,
-                    :producto,
-                    :motivo_devolucion,
-                    :fecha_compra,
-                    :fecha_devolucion,
-                    :observaciones,
-                    :estado
-                )";
+{
+    $sql = "
+        INSERT INTO devoluciones (
+            cliente_id,
+            proveedor_id,
+            producto_id,
+            cantidad,
+            numero_orden,
+            motivo_devolucion,
+            fecha_compra,
+            fecha_devolucion,
+            estado,
+            observaciones,
+            origen
+        ) VALUES (
+            :cliente_id,
+            :proveedor_id,
+            :producto_id,
+            :cantidad,
+            :numero_orden,
+            :motivo_devolucion,
+            :fecha_compra,
+            :fecha_devolucion,
+            :estado,
+            :observaciones,
+            :origen
+        )
+    ";
 
-        $st = $this->pdo->prepare($sql);
+    $st = $this->pdo->prepare($sql);
 
-        $st->bindValue(':nombre_cliente',    $d['nombre_cliente']);
-        $st->bindValue(':correo',            $d['correo']);
-        $st->bindValue(':numero_orden',      $d['numero_orden']);
-        $st->bindValue(':telefono',          $d['telefono']);
-        $st->bindValue(':producto',          $d['producto']);
-        $st->bindValue(':motivo_devolucion', $d['motivo_devolucion']);
-        $st->bindValue(':fecha_compra',      $d['fecha_compra']);
-        $st->bindValue(':fecha_devolucion',  $d['fecha_devolucion']);
-        $st->bindValue(':observaciones',     $d['observaciones']);
-        $st->bindValue(':estado',            $d['estado']);
+    $clienteId   = $d['cliente_id'];
+    $proveedorId = $d['proveedor_id'];
 
-        $st->execute();
+    $st->bindValue(':cliente_id',   $clienteId,
+        $clienteId === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+    $st->bindValue(':proveedor_id', $proveedorId,
+        $proveedorId === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+    $st->bindValue(':producto_id',  $d['producto_id'], PDO::PARAM_INT);
+    $st->bindValue(':cantidad',     $d['cantidad'], PDO::PARAM_INT);
+    $st->bindValue(':numero_orden', $d['numero_orden']);
+    $st->bindValue(':motivo_devolucion', $d['motivo_devolucion']);
+    $st->bindValue(':fecha_compra',      $d['fecha_compra']);
+    $st->bindValue(':fecha_devolucion',  $d['fecha_devolucion']);
+    $st->bindValue(':estado',            $d['estado']);
+    $st->bindValue(':observaciones',     $d['observaciones']);
+    $st->bindValue(':origen',            $d['origen']);
 
-        return (int) $this->pdo->lastInsertId();
-    }
+    $st->execute();
+    return (int)$this->pdo->lastInsertId();
+}
+
 
     /* ============================================================
        ACTUALIZAR
-       ============================================================ */
+    ============================================================ */
     public function actualizar(int $id, array $d): void
     {
-        $sql = "UPDATE devoluciones
-                SET 
-                    nombre_cliente    = :nombre_cliente,
-                    correo            = :correo,
-                    numero_orden      = :numero_orden,
-                    telefono          = :telefono,
-                    producto          = :producto,
-                    motivo_devolucion = :motivo_devolucion,
-                    fecha_compra      = :fecha_compra,
-                    fecha_devolucion  = :fecha_devolucion,
-                    observaciones     = :observaciones,
-                    estado            = :estado
-                WHERE id = :id";
-
+        $sql = "
+            UPDATE devoluciones
+            SET
+                cliente_id        = :cliente_id,
+                proveedor_id      = :proveedor_id,
+                producto_id       = :producto_id,
+                cantidad          = :cantidad,
+                numero_orden      = :numero_orden,
+                motivo_devolucion = :motivo_devolucion,
+                fecha_compra      = :fecha_compra,
+                fecha_devolucion  = :fecha_devolucion,
+                estado            = :estado,
+                observaciones     = :observaciones,
+                origen            = :origen
+            WHERE id = :id
+        ";
         $st = $this->pdo->prepare($sql);
 
-        $st->bindValue(':id',               $id, PDO::PARAM_INT);
-        $st->bindValue(':nombre_cliente',   $d['nombre_cliente']);
-        $st->bindValue(':correo',           $d['correo']);
-        $st->bindValue(':numero_orden',     $d['numero_orden']);
-        $st->bindValue(':telefono',         $d['telefono']);
-        $st->bindValue(':producto',         $d['producto']);
-        $st->bindValue(':motivo_devolucion',$d['motivo_devolucion']);
-        $st->bindValue(':fecha_compra',     $d['fecha_compra']);
-        $st->bindValue(':fecha_devolucion', $d['fecha_devolucion']);
-        $st->bindValue(':observaciones',    $d['observaciones']);
-        $st->bindValue(':estado',           $d['estado']);
+        $st->bindValue(':id', (int)$id, PDO::PARAM_INT);
+        $this->bindClienteProveedor($st, $d);
+
+        $st->bindValue(':producto_id',       (int)$d['producto_id'], PDO::PARAM_INT);
+        $st->bindValue(':cantidad',          (int)$d['cantidad'], PDO::PARAM_INT);
+        $st->bindValue(':numero_orden',      $d['numero_orden']);
+        $st->bindValue(':motivo_devolucion', $d['motivo_devolucion']);
+        $st->bindValue(':fecha_compra',      $d['fecha_compra']);
+        $st->bindValue(':fecha_devolucion',  $d['fecha_devolucion']);
+        $st->bindValue(':estado',            $d['estado']);
+        $st->bindValue(':observaciones',     $d['observaciones']);
+        $st->bindValue(':origen',            $d['origen']);
 
         $st->execute();
+    }
+
+    private function bindClienteProveedor(\PDOStatement $st, array $d): void
+    {
+        // cliente
+        if (!empty($d['cliente_id'])) {
+            $st->bindValue(':cliente_id', (int)$d['cliente_id'], PDO::PARAM_INT);
+        } else {
+            $st->bindValue(':cliente_id', null, PDO::PARAM_NULL);
+        }
+
+        // proveedor
+        if (!empty($d['proveedor_id'])) {
+            $st->bindValue(':proveedor_id', (int)$d['proveedor_id'], PDO::PARAM_INT);
+        } else {
+            $st->bindValue(':proveedor_id', null, PDO::PARAM_NULL);
+        }
     }
 
     /* ============================================================
        ELIMINAR
-       ============================================================ */
+    ============================================================ */
     public function eliminar(int $id): void
     {
         $sql = "DELETE FROM devoluciones WHERE id = :id";
         $st  = $this->pdo->prepare($sql);
-        $st->bindValue(':id', $id, PDO::PARAM_INT);
+        $st->bindValue(":id", $id, PDO::PARAM_INT);
         $st->execute();
     }
 
-    /* ============================================================
-       KPIs / Reportes (los que ya tenías)
-       ============================================================ */
+    public function actualizarBasico(int $id, string $fechaDev, string $estado, ?string $obs = null): void
+{
+    $sql = "
+        UPDATE devoluciones
+        SET
+            fecha_devolucion = :fecha_devolucion,
+            estado           = :estado,
+            observaciones    = :observaciones
+        WHERE id = :id
+    ";
 
-    // TOP: Productos con más devoluciones (unidades)
-    public function topProductosDevueltos(int $limit = 10): array
-    {
-        // Asumiendo:
-        // devoluciones (id, producto, motivo, fecha_devolucion, ...)
-        // productos (id, nombre, img)
+    $st = $this->pdo->prepare($sql);
+    $st->bindValue(':id', $id, PDO::PARAM_INT);
+    $st->bindValue(':fecha_devolucion', $fechaDev);
+    $st->bindValue(':estado', $estado);
+    // si viene vacío lo guardamos como NULL
+    $st->bindValue(':observaciones', ($obs !== null && $obs !== '') ? $obs : null);
+    $st->execute();
+}
 
-        $sql = "SELECT 
-                    p.id,
-                    p.nombre,
-                    p.img,
-                    COUNT(d.id) AS devoluciones
-                FROM devoluciones d
-                JOIN productos p ON p.nombre = d.producto
-                GROUP BY p.id, p.nombre, p.img
-                ORDER BY devoluciones DESC
-                LIMIT :lim";
+public function getProductosPorProveedor(int $proveedorId): array
+{
+    $sql = "
+        SELECT DISTINCT p.id, p.nombre
+        FROM proveedor_producto pp
+        INNER JOIN productos p ON p.id = pp.producto_id
+        WHERE pp.proveedor_id = :prov
+          AND p.estado = 'activo'
+        ORDER BY p.nombre ASC
+    ";
 
-        $st = $this->pdo->prepare($sql);
-        $st->bindValue(':lim', $limit, PDO::PARAM_INT);
-        $st->execute();
+    $st = $this->pdo->prepare($sql);
+    $st->bindValue(':prov', $proveedorId, PDO::PARAM_INT);
+    $st->execute();
 
-        return $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
-    }
+    return $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
+}
 
-    // TOP: Clientes que más devuelven (mes actual)
-    public function topClientesMesActual(int $limit = 10): array
-    {
-        // devoluciones (id, nombre_cliente, fecha_devolucion)
 
-        $sql = "SELECT 
-                    d.nombre_cliente AS cliente,
-                    COUNT(*) AS total
-                FROM devoluciones d
-                WHERE YEAR(d.fecha_devolucion) = YEAR(CURDATE())
-                  AND MONTH(d.fecha_devolucion) = MONTH(CURDATE())
-                GROUP BY d.nombre_cliente
-                ORDER BY total DESC
-                LIMIT :lim";
 
-        $st = $this->pdo->prepare($sql);
-        $st->bindValue(':lim', $limit, PDO::PARAM_INT);
-        $st->execute();
-
-        return $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
-    }
-
-    // KPI: total de devoluciones del mes
-    public function totalDevolucionesMes(): int
-    {
-        $sql = "SELECT COUNT(*)
-                FROM devoluciones
-                WHERE YEAR(fecha_devolucion) = YEAR(CURDATE())
-                  AND MONTH(fecha_devolucion) = MONTH(CURDATE())";
-
-        return (int) $this->pdo->query($sql)->fetchColumn();
-    }
 }
