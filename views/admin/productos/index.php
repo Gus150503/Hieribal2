@@ -292,6 +292,15 @@ $base = $this->config['app']['base_url'] ?? '';
     font-size: 24px;
     border: 2px dashed #dee2e6;
 }
+
+/* Ocultar opción URL y su sección de input */
+#tipoURL,
+label[for="tipoURL"],
+#seccionURL {
+    display: none !important;
+}
+
+
 </style>
 
 <!-- Endpoint API; el JS lo usa -->
