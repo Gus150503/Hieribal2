@@ -22,9 +22,36 @@ $rol = strtolower($_SESSION['admin']['rol'] ?? 'empleado');
 
 /* ACL (Control de acceso por rol) */
 $ACL = [
-  'admin'    => ['dashboard','ventas','inventario','productos','clientes','usuarios','proveedores','configuracion','ventas','devoluciones'],
-  'cajero'   => ['dashboard','ventas','inventario.view','productos.view','clientes.view'],
-  'empleado' => ['dashboard','inventario','productos','clientes.view'],
+  // 👇 Admin ve todo, incluimos cajero
+  'admin'    => [
+    'dashboard',
+    'ventas',
+    'inventario',
+    'productos',
+    'clientes',
+    'usuarios',
+    'proveedores',
+    'configuracion',
+    'devoluciones',
+    'cajero'
+  ],
+
+  // 👇 Rol cajero: acceso directo a módulo Cajero + vistas limitadas
+  'cajero'   => [
+    'dashboard',
+    'cajero',
+    'inventario.view',
+    'productos.view',
+    'clientes.view'
+  ],
+
+  // 👇 Empleado normal (sin cajero)
+  'empleado' => [
+    'dashboard',
+    'inventario',
+    'productos',
+    'clientes.view'
+  ],
 ];
 
 $can = function (string $perm) use ($rol, $ACL): bool {
@@ -85,7 +112,6 @@ $can = function (string $perm) use ($rol, $ACL): bool {
       </li>
     <?php endif; ?>
 
-
     <?php if ($can('ventas')): ?>
       <li class="<?= $active('ventas') ?>">
         <a href="?r=admin/ventas" aria-current="<?= $sec==='ventas'?'page':'false' ?>">
@@ -94,9 +120,7 @@ $can = function (string $perm) use ($rol, $ACL): bool {
       </li>
     <?php endif; ?>
 
-
-
-      <?php if ($can('proveedores')): ?>
+    <?php if ($can('proveedores')): ?>
       <li class="<?= $active('proveedores') ?>">
         <a href="?r=admin/proveedores" aria-current="<?= $sec==='proveedores'?'page':'false' ?>">
           <i class="bi bi-truck"></i><span class="label">Proveedores</span>
@@ -112,8 +136,6 @@ $can = function (string $perm) use ($rol, $ACL): bool {
       </li>
     <?php endif; ?>
 
-
-
     <?php if ($can('usuarios')): ?>
       <li class="<?= $active('usuarios') ?>">
         <a href="?r=admin/usuarios" aria-current="<?= $sec==='usuarios'?'page':'false' ?>">
@@ -123,13 +145,20 @@ $can = function (string $perm) use ($rol, $ACL): bool {
     <?php endif; ?>
 
     <?php if ($can('devoluciones')): ?>
-  <li class="<?= $active('devoluciones') ?>">
-    <a href="?r=admin/devoluciones" aria-current="<?= $sec==='devoluciones'?'page':'false' ?>">
-      <i class="bi bi-arrow-counterclockwise"></i><span class="label">Devoluciones</span>
-    </a>
-  </li>
-<?php endif; ?>
+      <li class="<?= $active('devoluciones') ?>">
+        <a href="?r=admin/devoluciones" aria-current="<?= $sec==='devoluciones'?'page':'false' ?>">
+          <i class="bi bi-arrow-counterclockwise"></i><span class="label">Devoluciones</span>
+        </a>
+      </li>
+    <?php endif; ?>
 
+    <?php if ($can('cajero')): ?>
+      <li class="<?= $active('cajero') ?>">
+        <a href="?r=admin/cajero" aria-current="<?= $sec==='cajero'?'page':'false' ?>">
+          <i class="bi bi-cash-coin"></i><span class="label">Cajero</span>
+        </a>
+      </li>
+    <?php endif; ?>
 
     <?php if ($can('configuracion')): ?>
       <li class="<?= $active('configuracion') ?>">
