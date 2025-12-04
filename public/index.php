@@ -216,7 +216,10 @@ switch ($r) {
         (new AdminCajeroController($config))->api();
         break;
 
-        
+    case 'admin_cajero_factura':
+        (new AdminCajeroController($config))->factura();
+        break;
+
 
     /* ====== Compat ====== */
     case 'usuarioadmin':
