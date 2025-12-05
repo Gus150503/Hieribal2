@@ -1,5 +1,6 @@
 <?php
 // views/admin/productos/index.php
+// MODULO PRODUCTOS / Juliana Lugo / vista de index de productos 
 $base = $this->config['app']['base_url'] ?? '';
 ?>
 <section class="card shadow-sm ui-pro border-0 rounded-4">
@@ -33,7 +34,6 @@ $base = $this->config['app']['base_url'] ?? '';
                     <th>Marca</th>
                     <th>Presentación</th>
                     <th>Descripción</th>
-                    <th>Stock Actual</th>
                     <th>Stock Mínimo</th>
                     <th>Lote</th>
                     <th>Fecha de Vencimiento</th>
@@ -109,14 +109,6 @@ $base = $this->config['app']['base_url'] ?? '';
                             <textarea class="form-control" name="descripcion" id="descripcion" rows="2"
                             maxlength="100"></textarea>
                         </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label">Stock actual</label>
-                            <input type="number" class="form-control" name="stock_actual" id="stock_actual"
-                                   min="0" value="0" required>
-                                   <div class="invalid-feedback">Stock Actual requerida.</div>
-                        </div>
-
                         <div class="col-md-3">
                             <label class="form-label">Stock mínimo</label>
                             <input type="number" class="form-control" name="stock_minimo" id="stock_minimo"
@@ -228,77 +220,77 @@ $base = $this->config['app']['base_url'] ?? '';
 </div>
 
 <style>
-/* Encabezado verde productos */
-#tblProductos thead.table-light {
-    --bs-table-bg: #198754;
-    --bs-table-color: #fff;
-    --bs-table-border-color: rgba(255, 255, 255, .25);
-    background-color: #198754 !important;
-    color: #fff !important;
-}
+    /* Encabezado verde productos */
+    #tblProductos thead.table-light {
+        --bs-table-bg: #198754;
+        --bs-table-color: #fff;
+        --bs-table-border-color: rgba(255, 255, 255, .25);
+        background-color: #198754 !important;
+        color: #fff !important;
+    }
 
-#tblProductos thead.table-light th {
-    background-color: #198754 !important;
-    color: #ffffff !important;
-    border-color: rgba(255,255,255,.25) !important;
-}
+    #tblProductos thead.table-light th {
+        background-color: #198754 !important;
+        color: #ffffff !important;
+        border-color: rgba(255,255,255,.25) !important;
+    }
 
-/* Tabla amplia y legible */
-#tblProductos {
-    width: 100%;
-    min-width: 1500px;
-}
+    /* Tabla amplia y legible */
+    #tblProductos {
+        width: 100%;
+        min-width: 1500px;
+    }
 
-#tblProductos th,
-#tblProductos td {
-    vertical-align: middle;
-    white-space: nowrap;
-}
+    #tblProductos th,
+    #tblProductos td {
+        vertical-align: middle;
+        white-space: nowrap;
+    }
 
-#tblProductos td.descripcion {
-    white-space: normal;
-    max-width: 250px;
-    overflow-wrap: break-word;
-    text-align: left;
-}
+    #tblProductos td.descripcion {
+        white-space: normal;
+        max-width: 250px;
+        overflow-wrap: break-word;
+        text-align: left;
+    }
 
-/* Imagen miniatura */
-.producto-img {
-    width: 55px;
-    height: 55px;
-    object-fit: cover;
-    border-radius: 8px;
-    border: 2px solid #e9ecef;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
-    transition: transform .2s, box-shadow .2s;
-}
+    /* Imagen miniatura */
+    .producto-img {
+        width: 55px;
+        height: 55px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+        transition: transform .2s, box-shadow .2s;
+    }
 
-.producto-img:hover {
-    transform: scale(1.8);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, .2);
-    z-index: 10;
-    cursor: pointer;
-}
+    .producto-img:hover {
+        transform: scale(1.8);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, .2);
+        z-index: 10;
+        cursor: pointer;
+    }
 
-.producto-img-placeholder {
-    width: 55px;
-    height: 55px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #f5f7fa, #e9ecef);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #adb5bd;
-    font-size: 24px;
-    border: 2px dashed #dee2e6;
-}
+    .producto-img-placeholder {
+        width: 55px;
+        height: 55px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #f5f7fa, #e9ecef);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #adb5bd;
+        font-size: 24px;
+        border: 2px dashed #dee2e6;
+    }
 
-/* Ocultar opción URL y su sección de input */
-#tipoURL,
-label[for="tipoURL"],
-#seccionURL {
-    display: none !important;
-}
+    /* Ocultar opción URL y su sección de input */
+    #tipoURL,
+    label[for="tipoURL"],
+    #seccionURL {
+        display: none !important;
+    }
 
 
 </style>

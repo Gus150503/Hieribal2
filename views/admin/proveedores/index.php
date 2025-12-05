@@ -1,5 +1,6 @@
 <?php
 // views/admin/proveedores/index.php
+// MODULO PROVEDORES / Juliana Lugo / vista de index de proveedores
 $base = $this->config['app']['base_url'] ?? '';
 ?>
 <style>

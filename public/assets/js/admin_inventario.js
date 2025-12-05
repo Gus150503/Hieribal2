@@ -1,4 +1,5 @@
 // assets/js/admin_inventario.js
+// MODULO INVENTARIOS / Juliana Lugo /
 (function () {
   if (window.__INVENTARIO_JS_BOUND__) return;
   window.__INVENTARIO_JS_BOUND__ = true;
