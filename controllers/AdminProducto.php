@@ -55,17 +55,36 @@ final class AdminProducto extends Controller
         }
     }
 
-    private function friendlyDbError(\Throwable $e): string
-    {
-        if ($e instanceof \PDOException && $e->getCode() === '23000') {
-            $msg = $e->getMessage();
-            if (stripos($msg, 'codigo_sku') !== false) return 'Ese SKU ya existe.';
-            if (stripos($msg, 'duplicate') !== false || stripos($msg, '1062') !== false) {
-                return 'Datos duplicados.';
-            }
+private function friendlyDbError(\Throwable $e): string
+{
+    if ($e instanceof \PDOException && $e->getCode() === '23000') {
+        $msg = $e->getMessage();
+
+        // 🔹 FK: producto usado en carrito / otros módulos
+        if (
+            stripos($msg, 'fk_carrito_productos') !== false ||
+            stripos($msg, 'foreign key constraint fails') !== false
+        ) {
+            return '⚠️ No se puede eliminar este producto porque está en uso en otros módulos '
+                 . '(por ejemplo, en el carrito de compras). '
+                 . 'Si no deseas que se siga usando, cámbialo a INACTIVO.';
         }
-        return $e->getMessage();
+
+        // 🔹 SKU duplicado
+        if (stripos($msg, 'codigo_sku') !== false) {
+            return 'Ese SKU ya existe. Por favor usa otro código.';
+        }
+
+        // 🔹 Otros duplicados
+        if (stripos($msg, 'duplicate') !== false || stripos($msg, '1062') !== false) {
+            return 'Datos duplicados. Verifica que no estés repitiendo información única.';
+        }
     }
+
+    // Mensaje genérico para cualquier otro error
+    return 'Ocurrió un error al procesar la operación. Intenta de nuevo.';
+}
+
 
     private function procesarImagen(): ?string
     {
@@ -184,19 +203,42 @@ final class AdminProducto extends Controller
             }
 
             if ($m === 'POST' && $action === 'delete') {
-                try {
-                    $id = (int)($_POST['id'] ?? 0);
-                    if ($id <= 0) {
-                        $this->fail('ID inválido');
-                        return;
-                    }
-                    $this->Model->eliminar($id);
-                    $this->ok();
-                } catch (\Throwable $ex) {
-                    $this->fail($this->friendlyDbError($ex), 500);
-                }
-                return;
-            }
+    try {
+        $id = (int)($_POST['id'] ?? 0);
+        if ($id <= 0) {
+            $this->fail('ID inválido');
+            return;
+        }
+
+        // Obtener el producto primero
+        $row = $this->Model->obtener($id);
+        if (!$row) {
+            $this->fail('El producto no existe.');
+            return;
+        }
+
+        // 1️⃣ Si está ACTIVO → No permitir borrar y mostrar mensaje correcto
+        if (strcasecmp($row['estado'], 'activo') === 0) {
+            $this->fail('No puedes eliminar este producto mientras esté ACTIVO. Cámbialo a INACTIVO primero.');
+            return;
+        }
+
+        // 2️⃣ Si está INACTIVO pero está en uso → mensaje diferente
+        if ($this->Model->estaEnUso($id)) {
+            $this->fail('Este producto está INACTIVO pero sigue siendo utilizado en otros registros, por lo que no puede eliminarse.');
+            return;
+        }
+
+        // 3️⃣ Si está INACTIVO y NO está en uso → se elimina
+        $this->Model->eliminar($id);
+        $this->ok(['msg' => 'Producto eliminado correctamente']);
+
+    } catch (\Throwable $ex) {
+        $this->fail($this->friendlyDbError($ex), 500);
+    }
+    return;
+}
+
 
             if ($m === 'POST' && $action === 'toggle') {
                 try {

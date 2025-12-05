@@ -8,8 +8,15 @@
   // =========================
   // Rol actual (viene del <body data-rol="...">)
   // =========================
-  const ROL = (document.body.dataset.rol || 'empleado').toLowerCase();
-  const PUEDE_GESTIONAR_CLIENTES = (ROL === 'admin'); // sólo admin puede crear/editar/eliminar
+// =========================
+// Permisos basados en lo que pintó PHP
+// =========================
+const ROL = (document.body.dataset.rol || '').toLowerCase();
+
+// PHP solo pinta el <th class="text-end">Acciones</th> si el usuario puede gestionar
+const PUEDE_GESTIONAR_CLIENTES =
+  !!document.querySelector('#tblClientes thead th.text-end');
+
 
   // ===== Base y endpoints =====
   const base = location.pathname.replace(/\/public\/?$/, '') + '/public';

@@ -13,6 +13,9 @@ use Controllers\AdminVentasController;
 use Controllers\AdminDevolucionesController;  
 use Controllers\CarritoAdminController;       
 use Controllers\AdminCajeroController;  
+use Controllers\AdminReportesController;   // 👈 agrega esto
+
+
 
 
 /* =============================
@@ -230,6 +233,37 @@ switch ($r) {
         require __DIR__ . '/../controllers/AdminConfigApiController.php';
         (new \Controllers\AdminConfigApiController())->handle();
         break;
+
+
+case 'admin_reportes':
+    (new AdminReportesController($config))->index();
+    break;
+
+
+case 'admin_reportes_inventario_excel':
+    (new AdminReportesController($config))->inventarioExcel();
+    break;
+
+case 'admin_reportes_ventas_excel':
+    (new AdminReportesController($config))->ventasExcel();
+    break;
+
+case 'admin_reportes_proveedores_excel':
+    (new AdminReportesController($config))->proveedoresExcel();
+    break;
+
+case 'admin_reportes_clientes_excel':
+    (new AdminReportesController($config))->clientesExcel();
+    break;
+
+case 'admin_reportes_usuarios_excel':
+    (new AdminReportesController($config))->usuariosExcel();
+    break;
+
+case 'admin_reportes_devoluciones_excel':
+    (new AdminReportesController($config))->devolucionesExcel();
+    break;
+
 
     /* ====== 404 ====== */
     default:
