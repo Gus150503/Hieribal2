@@ -541,17 +541,24 @@
         body: fd
       });
 
-      if (!res.ok) {
-        const jErr = await resToJsonSafe(res);
-        const msg = jErr.msg || jErr.error || `HTTP ${res.status}`;
+      const j = await resToJsonSafe(res);
+
+      // Caso error (HTTP != 200/201 o JSON con ok === false)
+      if (!res.ok || j.ok === false) {
+        // Caso específico: stock insuficiente
+        if (
+          j.error_code === 'OUT_OF_STOCK' ||
+          (j.msg && j.msg.toLowerCase().includes('stock insuficiente'))
+        ) {
+          uiToast(j.msg || 'Stock insuficiente para completar la venta.', 'warning');
+          setMsg(j.msg || 'Stock insuficiente para uno o más productos.', false);
+          return; // No seguimos, pero el finally igual re-habilita el botón
+        }
+
+        const msg = j.msg || j.error || `HTTP ${res.status}`;
         throw new Error(msg);
       }
 
-      const j = await resToJsonSafe(res);
-
-      if (j.ok === false) {
-        throw new Error(j.msg || 'No se pudo guardar la venta');
-      }
 
       const idVenta = j.id_venta ?? j.id ?? null;
 
