@@ -6,6 +6,10 @@
 
     'use strict';
 
+        // Permisos basados en lo que pintó PHP
+        const PUEDE_GESTIONAR_PRODUCTOS =
+      !!document.querySelector('#tblProductos thead th.text-end');
+
     // =====================================
     // Endpoints
     // =====================================
@@ -356,15 +360,17 @@
     function setLoading(on) {
         if (!tblBody) return;
         if (on) {
+            const colspan = PUEDE_GESTIONAR_PRODUCTOS ? 18 : 17;
             tblBody.innerHTML = `
 <tr>
-  <td colspan="18" class="text-center py-3">
+  <td colspan="${colspan}" class="text-center py-3">
     <div class="spinner-border spinner-border-sm me-2"></div>
     Cargando…
   </td>
 </tr>`;
         }
     }
+
 
     function renderPager() {
         if (!pager) return;
@@ -453,12 +459,14 @@
             state.per = +j.per || state.per;
 
             if (!items.length) {
+                const colspan = PUEDE_GESTIONAR_PRODUCTOS ? 18 : 17;
                 tblBody.innerHTML = `
 <tr>
-  <td colspan="18" class="text-center text-muted py-3">
+  <td colspan="${colspan}" class="text-center text-muted py-3">
     Sin resultados
   </td>
 </tr>`;
+
                 renderPager();
                 updateTotal();
                 return;
@@ -469,12 +477,14 @@
             updateTotal();
         } catch (err) {
             if (seq !== __SEQ__) return;
+            const colspan = PUEDE_GESTIONAR_PRODUCTOS ? 18 : 17;
             tblBody.innerHTML = `
 <tr>
-  <td colspan="18" class="text-center text-danger py-3">
+  <td colspan="${colspan}" class="text-center text-danger py-3">
     No se pudo cargar.
   </td>
 </tr>`;
+
             uiToast('No se pudo cargar productos.', 'danger');
         }
     }
@@ -498,7 +508,26 @@
                     '<div class="producto-img-placeholder"><i class="bi bi-box-seam"></i></div>';
             }
 
-            tr.innerHTML = `
+                        let accionesHtml = '';
+            if (PUEDE_GESTIONAR_PRODUCTOS) {
+                accionesHtml = `
+<td class="text-end">
+  <div class="btn-group btn-group-sm">
+    <button class="btn btn-outline-primary" data-edit="${p.id}" title="Editar">
+      <i class="bi bi-pencil-square"></i>
+    </button>
+    <button class="btn btn-outline-danger" data-del="${p.id}" title="Eliminar">
+      <i class="bi bi-trash"></i>
+    </button>
+    <button class="btn btn-outline-secondary" data-toggle="${p.id}" title="${activo ? 'Inactivar' : 'Activar'}">
+      <i class="bi ${activo ? 'bi-toggle-on' : 'bi-toggle-off'}"></i>
+    </button>
+  </div>
+</td>`;
+            }
+
+
+           tr.innerHTML = `
 <td>${p.id}</td>
 <td class="fw-semibold">${escapeHtml(p.nombre)}</td>
 <td>${escapeHtml(p.categoria ?? '')}</td>
@@ -514,26 +543,14 @@
 <td>${escapeHtml(p.codigo_sku ?? p.codigo_barras ?? '')}</td>
 <td>${escapeHtml(p.ubicacion ?? '')}</td>
 <td>${
-                activo
-                    ? '<span class="badge bg-success-subtle text-success border">Activo</span>'
-                    : '<span class="badge bg-secondary-subtle text-secondary border">Inactivo</span>'
-            }</td>
+        activo
+            ? '<span class="badge bg-success-subtle text-success border">Activo</span>'
+            : '<span class="badge bg-secondary-subtle text-secondary border">Inactivo</span>'
+    }</td>
 <td class="text-center">${imagenHtml}</td>
-<td class="text-end">
-  <div class="btn-group btn-group-sm">
-    <button class="btn btn-outline-primary" data-edit="${p.id}" title="Editar">
-      <i class="bi bi-pencil-square"></i>
-    </button>
-    <button class="btn btn-outline-danger" data-del="${p.id}" title="Eliminar">
-      <i class="bi bi-trash"></i>
-    </button>
-    <button class="btn btn-outline-secondary" data-toggle="${p.id}" title="${
-                activo ? 'Inactivar' : 'Activar'
-            }">
-      <i class="bi ${activo ? 'bi-toggle-on' : 'bi-toggle-off'}"></i>
-    </button>
-  </div>
-</td>`;
+${accionesHtml}
+`;
+
             tblBody.appendChild(tr);
         }
     }
@@ -617,9 +634,11 @@
     }
 
     // Botón "Nuevo" – modo creación
-    btnNuevo?.addEventListener('click', () => {
-        if (!frm) return;
-        frm.reset();
+btnNuevo?.addEventListener('click', () => {
+    if (!PUEDE_GESTIONAR_PRODUCTOS) return;  // ← corregir
+    if (!frm) return;
+
+    frm.reset();
 
         const idInput = frm.querySelector('[name="id"]');
         if (idInput) idInput.value = '';
@@ -715,9 +734,9 @@
     // =====================================
     // Acciones de fila (editar / eliminar / toggle)
     // =====================================
-    tblBody?.addEventListener('click', async (e) => {
-        const btn = e.target.closest('button');
-        if (!btn) return;
+tblBody?.addEventListener('click', async (e) => {
+    if (!PUEDE_GESTIONAR_PRODUCTOS) return;  // ← corregir
+    const btn = e.target.closest('button');
 
         const id = btn.dataset.edit || btn.dataset.del || btn.dataset.toggle;
         if (!id) return;

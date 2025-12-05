@@ -2,7 +2,15 @@
 // views/admin/productos/index.php
 // MODULO PRODUCTOS / Juliana Lugo / vista de index de productos 
 $base = $this->config['app']['base_url'] ?? '';
+
+// === Rol / permisos (igual que clientes) ===
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+$rol = strtolower($_SESSION['admin']['rol'] ?? 'empleado');
+$puedeGestionarProductos = ($rol === 'admin');
 ?>
+
 <section class="card shadow-sm ui-pro border-0 rounded-4">
     <div class="card-body">
         <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
@@ -10,9 +18,12 @@ $base = $this->config['app']['base_url'] ?? '';
                 <i class="bi bi-basket fs-4 text-success"></i>
                 <h1 class="h4 m-0">Productos</h1>
             </div>
+                <?php if ($puedeGestionarProductos): ?>
             <button id="btnNuevoProd" type="button" class="btn btn-success">
                 <i class="bi bi-plus-lg me-1"></i> Nuevo
             </button>
+            <?php endif; ?>
+
         </div>
 
         <!-- Buscador -->
@@ -44,7 +55,10 @@ $base = $this->config['app']['base_url'] ?? '';
                     <th>Ubicación</th>
                     <th>Estado</th>
                     <th>Imagen</th>
+                    <?php if ($puedeGestionarProductos): ?>
                     <th class="text-end">Acciones</th>
+                <?php endif; ?>
+
                 </tr>
                 </thead>
                 <tbody></tbody>

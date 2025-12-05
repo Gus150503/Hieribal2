@@ -141,7 +141,7 @@ $proveedores = $proveedores ?? [];
                         <!-- NÚMERO DE ORDEN -->
                         <div class="col-md-4">
                             <label class="form-label">Número de orden</label>
-                            <input class="form-control" id="numero_orden" name="numero_orden" required>
+                            <input type="text" id="numero_orden" name="numero_orden" class="form-control">
                             <div class="invalid-feedback">Número de orden requerido.</div>
                         </div>
 

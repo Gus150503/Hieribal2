@@ -855,10 +855,12 @@ mpBtnGuardar?.addEventListener("click", async () => {
     });
   });
 
+   // Si no hay productos, igual permitimos guardar:
   if (!items.length) {
-    uiToast("Agrega al menos un producto.", "warning");
-    return;
+    uiToast("Este proveedor quedará sin productos asignados.", "info");
+    // OJO: no hacemos return; mandamos el arreglo vacío al backend
   }
+
 
   try {
     const r = await fetch(api("action=productos_save"), {

@@ -297,4 +297,14 @@ final class UsuarioProducto
 
         return ['estado' => $nuevo];
     }
+
+    /** Verifica si el producto está siendo usado en otras tablas */
+public function estaEnUso(int $id): bool
+{
+    // Aquí validamos SOLO carrito, puedes agregar ventas si las tienes
+    $st = $this->db->prepare("SELECT COUNT(*) FROM carrito WHERE id_producto = :id");
+    $st->execute([':id' => $id]);
+    return (int)$st->fetchColumn() > 0;
+}
+
 }
