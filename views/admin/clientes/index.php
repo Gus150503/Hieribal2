@@ -1,6 +1,18 @@
 <?php
 $base = $this->config['app']['base_url'] ?? '';
+
+// 👇 leer rol de la sesión
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+$rol  = strtolower($_SESSION['admin']['rol'] ?? 'empleado');
+
+// 👇 sólo admin puede crear/editar/borrar clientes
+$puedeGestionarClientes = ($rol === 'admin');
 ?>
+
+
+
 <section class="card shadow-sm ui-pro border-0 rounded-4">
   <div class="card-body">
     <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
@@ -8,10 +20,14 @@ $base = $this->config['app']['base_url'] ?? '';
         <i class="bi bi-person-badge fs-4 text-success"></i>
         <h1 class="h4 m-0">Clientes</h1>
       </div>
-      <button id="btnNuevoCliente" class="btn btn-success">
-        <i class="bi bi-plus-lg me-1"></i> Nuevo
-      </button>
+
+      <?php if ($puedeGestionarClientes): ?>
+        <button id="btnNuevoCliente" class="btn btn-success">
+          <i class="bi bi-plus-lg me-1"></i> Nuevo
+        </button>
+      <?php endif; ?>
     </div>
+
 
     <!-- Buscador: IDs que usa el JS -->
     <div class="input-group mb-3" style="max-width:520px;">
@@ -31,7 +47,11 @@ $base = $this->config['app']['base_url'] ?? '';
             <th>Correo</th>
             <th>Estado</th>
             <th>Registro</th>
-            <th class="text-end">Acciones</th>
+
+            <?php if ($puedeGestionarClientes): ?>
+              <th class="text-end">Acciones</th>
+            <?php endif; ?>
+
           </tr>
         </thead>
         <tbody></tbody>

@@ -208,12 +208,20 @@ if ($m === 'POST' && $action === 'crear_venta') {
 
         $this->ok(['id_venta' => $idVenta], 201);
 
-    } catch (\RuntimeException $e) {
+       } catch (\RuntimeException $e) {
         // 💡 errores lógicos (stock insuficiente, etc.)
-        $this->fail($e->getMessage(), 400);
+        $extra = [];
+
+        // Si el mensaje indica stock insuficiente, marcamos un código específico
+        if (stripos($e->getMessage(), 'stock insuficiente') !== false) {
+            $extra['error_code'] = 'OUT_OF_STOCK';
+        }
+
+        $this->fail($e->getMessage(), 400, $extra);
     } catch (\Throwable $e) {
         $this->fail($this->friendlyDbError($e), 500);
     }
+
     return;
 }
 

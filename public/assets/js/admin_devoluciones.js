@@ -858,6 +858,22 @@ btnNuevo?.addEventListener('click', () => {
     if (document.readyState === 'loading')
         document.addEventListener('DOMContentLoaded', boot);
     else boot();
+const inputNumOrden = document.getElementById('numero_orden');
+
+if (inputNumOrden) {
+    inputNumOrden.addEventListener('input', (e) => {
+
+        // Elimina todo lo que NO sea un dígito
+        const limpio = e.target.value.replace(/[^0-9]/g, '');
+
+        // Si hubo cambios, restaura el caret correctamente
+        if (limpio !== e.target.value) {
+            const pos = e.target.selectionStart - (e.target.value.length - limpio.length);
+            e.target.value = limpio;
+            e.target.setSelectionRange(pos, pos);
+        }
+    });
+}
 
     window.addEventListener('pageshow', (e) => {
         if (e.persisted) boot();
