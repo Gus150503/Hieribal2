@@ -1,4 +1,6 @@
 <?php
+// views/admin/productos/index.php
+// MODULO INVENTARIO / Juliana Lugo / vista de index de inventario 
 $base = $this->config['app']['base_url'] ?? '';
 ?>
 <section class="card shadow-sm ui-pro border-0 rounded-4">

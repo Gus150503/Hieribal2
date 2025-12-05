@@ -1,4 +1,5 @@
 // assets/js/admin_productos.js
+// MODULO PRODUCTOS / Juliana Lugo /
 (function () {
     if (window.__PRODUCTOS_JS_BOUND__) return;
     window.__PRODUCTOS_JS_BOUND__ = true;
@@ -533,7 +534,6 @@
 <td>${escapeHtml(p.marca ?? '')}</td>
 <td>${escapeHtml(p.presentacion ?? '')}</td>
 <td class="descripcion">${escapeHtml(p.descripcion ?? '')}</td>
-<td>${fmtNumber(p.stock_actual)}</td>
 <td>${fmtNumber(p.stock_minimo)}</td>
 <td>${escapeHtml(p.lote ?? '')}</td>
 <td>${escapeHtml(p.f_vencimiento ?? p.fecha_vencimiento ?? '')}</td>
@@ -950,12 +950,6 @@ tblBody?.addEventListener('click', async (e) => {
         )
             return 'Precio Venta debe ser mayor a 0';
 
-        if (
-            plain.stock_actual !== undefined &&
-            +plain.stock_actual <= 0
-        )
-            return 'Se requiere un Stock actual';
-
         // Fecha de vencimiento obligatoria
         if (!plain.f_vencimiento || !plain.f_vencimiento.trim())
             return 'Fecha de vencimiento es requerida.';
@@ -1029,13 +1023,6 @@ tblBody?.addEventListener('click', async (e) => {
             )
         );
 
-        setValid(
-            $('#stock_actual'),
-            !(
-                plain.stock_actual === '' ||
-                +plain.stock_actual <= 0
-            )
-        );
 
         // Descripción: opcional pero solo letras/espacios si se llena
         const descOK =

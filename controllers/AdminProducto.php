@@ -8,52 +8,139 @@ use Core\Controller;
 use Core\Database;
 use Models\UsuarioProducto;
 use PDOException;
-use Models\Categoria;   // ← NUEVO
 
-
+/** controllers/AdminProducto.php
+ *  MODULO PRODUCTOS / Juliana Lugo / Controlador de administración de productos.
+ *
+ * Expone:
+ *  - La vista principal del módulo (index).
+ *  - Un endpoint API para CRUD (create, read, update, delete) vía JSON.
+ */
 final class AdminProducto extends Controller
 {
-    private UsuarioProducto $Model;
+    /**
+     * 
+     *
+     * @var UsuarioProducto
+     */
+    private UsuarioProducto $model;
 
+    /**
+     * Constructor.
+     *
+     * Inicializa la conexión a base de datos y el modelo de productos.
+     *
+     * @param array $config Configuración general de la aplicación.
+     */
     public function __construct(array $config)
     {
         parent::__construct($config);
 
         try {
-            $pdo = Database::get($config['db']);
-            $this->Model = new UsuarioProducto($pdo);
+            $pdo         = Database::get($config['db']);
+            $this->model = new UsuarioProducto($pdo);
         } catch (PDOException $e) {
+            // En un entorno real, se recomienda registrar el error en un log
+            // y mostrar un mensaje genérico al usuario.
             die('Error de conexión a la base de datos: ' . $e->getMessage());
         }
     }
 
-    /* ---------- Helpers ---------- */
+    /* ==============================================================
+     * Helpers de respuesta JSON
+     * ============================================================== */
+
+    /**
+     * Envía una respuesta JSON con código HTTP.
+     *
+     * @param array $data   Datos a codificar en JSON.
+     * @param int   $status Código de estado HTTP.
+     */
     private function json(array $data, int $status = 200): void
     {
         http_response_code($status);
         header('Content-Type: application/json; charset=utf-8');
+
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
     }
 
+    /**
+     * Respuesta JSON de éxito con estructura estándar.
+     *
+     * @param array $extra  Datos adicionales a incluir.
+     * @param int   $status Código de estado HTTP.
+     */
     private function ok(array $extra = [], int $status = 200): void
     {
         $this->json(['ok' => true] + $extra, $status);
     }
 
+    /**
+     * Respuesta JSON de error con estructura estándar.
+     *
+     * @param string $msg    Mensaje de error para el cliente.
+     * @param int    $status Código de estado HTTP.
+     * @param array  $extra  Datos adicionales a incluir.
+     */
     private function fail(string $msg, int $status = 400, array $extra = []): void
     {
         $this->json(['ok' => false, 'msg' => $msg] + $extra, $status);
     }
 
+    /**
+     * Verifica que exista una sesión de administrador activa.
+     *
+     * Si no existe, redirige al login de administrador.
+     */
     private function ensureAdmin(): void
     {
-        if (session_status() !== \PHP_SESSION_ACTIVE) session_start();
+        if (session_status() !== \PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+
         if (empty($_SESSION['admin'])) {
             $_SESSION['admin_error'] = 'Inicia sesión para continuar.';
             header('Location: /?r=admin_login');
             exit;
         }
     }
+
+
+    /**
+     * Convierte errores de base de datos en mensajes más amigables.
+     *
+     * @param \Throwable $e Excepción capturada.
+     *
+     * @return string Mensaje listo para mostrar al usuario.
+     */
+    private function friendlyDbError(\Throwable $e): string
+    {
+        if ($e instanceof \PDOException && $e->getCode() === '23000') {
+            $msg = $e->getMessage();
+
+            if (stripos($msg, 'codigo_sku') !== false) {
+                return 'Ese SKU ya existe.';
+            }
+
+            if (stripos($msg, 'duplicate') !== false || stripos($msg, '1062') !== false) {
+                return 'Datos duplicados.';
+            }
+        }
+
+        return $e->getMessage();
+    }
+
+    /**
+     * Procesa la imagen enviada en el formulario.
+     *
+     * - Si viene un archivo en `imagen_archivo`, lo valida y lo mueve a assets/img/.
+     * - Si viene una URL en `imagen`, la retorna tal cual.
+     * - Si no se envía nada, retorna null.
+     *
+     * @return string|null URL final de la imagen o null si no se envió.
+     *
+     * @throws \Exception Si el formato o la subida del archivo no son válidos.
+     */
 
 private function friendlyDbError(\Throwable $e): string
 {
@@ -86,31 +173,34 @@ private function friendlyDbError(\Throwable $e): string
 }
 
 
+
     private function procesarImagen(): ?string
     {
         // 1. Si subieron archivo
         if (!empty($_FILES['imagen_archivo']['name'])) {
-
             $file = $_FILES['imagen_archivo'];
-            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
             $permitidas = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-            if (!in_array($ext, $permitidas)) {
-                throw new \Exception("Formato de imagen no permitido");
+
+            if (!in_array($ext, $permitidas, true)) {
+                throw new \Exception('Formato de imagen no permitido');
             }
 
-            $nuevo = uniqid('prod_') . "." . $ext;
+            // Nombre único para evitar colisiones
+            $nuevo = uniqid('prod_', true) . '.' . $ext;
 
-            $rutaFS = __DIR__ . "/../public/assets/img/" . $nuevo;
-
+            // Ruta física donde se guarda el archivo
+            $rutaFS = __DIR__ . '/../public/assets/img/' . $nuevo;
 
             if (!move_uploaded_file($file['tmp_name'], $rutaFS)) {
-                throw new \Exception("No se pudo subir la imagen");
+                throw new \Exception('No se pudo subir la imagen');
             }
 
-            // URL final
+            // URL pública final
             $base = rtrim($this->config['app']['base_url'], '/');
-            return $base . "/assets/img/" . $nuevo;
+
+            return $base . '/assets/img/' . $nuevo;
         }
 
         // 2. Si vino URL en el POST
@@ -118,87 +208,153 @@ private function friendlyDbError(\Throwable $e): string
             return trim($_POST['imagen']);
         }
 
+        // 3. No se envió imagen
         return null;
     }
 
+    /* ==============================================================
+     * Vista principal
+     * ============================================================== */
 
-    /* ---------- VISTA ---------- */
+    /**
+     * Renderiza la vista del listado de productos en el panel de administración.
+     *
+     * @return void
+     */
     public function index(): void
     {
         $this->ensureAdmin();
+
         $base = rtrim($this->config['app']['base_url'] ?? '', '/');
-        $this->render('admin/productos/index', [
-            'page_title' => 'Productos',
-            'esAdmin'    => true,
-            'extra_css'  => [$base . '/assets/css/admin_productos.css?v=1'],
-            'extra_js'   => [$base . '/assets/js/admin_productos.js?v=2'],
-        ]);
+
+        $this->render(
+            'admin/productos/index',
+            [
+                'page_title' => 'Productos',
+                'esAdmin'    => true,
+                'extra_css'  => [$base . '/assets/css/admin_productos.css?v=1'],
+                'extra_js'   => [$base . '/assets/js/admin_productos.js?v=2'],
+            ]
+        );
     }
 
-    /* ---------- API CRUD ---------- */
+    /* ==============================================================
+     * API CRUD (JSON)
+     * ============================================================== */
+
+    /**
+     * Punto de entrada API para las operaciones CRUD de productos.
+     *
+     * Usa el parámetro `action` para decidir qué operación ejecutar:
+     *  - list   (GET)
+     *  - get    (GET)
+     *  - create (POST)
+     *  - update (POST)
+     *  - delete (POST)
+     *  - toggle (POST)
+     *
+     * @return void
+     */
     public function api(): void
     {
         $this->ensureAdmin();
         header('Content-Type: application/json; charset=utf-8');
 
         try {
-            $m      = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+            $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
             $action = $_REQUEST['action'] ?? '';
 
-            if ($m === 'GET' && $action === 'list') {
+            // LISTAR
+            if ($method === 'GET' && $action === 'list') {
                 try {
-                    $q    = trim((string)($_GET['q'] ?? ''));
-                    $page = max(1, (int)($_GET['page'] ?? 1));
-                    $per  = max(1, min(100, (int)($_GET['per'] ?? 10)));
-                    $data = $this->Model->listar($q, $page, $per);
+                    $q    = trim((string) ($_GET['q'] ?? ''));
+                    $page = max(1, (int) ($_GET['page'] ?? 1));
+                    $per  = max(1, min(100, (int) ($_GET['per'] ?? 10)));
+
+                    $data = $this->model->listar($q, $page, $per);
                     $this->json($data);
                 } catch (\Throwable $e) {
                     $this->fail($this->friendlyDbError($e), 500);
                 }
+
                 return;
             }
 
-            if ($m === 'GET' && $action === 'get') {
+            // OBTENER UN PRODUCTO
+            if ($method === 'GET' && $action === 'get') {
                 try {
-                    $id = (int)($_GET['id'] ?? 0);
+                    $id = (int) ($_GET['id'] ?? 0);
+
                     if ($id <= 0) {
                         $this->fail('ID inválido');
                         return;
                     }
-                    $row = $this->Model->obtener($id);
+
+                    $row = $this->model->obtener($id);
                     $this->json(['data' => $row]);
                 } catch (\Throwable $e) {
                     $this->fail($this->friendlyDbError($e), 500);
                 }
+
                 return;
             }
 
-            if ($m === 'POST' && $action === 'create') {
+            // CREAR PRODUCTO
+            if ($method === 'POST' && $action === 'create') {
                 try {
-                    $d  = $this->sanitize($_POST, true);
-                    $d['imagen'] = $this->procesarImagen();
-                    $id = $this->Model->crear($d);
+                    // Sanitizar datos de entrada
+                    $data          = $this->sanitize($_POST, true);
+                    $data['imagen'] = $this->procesarImagen();
+
+                    // Insertar en BD
+                    $id = $this->model->crear($data);
+
                     $this->ok(['id' => $id], 201);
                 } catch (\Throwable $ex) {
                     $this->fail($this->friendlyDbError($ex), 500);
                 }
+
                 return;
             }
 
-            if ($m === 'POST' && $action === 'update') {
+            // ACTUALIZAR PRODUCTO
+            if ($method === 'POST' && $action === 'update') {
                 try {
-                    $id = (int)($_POST['id'] ?? 0);
+                    $id = (int) ($_POST['id'] ?? 0);
+
                     if ($id <= 0) {
                         $this->fail('ID inválido');
                         return;
                     }
-                    $d = $this->sanitize($_POST, false);
-                    $d['imagen'] = $this->procesarImagen();
-                    $this->Model->actualizar($id, $d);
+
+                    $data          = $this->sanitize($_POST, false);
+                    $data['imagen'] = $this->procesarImagen();
+
+                    $this->model->actualizar($id, $data);
                     $this->ok();
                 } catch (\Throwable $ex) {
                     $this->fail($this->friendlyDbError($ex), 500);
                 }
+
+                return;
+            }
+
+            // ELIMINAR PRODUCTO
+            if ($method === 'POST' && $action === 'delete') {
+                try {
+                    $id = (int) ($_POST['id'] ?? 0);
+
+                    if ($id <= 0) {
+                        $this->fail('ID inválido');
+                        return;
+                    }
+
+                    $this->model->eliminar($id);
+                    $this->ok();
+                } catch (\Throwable $ex) {
+                    $this->fail($this->friendlyDbError($ex), 500);
+                }
+
                 return;
             }
 
@@ -240,82 +396,127 @@ private function friendlyDbError(\Throwable $e): string
 }
 
 
-            if ($m === 'POST' && $action === 'toggle') {
+
+            // CAMBIAR ESTADO ACTIVO/INACTIVO
+            if ($method === 'POST' && $action === 'toggle') {
                 try {
-                    $id = (int)($_POST['id'] ?? 0);
+                    $id = (int) ($_POST['id'] ?? 0);
+
                     if ($id <= 0) {
                         $this->fail('ID inválido');
                         return;
                     }
-                    $res = $this->Model->toggleEstado($id);
+
+                    $res = $this->model->toggleEstado($id);
                     $this->ok(['estado' => $res['estado'] ?? null]);
                 } catch (\Throwable $e) {
                     $this->fail($this->friendlyDbError($e), 500);
                 }
+
                 return;
             }
 
+            // Si llega aquí, la acción no es válida
             $this->fail('Acción no válida', 400);
         } catch (\Throwable $e) {
             $this->fail($e->getMessage(), 500);
         }
     }
 
-    /* ---------- Sanitización Productos (según tu esquema) ---------- */
+    /* ==============================================================
+     * Sanitización de datos de productos
+     * ============================================================== */
+
+    /**
+     * Sanitiza y valida los datos de un producto recibidos por POST.
+     *
+     * @param array $in       Datos de entrada sin filtrar.
+     * @param bool  $creating Indica si es creación (true) o actualización (false).
+     *
+     * @return array Datos limpios y listos para el modelo.
+     *
+     * @throws \Exception Si algún campo requerido es inválido.
+     */
     private function sanitize(array $in, bool $creating): array
     {
+        // Nombre (obligatorio, máx 255 caracteres)
         $nombre = trim($in['nombre'] ?? '');
-        if ($nombre === '' || strlen($nombre) > 255) throw new \Exception('Nombre inválido');
 
-        $categoria      = trim($in['categoria'] ?? '');
-        $marca          = trim($in['marca'] ?? '');
-        $presentacion   = trim($in['presentacion'] ?? '');
-        $descripcion    = trim($in['descripcion'] ?? '');
-        $stock_actual   = is_numeric($in['stock_actual'] ?? null) ? (int)$in['stock_actual'] : 0;
-        $stock_minimo   = is_numeric($in['stock_minimo'] ?? null) ? (int)$in['stock_minimo'] : 0;
-        $lote           = trim($in['lote'] ?? '');
-        $f_vencimiento  = trim($in['f_vencimiento'] ?? '');
-        $precio_compra  = is_numeric($in['precio_compra'] ?? null) ? (float)$in['precio_compra'] : 0.0;
-        $precio_venta   = is_numeric($in['precio_venta'] ?? null) ? (float)$in['precio_venta']  : 0.0;
-        $iva            = is_numeric($in['iva'] ?? null)           ? (float)$in['iva']          : 0.0;
-        $codigo_sku     = trim($in['codigo_sku'] ?? '');
-        $ubicacion      = trim($in['ubicacion'] ?? '');
-        $imagen         = trim($in['imagen'] ?? '');
-        $estadoIn       = strtolower(trim($in['estado'] ?? 'activo'));
-        $estado         = in_array($estadoIn, ['activo', 'inactivo'], true) ? $estadoIn : 'activo';
+        if ($nombre === '' || strlen($nombre) > 255) {
+            throw new \Exception('Nombre inválido');
+        }
 
-        if ($stock_actual < 0 || $stock_minimo < 0) {
+        // Campos de texto (pueden ser obligatorios u opcionales según la lógica de negocio)
+        $categoria    = trim($in['categoria'] ?? '');
+        $marca        = trim($in['marca'] ?? '');
+        $presentacion = trim($in['presentacion'] ?? '');
+        $descripcion  = trim($in['descripcion'] ?? '');
+
+        // Númericos
+        $stockMinimo = is_numeric($in['stock_minimo'] ?? null)
+            ? (int) $in['stock_minimo']
+            : 0;
+
+        $precioCompra = is_numeric($in['precio_compra'] ?? null)
+            ? (float) $in['precio_compra']
+            : 0.0;
+
+        $precioVenta = is_numeric($in['precio_venta'] ?? null)
+            ? (float) $in['precio_venta']
+            : 0.0;
+
+        $iva = is_numeric($in['iva'] ?? null)
+            ? (float) $in['iva']
+            : 0.0;
+
+        // Otros campos de texto
+        $lote       = trim($in['lote'] ?? '');
+        $codigoSku  = trim($in['codigo_sku'] ?? '');
+        $ubicacion  = trim($in['ubicacion'] ?? '');
+        $imagen     = trim($in['imagen'] ?? '');
+        $estadoIn   = strtolower(trim($in['estado'] ?? 'activo'));
+
+        // Validación de stock mínimo
+        if ($stockMinimo < 0) {
             throw new \Exception('El stock no puede ser negativo');
         }
-        if ($stock_minimo > $stock_actual && $stock_actual > 0) {
-            // permisivo, pero te aviso
-            // throw new \Exception('El stock mínimo no puede exceder el stock actual');
-        }
-        if ($f_vencimiento !== '') {
-            $ts = strtotime($f_vencimiento);
-            if ($ts === false) throw new \Exception('Fecha de vencimiento inválida');
-            $f_vencimiento = date('Y-m-d', $ts);
+
+        // Normalización de estado (solo 'activo' o 'inactivo')
+        $estado = in_array($estadoIn, ['activo', 'inactivo'], true)
+            ? $estadoIn
+            : 'activo';
+
+        // Fecha de vencimiento (puede venir vacía)
+        $fVencimiento = trim($in['f_vencimiento'] ?? '');
+
+        if ($fVencimiento !== '') {
+            $ts = strtotime($fVencimiento);
+
+            if ($ts === false) {
+                throw new \Exception('Fecha de vencimiento inválida');
+            }
+
+            $fVencimiento = date('Y-m-d', $ts);
         } else {
-            $f_vencimiento = null;
+            $fVencimiento = null;
         }
 
         return [
-            'nombre'         => $nombre,
-            'categoria'      => $categoria,
-            'marca'          => $marca,
-            'presentacion'   => $presentacion,
-            'descripcion'    => $descripcion,
-            'stock_actual'   => $stock_actual,
-            'stock_minimo'   => $stock_minimo,
-            'lote'           => $lote,
-            'f_vencimiento'  => $f_vencimiento,
-            'precio_compra'  => $precio_compra,
-            'precio_venta'   => $precio_venta,
-            'iva'            => $iva,
-            'codigo_sku'     => $codigo_sku,
-            'ubicacion'      => $ubicacion,
-            'estado'         => $estado,
-            'imagen'         => ($imagen !== '') ? $imagen : null,
+            'nombre'        => $nombre,
+            'categoria'     => $categoria,
+            'marca'         => $marca,
+            'presentacion'  => $presentacion,
+            'descripcion'   => $descripcion,
+            'stock_minimo'  => $stockMinimo,
+            'lote'          => $lote,
+            'f_vencimiento' => $fVencimiento,
+            'precio_compra' => $precioCompra,
+            'precio_venta'  => $precioVenta,
+            'iva'           => $iva,
+            'codigo_sku'    => $codigoSku,
+            'ubicacion'     => $ubicacion,
+            'estado'        => $estado,
+            'imagen'        => ($imagen !== '') ? $imagen : null,
         ];
     }
 }

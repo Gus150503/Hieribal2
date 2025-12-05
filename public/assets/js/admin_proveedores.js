@@ -1,4 +1,5 @@
-// assets/js/admin_proveedores.js 
+// assets/js/admin_proveedores.js
+// MODULO INVENTARIOS / Juliana Lugo /
 (function () {
   if (window.__PROVEEDORES_JS_BOUND__) return;
   window.__PROVEEDORES_JS_BOUND__ = true;
