@@ -2,7 +2,7 @@
 // === Activar SweetAlert2 y JS de validación ===
 $carga_swal = true;  // el layout cargará SweetAlert2
 $extra_js   = $extra_js ?? [];
-$extra_js[] = $this->config['app']['base_url'] . '/assets/js/validarRegistro.js';
+$extra_js[] = $this->config['app']['base_url'] . '/assets/js/validarRegistro.js?v=' . time();
 ?>
 
 <div class="login-page">
@@ -33,7 +33,17 @@ $extra_js[] = $this->config['app']['base_url'] . '/assets/js/validarRegistro.js'
 
           <!-- Fila 1: 3 columnas -->
           <div class="form-row form-3">
-            <input type="text"   name="cedula"    placeholder="Cédula"   required>
+          <input
+            type="text"
+            name="cedula"
+            placeholder="Cédula"
+            required
+            inputmode="numeric"
+            minlength="8"
+            maxlength="10"
+          />
+
+
             <input type="text"   name="nombres"   placeholder="Nombres"  required>
             <input type="text"   name="apellidos" placeholder="Apellidos">
           </div>

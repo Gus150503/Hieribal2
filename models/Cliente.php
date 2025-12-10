@@ -13,23 +13,77 @@ final class Cliente {
 
     // ---------------- EXISTENTES ---------------- //
     public function buscarPorCorreo(string $correo): ?array {
-        $st = $this->pdo->prepare('SELECT * FROM clientes WHERE correo = :c LIMIT 1');
-        $st->execute([':c' => $correo]);
+        $email = trim(mb_strtolower($correo));
+        $st = $this->pdo->prepare(
+            'SELECT * 
+            FROM clientes 
+            WHERE LOWER(TRIM(correo)) = :c 
+            LIMIT 1'
+        );
+        $st->execute([':c' => $email]);
         $row = $st->fetch(PDO::FETCH_ASSOC);
         return $row ?: null;
     }
 
     public function correoExiste(string $correo): bool {
-        $st = $this->pdo->prepare('SELECT 1 FROM clientes WHERE correo = :c LIMIT 1');
-        $st->execute([':c'=>$correo]);
+        $email = trim(mb_strtolower($correo));
+        $st = $this->pdo->prepare(
+            'SELECT 1 
+            FROM clientes 
+            WHERE LOWER(TRIM(correo)) = :c 
+            LIMIT 1'
+        );
+        $st->execute([':c' => $email]);
         return $st->fetchColumn() !== false;
     }
 
     public function cedulaExiste(string $cedula): bool {
-        $st = $this->pdo->prepare('SELECT 1 FROM clientes WHERE cedula = :d LIMIT 1');
-        $st->execute([':d'=>$cedula]);
+        $doc = trim($cedula);
+        $st = $this->pdo->prepare(
+            'SELECT 1 
+            FROM clientes 
+            WHERE TRIM(cedula) = :d 
+            LIMIT 1'
+        );
+        $st->execute([':d' => $doc]);
         return $st->fetchColumn() !== false;
     }
+
+    /**
+     * Verifica si la cédula existe en OTRO cliente (para actualizar).
+     */
+    public function cedulaExisteEnOtro(string $cedula, int $idCliente): bool {
+        $doc = trim($cedula);
+        $st = $this->pdo->prepare(
+            'SELECT 1
+            FROM clientes
+            WHERE TRIM(cedula) = :d
+              AND id_cliente <> :id
+            LIMIT 1'
+        );
+        $st->execute([
+            ':d'  => $doc,
+            ':id' => $idCliente,
+        ]);
+        return $st->fetchColumn() !== false;
+    }
+
+    /**
+     * Actualiza la cédula de un cliente concreto.
+     */
+    public function actualizarCedula(int $idCliente, string $cedula): bool {
+        $doc = trim($cedula);
+        $st = $this->pdo->prepare(
+            'UPDATE clientes
+            SET cedula = :d
+            WHERE id_cliente = :id'
+        );
+        return $st->execute([
+            ':d'  => $doc,
+            ':id' => $idCliente,
+        ]);
+    }
+
 
     public function crear(array $d): int {
         $hash = password_hash($d['password'], PASSWORD_DEFAULT);

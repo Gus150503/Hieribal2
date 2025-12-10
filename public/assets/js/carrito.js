@@ -12,19 +12,8 @@ const checkoutBtn = document.getElementById("checkoutBtn");
 ============================================================ */
 function addToCart(id, nombre, precio, imagen) {
     let item = cart.find(p => p.id === id);
-
-    if (item) {
-        item.cantidad++;
-    } else {
-        cart.push({
-            id,
-            nombre,
-            precio,
-            imagen,
-            cantidad: 1
-        });
-    }
-
+    if (item) item.cantidad++;
+    else cart.push({ id, nombre, precio, imagen, cantidad: 1 });
     renderCart();
 }
 
@@ -44,10 +33,7 @@ function updateQuantity(id, change) {
     if (!item) return;
 
     item.cantidad += change;
-
-    if (item.cantidad <= 0) {
-        removeFromCart(id);
-    }
+    if (item.cantidad <= 0) removeFromCart(id);
 
     renderCart();
 }
@@ -63,9 +49,7 @@ function renderCart() {
             <div class="cart-empty">
                 <p>Tu carrito está vacío</p>
                 <p style="font-size:48px;margin-top:20px;">🛍️</p>
-            </div>
-        `;
-
+            </div>`;
         cartTotal.textContent = "$0";
         cartCount.textContent = "0";
         checkoutBtn.disabled = true;
@@ -81,21 +65,17 @@ function renderCart() {
         cartItems.innerHTML += `
             <div class="cart-item">
                 <img src="${item.imagen}" class="cart-item-img">
-
                 <div class="cart-info">
                     <strong>${item.nombre}</strong>
                     <p>$${item.precio.toLocaleString()}</p>
-
                     <div class="qty-controls">
                         <button onclick="updateQuantity(${item.id}, -1)">−</button>
                         <span>${item.cantidad}</span>
                         <button onclick="updateQuantity(${item.id}, 1)">+</button>
                     </div>
                 </div>
-
                 <button class="remove-btn" onclick="removeFromCart(${item.id})">🗑</button>
-            </div>
-        `;
+            </div>`;
     });
 
     cartTotal.textContent = "$" + total.toLocaleString();
@@ -106,33 +86,40 @@ function renderCart() {
 /* ============================================================
    GUARDAR COMPRA EN LA BD
 ============================================================ */
-function checkout() {
-    fetch("index.php?r=carrito_admin/guardar", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(cart)
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            alert("Compra registrada correctamente ✔");
-            cart = [];
-            renderCart();
-        } else {
-            alert("Error: " + data.msg);
+async function checkout() {
+    if (cart.length === 0) return;
+
+    try {
+        const res = await fetch("index.php?r=CarritoAdmin/guardar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(cart)
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+            alert("Error al guardar carrito: " + (data.msg || ""));
+            return;
         }
-    });
+
+        alert("✔ Compra registrada correctamente");
+        cart = [];
+        renderCart();
+
+    } catch (error) {
+        console.error(error);
+        alert("Error inesperado al guardar el carrito");
+    }
 }
 
 /* ============================================================
-   BUSCADOR DE PRODUCTOS
+   EVENTOS DE BUSCADOR Y CATEGORÍAS
 ============================================================ */
 const searchInput = document.getElementById("searchInput");
-
 searchInput.addEventListener("input", function () {
     let term = this.value.toLowerCase();
     let sections = document.querySelectorAll(".category-section");
-
     let found = false;
 
     sections.forEach(sec => {
@@ -141,7 +128,6 @@ searchInput.addEventListener("input", function () {
 
         productos.forEach(card => {
             let nombre = card.querySelector("h3").textContent.toLowerCase();
-
             if (nombre.includes(term)) {
                 card.style.display = "block";
                 visible = true;
@@ -159,16 +145,10 @@ searchInput.addEventListener("input", function () {
     }
 });
 
-/* ============================================================
-   BOTONES DE CATEGORÍAS CON SCROLL
-============================================================ */
 const catButtons = document.querySelectorAll(".cat-btn");
-
 catButtons.forEach(btn => {
     btn.addEventListener("click", () => {
         let cat = btn.dataset.category;
-
-        // Resaltar botón
         catButtons.forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
 
@@ -178,9 +158,8 @@ catButtons.forEach(btn => {
         }
 
         let section = document.querySelector(`section[data-category="${cat}"]`);
-
-        if (section) {
-            section.scrollIntoView({ behavior: "smooth" });
-        }
+        if (section) section.scrollIntoView({ behavior: "smooth" });
     });
 });
+
+checkoutBtn.addEventListener("click", checkout);

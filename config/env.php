@@ -30,16 +30,6 @@ return [
 ],
 
 
-    // 'mail' => [
-    //    'host'       => 'smtp.gmail.com',
-    //    'port'       => 587,
-    //    'secure'     => 'tls', // o 'ssl' si usas el puerto 465
-    //    'username'   => 'gustavoalexiscuevas@gmail.com', // tu gmail
-    //    'password'   => 'bhgn jeju ajnu vhtm',           // tu app password
-    //    'from_email' => 'gustavoalexiscuevas@gmail.com', // mismo que username
-    //    'from_name'  => 'Hieribal',
-    //],
-
     'mail' => [
     'host'       => 'smtp.gmail.com',
     'port'       => 587,

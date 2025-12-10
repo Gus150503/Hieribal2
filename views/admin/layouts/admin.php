@@ -3,7 +3,14 @@ $base      = $this->config['app']['base_url'] ?? '';
 $titulo    = $titulo ?? 'Panel';
 $extra_css = $extra_css ?? [];
 $extra_js  = $extra_js  ?? [];
+
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+$rolAdmin = strtolower($_SESSION['admin']['rol'] ?? 'empleado');
 ?>
+
+
 <!doctype html>
 <html lang="es">
 <head>
@@ -25,7 +32,9 @@ $extra_js  = $extra_js  ?? [];
     <link rel="stylesheet" href="<?= htmlspecialchars($href) ?>">
   <?php endforeach; ?>
 </head>
-<body class="admin-layout bg-body-tertiary">
+<body class="admin-layout bg-body-tertiary"
+      data-rol="<?= htmlspecialchars($rolAdmin, ENT_QUOTES) ?>">
+
 
   <!-- Botón hamburguesa solo en móvil (fuera del <aside>) -->
   <header class="main-header d-md-none p-2">

@@ -7,21 +7,45 @@ use PDO;
 use PDOException;
 use Exception;
 
+/**models/UsuarioProveedores.php
+ *  MODULO PROVEEDORES / Juliana Lugo / Clase modelo para gestión de proveedores.
+ * Gestiona proveedores y sus productos relacionados.
+ * 
+ * Incluye:
+ * - CRUD completo de proveedores
+ * - Paginación y búsqueda
+ * - Asociación de productos a proveedores
+ */
 final class UsuarioProveedores
 {
+    /**
+     * Constructor: recibe una instancia de PDO ya configurada.
+     */
     public function __construct(private PDO $db) {}
 
     /* =====================================================
        LISTAR con búsqueda y paginación
-    ===================================================== */
+       ===================================================== */
+    /**
+     * Lista proveedores aplicando filtros de búsqueda y paginación.
+     *
+     * @param string $q     Texto a buscar (empresa, nit, contacto, ciudad).
+     * @param int    $page  Página actual.
+     * @param int    $per   Registros por página.
+     *
+     * @return array        Lista de proveedores + datos de paginación.
+     * @throws PDOException
+     */
     public function listar(string $q, int $page, int $per): array
     {
+        // Normalización de paginación
         $page = max(1, $page);
         $per  = max(1, min(100, $per));
         $off  = ($page - 1) * $per;
         $like = "%{$q}%";
 
         try {
+            // Consulta principal
             $sql = "SELECT id, empresa, nit, nombre_contacto, telefono, email,
                            direccion, ciudad, condiciones_pago, estado, creado
                     FROM proveedores
@@ -32,15 +56,19 @@ final class UsuarioProveedores
                     ORDER BY id DESC
                     LIMIT ?, ?";
             $st = $this->db->prepare($sql);
+
+            // Bind seguro
             $st->bindValue(1, $like, PDO::PARAM_STR);
             $st->bindValue(2, $like, PDO::PARAM_STR);
             $st->bindValue(3, $like, PDO::PARAM_STR);
             $st->bindValue(4, $like, PDO::PARAM_STR);
             $st->bindValue(5, (int)$off, PDO::PARAM_INT);
             $st->bindValue(6, (int)$per, PDO::PARAM_INT);
+
             $st->execute();
             $items = $st->fetchAll(PDO::FETCH_ASSOC);
 
+            // Total de registros
             $sql2 = "SELECT COUNT(*)
                      FROM proveedores
                      WHERE (empresa LIKE ?
@@ -53,6 +81,7 @@ final class UsuarioProveedores
             $st2->bindValue(3, $like, PDO::PARAM_STR);
             $st2->bindValue(4, $like, PDO::PARAM_STR);
             $st2->execute();
+
             $total = (int)$st2->fetchColumn();
 
             return [
@@ -61,6 +90,7 @@ final class UsuarioProveedores
                 'per'   => $per,
                 'total' => $total
             ];
+
         } catch (PDOException $e) {
             throw $e;
         }
@@ -68,7 +98,10 @@ final class UsuarioProveedores
 
     /* =====================================================
        OBTENER UNO
-    ===================================================== */
+       ===================================================== */
+    /**
+     * Obtiene un solo proveedor por ID.
+     */
     public function obtener(int $id): ?array
     {
         try {
@@ -80,6 +113,7 @@ final class UsuarioProveedores
             );
             $st->execute([':id' => $id]);
             $row = $st->fetch(PDO::FETCH_ASSOC);
+
             return $row ?: null;
         } catch (PDOException $e) {
             throw $e;
@@ -88,7 +122,12 @@ final class UsuarioProveedores
 
     /* =====================================================
        CREAR
-    ===================================================== */
+       ===================================================== */
+    /**
+     * Crea un nuevo proveedor en la base de datos.
+     *
+     * @return int ID del proveedor insertado.
+     */
     public function crear(array $d): int
     {
         try {
@@ -98,6 +137,7 @@ final class UsuarioProveedores
                     VALUES
                     (:empresa, :nit, :nombre_contacto, :telefono, :email, :direccion,
                      :ciudad, :condiciones_pago, :estado, NOW())";
+
             $st = $this->db->prepare($sql);
             $st->execute([
                 ':empresa'          => $d['empresa'],
@@ -110,16 +150,20 @@ final class UsuarioProveedores
                 ':condiciones_pago' => $d['condiciones_pago'],
                 ':estado'           => $d['estado'] ?? 'activo',
             ]);
+
             return (int)$this->db->lastInsertId();
+
         } catch (PDOException $e) {
-            // 23000 = duplicados -> lo traduce el controller
             throw $e;
         }
     }
 
     /* =====================================================
        ACTUALIZAR
-    ===================================================== */
+       ===================================================== */
+    /**
+     * Actualiza un proveedor existente.
+     */
     public function actualizar(int $id, array $d): void
     {
         try {
@@ -134,6 +178,7 @@ final class UsuarioProveedores
                         condiciones_pago = :condiciones_pago,
                         estado = :estado
                     WHERE id = :id";
+
             $st = $this->db->prepare($sql);
             $st->execute([
                 ':empresa'          => $d['empresa'],
@@ -147,6 +192,7 @@ final class UsuarioProveedores
                 ':estado'           => $d['estado'],
                 ':id'               => $id,
             ]);
+
         } catch (PDOException $e) {
             throw $e;
         }
@@ -154,7 +200,10 @@ final class UsuarioProveedores
 
     /* =====================================================
        ELIMINAR
-    ===================================================== */
+       ===================================================== */
+    /**
+     * Elimina un proveedor por ID.
+     */
     public function eliminar(int $id): void
     {
         try {
@@ -167,41 +216,52 @@ final class UsuarioProveedores
 
     /* =====================================================
        TOGGLE ESTADO
-    ===================================================== */
+       ===================================================== */
+    /**
+     * Alterna estado: activo ↔ inactivo.
+     *
+     * @return array Nuevo estado.
+     */
     public function toggleEstado(int $id): array
     {
         try {
+            // Leer estado actual
             $st = $this->db->prepare("SELECT estado FROM proveedores WHERE id = :id");
             $st->execute([':id' => $id]);
             $p = $st->fetch(PDO::FETCH_ASSOC);
+
             if (!$p) {
                 throw new Exception('Proveedor no encontrado');
             }
 
+            // Alternancia
             $nuevo = (strcasecmp($p['estado'] ?? '', 'activo') === 0)
                 ? 'inactivo'
                 : 'activo';
 
+            // Guardar cambio
             $up = $this->db->prepare("UPDATE proveedores SET estado = :e WHERE id = :id");
             $up->execute([':e' => $nuevo, ':id' => $id]);
 
             return ['estado' => $nuevo];
+
         } catch (PDOException $e) {
             throw $e;
         }
     }
 
     /* =====================================================
-       PRODUCTOS DEL PROVEEDOR (tabla proveedor_producto)
-    ===================================================== */
+       PRODUCTOS DEL PROVEEDOR
+       ===================================================== */
 
-    /** Catálogo de productos activos (para el <select> del modal) */
+    /**
+     * Catálogo de productos activos para el selector de proveedores.
+     */
     public function productosCatalogo(): array
     {
-        // OJO: ajusta 'precio_compra' al nombre real de tu campo en productos
         $sql = "SELECT 
-                    id, 
-                    nombre, 
+                    id,
+                    nombre,
                     precio_compra
                 FROM productos
                 WHERE estado = 'activo'
@@ -211,15 +271,15 @@ final class UsuarioProveedores
         return $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
-    /** Devuelve los productos que maneja un proveedor concreto */
+    /**
+     * Devuelve los productos asociados a un proveedor.
+     */
     public function productosDeProveedor(int $idProv): array
     {
         $sql = "SELECT 
                     pp.producto_id,
                     p.nombre,
-                    -- precio base del producto (tabla productos)
                     p.precio_compra AS precio_base,
-                    -- precio de compra que maneja este proveedor
                     pp.precio_compra AS precio_compra,
                     pp.activo
                 FROM proveedor_producto pp
@@ -229,30 +289,29 @@ final class UsuarioProveedores
 
         $st = $this->db->prepare($sql);
         $st->execute([':prov' => $idProv]);
+
         return $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
     /**
-     * Guarda la lista de productos que maneja un proveedor.
-     * Estrategia: borrar los registros actuales y volver a insertar $items.
-     *
-     * $items = [
-     *   ['producto_id' => 3, 'precio_compra' => 1100.00, 'activo' => 1],
-     *   ...
-     * ]
+     * Guarda las relaciones producto ↔ proveedor.
+     * 
+     * Estrategia:
+     *   1. Borrar asociaciones actuales
+     *   2. Insertar nuevas
      */
     public function guardarProductosProveedor(int $idProv, array $items): void
     {
         $this->db->beginTransaction();
 
         try {
-            // 1) Borrar relaciones actuales
+            // Eliminar relaciones existentes
             $del = $this->db->prepare(
                 "DELETE FROM proveedor_producto WHERE proveedor_id = :id"
             );
             $del->execute([':id' => $idProv]);
 
-            // 2) Insertar nuevas
+            // Insertar nuevas asociaciones
             if (!empty($items)) {
                 $ins = $this->db->prepare(
                     "INSERT INTO proveedor_producto
@@ -262,16 +321,13 @@ final class UsuarioProveedores
 
                 foreach ($items as $row) {
                     $prodId = (int)($row['producto_id'] ?? 0);
-                    if ($prodId <= 0) {
-                        continue;
-                    }
+                    if ($prodId <= 0) continue;
 
                     $precio = isset($row['precio_compra'])
                         ? (float)$row['precio_compra']
                         : 0.0;
-                    if ($precio < 0) {
-                        $precio = 0.0;
-                    }
+
+                    if ($precio < 0) $precio = 0.0;
 
                     $activo = !empty($row['activo']) ? 1 : 0;
 
@@ -285,6 +341,7 @@ final class UsuarioProveedores
             }
 
             $this->db->commit();
+
         } catch (\Throwable $e) {
             $this->db->rollBack();
             throw $e;

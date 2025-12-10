@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 04-12-2025 a las 23:56:46
+-- Tiempo de generación: 10-12-2025 a las 20:22:14
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -44,7 +44,7 @@ CREATE TABLE `carrito` (
 
 INSERT INTO `carrito` (`id_carrito`, `id_producto`, `nombre_producto`, `cantidad`, `precio`, `fecha_agregado`, `id_cliente`) VALUES
 (1002, 3, 'Menta', 2, 1200.00, '2025-08-28 14:16:55', NULL),
-(3001, 2, 'Eucalipto', 4, 2000.00, '2025-08-28 14:27:37', 1);
+(3001, 2, 'Eucalipto', 4, 2000.00, '2025-08-28 14:27:37', NULL);
 
 -- --------------------------------------------------------
 
@@ -54,10 +54,10 @@ INSERT INTO `carrito` (`id_carrito`, `id_producto`, `nombre_producto`, `cantidad
 
 CREATE TABLE `clientes` (
   `id_cliente` int(11) NOT NULL,
-  `cedula` varchar(20) DEFAULT NULL,
+  `cedula` varchar(10) NOT NULL,
   `nombres` varchar(100) NOT NULL,
   `apellidos` varchar(100) NOT NULL,
-  `telefono` varchar(20) DEFAULT NULL,
+  `telefono` varchar(10) DEFAULT NULL,
   `correo` varchar(100) NOT NULL,
   `contraseña` varchar(255) NOT NULL,
   `estado` varchar(20) NOT NULL DEFAULT 'Activo',
@@ -73,10 +73,9 @@ CREATE TABLE `clientes` (
 --
 
 INSERT INTO `clientes` (`id_cliente`, `cedula`, `nombres`, `apellidos`, `telefono`, `correo`, `contraseña`, `estado`, `fecha_registro`, `verificado`, `token_verificacion`, `token_recuperacion`, `recuperacion_expira`) VALUES
-(1, '4123123132', 'ni idea', 'como quieras', NULL, 'holaa', '', 'Activo', '2025-12-01 19:12:27', 0, NULL, NULL, NULL),
-(43, '1223123123', 'jaiderstivenson', 'Pineda', '', 'jaiderpineda2003@gmail.com', '$2y$10$FB6kq7rjHjZCG5ctdnLxweFZgbB9aqbLGQFvGsQn9qZdlIjFGaWn2', 'Activo', '2025-11-12 18:16:18', 1, NULL, NULL, NULL),
 (44, '1023123123', 'michel', 'lugo', '2342424242', 'michel18lugo@gmail.com', '$2y$10$i4/.yXoV9J3qrXMSH2La4exjhq8UdcxoHMFT2ZMNpZedXykcVCX/u', 'Activo', '2025-11-29 08:13:34', 0, '9ed833e59821546fa690bbbe3f406e97f9dcbb94524f7d4863be30eb6b14e5e9', NULL, NULL),
-(45, '1231231231', 'Gustavo', 'Cuevas', '3132131312', 'gustavoalexiscuevas@gmail.com', '$2y$10$F7671oqeLkeLQEwS.uc/y.Zh2vZikwpEqewW29ikm.BZHGkWfmF/i', 'Activo', '2025-11-29 08:22:52', 1, NULL, NULL, NULL);
+(45, '1000789324', 'Gustavo', 'Cuevas', '3132131312', 'gustavoalexiscuevas@gmail.com', '$2y$10$F7671oqeLkeLQEwS.uc/y.Zh2vZikwpEqewW29ikm.BZHGkWfmF/i', 'Activo', '2025-11-29 08:22:52', 1, NULL, NULL, NULL),
+(67, '19493119', 'Gustavo Cuevas rico', '', '', 'gustavocuevas.1962@gmail.com', '$2y$10$7zYiWcTekozJK3GY0nDwQO1y8163O.Z/S/UQNfLjT6XJLuVcqeiaC', 'Activo', '2025-12-10 14:12:29', 1, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -135,8 +134,7 @@ CREATE TABLE `devoluciones` (
 
 INSERT INTO `devoluciones` (`id`, `cliente_id`, `proveedor_id`, `producto_id`, `cantidad`, `numero_orden`, `motivo_devolucion`, `origen`, `fecha_compra`, `fecha_devolucion`, `estado`, `observaciones`) VALUES
 (1, 44, NULL, 6, 1, 'ni idea', 'ni idea', 'cliente', '2025-12-05', '2025-12-13', 'aprobada', 'no viene bien'),
-(3, NULL, 3, 2, 1, 'ni idea', 'esta en mal estado', '', '2025-12-05', '2025-12-18', 'aprobada', NULL),
-(5, NULL, 4, 5, 1, 'ni idea', 'se daño', 'interno', '2025-12-05', '2025-12-06', 'pendiente', NULL);
+(6, NULL, 5, 13, 1, '78994', 'Tapa abierta', 'interno', '2025-12-04', '2025-12-04', 'pendiente', NULL);
 
 -- --------------------------------------------------------
 
@@ -177,9 +175,12 @@ CREATE TABLE `inventario` (
 
 INSERT INTO `inventario` (`id`, `id_producto`, `codigo_interno`, `stock`, `stock_minimo`, `stock_maximo`, `punto_reorden`, `ubicacion`, `estado`) VALUES
 (17, 3, NULL, 12, 0, 0, 0, NULL, 'disponible'),
-(18, 4, NULL, 15, 0, 0, 0, NULL, 'disponible'),
+(18, 4, 'INV-12-3951', 15, 0, 0, 0, '', 'pendiente'),
 (19, 5, NULL, 10, 23, 0, 0, NULL, 'disponible'),
-(20, 6, '555', 10, 77, 77, 9, 'calll', 'disponible');
+(20, 6, '555', 10, 77, 77, 9, 'calll', 'disponible'),
+(34, 13, 'INV-16-4351', 15, 4, 20, 5, 'Vitrina 8', 'agotado'),
+(35, 2, 'INV-2-2057', 5, 2, 10, 3, 'Vitrina 1', 'pendiente'),
+(36, 14, NULL, 0, 0, 0, 0, NULL, 'disponible');
 
 -- --------------------------------------------------------
 
@@ -194,7 +195,6 @@ CREATE TABLE `productos` (
   `marca` varchar(60) DEFAULT NULL,
   `presentacion` varchar(60) DEFAULT NULL,
   `descripcion` text DEFAULT NULL,
-  `stock_actual` varchar(20) DEFAULT NULL,
   `stock_minimo` int(10) UNSIGNED DEFAULT NULL,
   `lote` varchar(40) DEFAULT NULL,
   `f_vencimiento` date DEFAULT NULL,
@@ -212,12 +212,14 @@ CREATE TABLE `productos` (
 -- Volcado de datos para la tabla `productos`
 --
 
-INSERT INTO `productos` (`id`, `nombre`, `categoria`, `marca`, `presentacion`, `descripcion`, `stock_actual`, `stock_minimo`, `lote`, `f_vencimiento`, `precio_compra`, `precio_venta`, `iva`, `codigo_sku`, `ubicacion`, `estado`, `imagen`, `creado`) VALUES
-(2, 'Eucalipto', 'ramas', 'no se', 'fisica', '', '36', 100, '2', '2025-11-22', 1000.00, 2000.00, 0.00, '5342', 'ni idea', 'activo', 'http://localhost/Hieribal2/public/assets/img/prod_6918aa34e0270.png', '2025-08-27 23:37:31'),
-(3, 'Menta', NULL, NULL, NULL, '', '1', 100, NULL, NULL, 1000.00, 1200.00, 0.00, NULL, NULL, 'activo', 'menta.png', '2025-08-28 14:14:42'),
-(4, 'Toronjil', NULL, NULL, NULL, '', '15', 100, NULL, NULL, 1000.00, 1100.00, 0.00, NULL, NULL, 'activo', 'toronjil.png', '2025-08-28 14:15:14'),
-(5, 'Manzanilla', NULL, NULL, NULL, '', '4', 100, NULL, NULL, 1000.00, 1500.00, 0.00, NULL, NULL, 'activo', 'manzanilla.png', '2025-08-28 14:15:56'),
-(6, 'Diente de leon', NULL, NULL, NULL, '', '5', 100, NULL, NULL, 1000.00, 1500.00, 0.00, NULL, NULL, 'activo', 'leon.png', '2025-08-28 14:15:56');
+INSERT INTO `productos` (`id`, `nombre`, `categoria`, `marca`, `presentacion`, `descripcion`, `stock_minimo`, `lote`, `f_vencimiento`, `precio_compra`, `precio_venta`, `iva`, `codigo_sku`, `ubicacion`, `estado`, `imagen`, `creado`) VALUES
+(2, 'Eucalipto', 'Hierbas', 'Casero', 'Ramas x manojo', 'Aliviar problemas respiratorios', 100, 'N/A', '2025-12-11', 1000.00, 2000.00, 0.00, NULL, 'Vitrina 1', 'activo', 'http://localhost/Hieribal2/public/assets/img/prod_6932317855a593.16917257.png', '2025-08-27 23:37:31'),
+(3, 'Menta', 'Hierbas', 'Casera', 'Ramas x manojo', 'Frescura', 100, 'N/A', '2025-12-11', 1000.00, 1200.00, 0.00, NULL, 'Vitrina 1', 'activo', 'http://localhost/Hieribal2/public/assets/img/prod_693233fc0c95f2.88019775.png', '2025-08-28 14:14:42'),
+(4, 'Toronjil', 'Hierbas', 'Casera', 'Ramas x manojo', 'Hierba aromática para nervios', 100, 'N/A', '2025-12-11', 1000.00, 2000.00, 0.00, NULL, 'Vitrina 1', 'activo', 'http://localhost/Hieribal2/public/assets/img/prod_693239e9a9aff6.22280294.png', '2025-08-28 14:15:14'),
+(5, 'Manzanilla', 'Hierbas', 'Casera', 'Ramas x manojo', 'Aromática', 99, 'N/A', '2025-12-11', 1000.00, 2000.00, 0.00, NULL, 'Vitrina 1', 'activo', 'http://localhost/Hieribal2/public/assets/img/prod_69323a5947f385.91909608.png', '2025-08-28 14:15:56'),
+(6, 'Diente de leon', 'Hierbas', 'Casera', 'Ramas x manojo', 'Trastornos digestivos leves', 100, 'N/A', '2025-12-11', 500.00, 1500.00, 0.00, NULL, 'Vitrina 1', 'activo', 'http://localhost/Hieribal2/public/assets/img/prod_693230794f60d5.03038590.png', '2025-08-28 14:15:56'),
+(13, 'Vitamina C', 'Vitaminas', 'Healthy America Colombia SAS', 'Capsula 1000MG', 'ES UN SUPLEMENTO DIETARIO', 2, 'SD2015-0003704', '2025-12-10', 25000.00, 50000.00, 0.00, '565465', 'Mueble 8', 'inactivo', 'http://localhost/Hieribal2/public/assets/img/prod_69322ee336f030.01157151.png', '2025-12-05 01:01:23'),
+(14, 'Oxido de magnesio', 'Minerales', 'Healthy America Colombia SAS', 'Capsula 100 MG', 'Para los huesos', 3, '121323', '2025-12-26', 20000.00, 60000.00, 0.00, '5667676', 'Vitrina 6', 'activo', 'http://localhost/Hieribal2/public/assets/img/prod_693235ac891195.97393404.png', '2025-12-05 01:30:20');
 
 --
 -- Disparadores `productos`
@@ -255,7 +257,8 @@ CREATE TABLE `proveedores` (
 
 INSERT INTO `proveedores` (`id`, `empresa`, `nit`, `nombre_contacto`, `telefono`, `email`, `direccion`, `ciudad`, `condiciones_pago`, `estado`, `creado`) VALUES
 (3, 'ni ideaq', '123445', 'jmm', '3123214122', 'niidea@gmail.com', 'calle 80', 'bogota', 'tarjeta', 'activo', '2025-10-24 23:12:55'),
-(4, 'hieribal', '123445', 'jmm', '3123214122', 'niidea@gmail.com', 'calle 80', 'bogota', 'tarjeta', 'activo', '2025-12-04 21:58:51');
+(4, 'hieribal', '123445', 'jmm', '3123214122', 'niidea@gmail.com', 'calle 80', 'bogota', 'tarjeta', 'activo', '2025-12-04 21:58:51'),
+(5, 'Healthy America Colombia SAS', '9990151546', 'Roberto Perez', '3134405383', 'robertoperez@healthyamerica.com', 'Centro de Bogotá', 'Bogota DC', 'Daviplata  Nequi  Efectivo', 'activo', '2025-12-05 01:16:48');
 
 -- --------------------------------------------------------
 
@@ -279,7 +282,8 @@ CREATE TABLE `proveedor_producto` (
 INSERT INTO `proveedor_producto` (`id`, `proveedor_id`, `producto_id`, `precio_compra`, `activo`, `creado`) VALUES
 (3, 3, 2, 2000.00, 1, '2025-12-04 21:16:52'),
 (5, 4, 5, 100000.00, 1, '2025-12-04 22:55:15'),
-(6, 4, 3, 5000.00, 1, '2025-12-04 22:55:15');
+(6, 4, 3, 5000.00, 1, '2025-12-04 22:55:15'),
+(7, 5, 13, 50000.00, 1, '2025-12-05 01:20:22');
 
 -- --------------------------------------------------------
 
@@ -481,13 +485,13 @@ ALTER TABLE `carrito`
 -- AUTO_INCREMENT de la tabla `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- AUTO_INCREMENT de la tabla `devoluciones`
 --
 ALTER TABLE `devoluciones`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `historial_pedido`
@@ -499,25 +503,25 @@ ALTER TABLE `historial_pedido`
 -- AUTO_INCREMENT de la tabla `inventario`
 --
 ALTER TABLE `inventario`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT de la tabla `productos`
 --
 ALTER TABLE `productos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `proveedores`
 --
 ALTER TABLE `proveedores`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `proveedor_producto`
 --
 ALTER TABLE `proveedor_producto`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `reporte_venta`

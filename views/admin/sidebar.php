@@ -33,7 +33,8 @@ $ACL = [
     'proveedores',
     'configuracion',
     'devoluciones',
-    'cajero'
+    'cajero',
+    'reportes' 
   ],
 
   // 👇 Rol cajero: acceso directo a módulo Cajero + vistas limitadas
@@ -119,6 +120,15 @@ $can = function (string $perm) use ($rol, $ACL): bool {
         </a>
       </li>
     <?php endif; ?>
+
+    <?php if ($can('reportes')): ?>
+  <li class="<?= $active('reportes') ?>">
+    <a href="?r=admin/reportes">
+      <i class="bi bi-graph-up"></i><span class="label">Reportes</span>
+    </a>
+  </li>
+<?php endif; ?>
+
 
     <?php if ($can('proveedores')): ?>
       <li class="<?= $active('proveedores') ?>">
