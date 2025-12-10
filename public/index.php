@@ -158,6 +158,7 @@ switch ($r) {
     case 'google_start':     $auth->googleStart();   break;
     case 'google_callback':  $auth->googleCallback();break;
     case 'verify':           $auth->verify();        break;
+    case 'completar_cedula': $auth->completarCedula(); break;
 
     /* ====== Admin (auth + dashboard) ====== */
     case 'admin_login':         $adminA->loginForm();     break;

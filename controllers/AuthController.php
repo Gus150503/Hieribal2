@@ -99,7 +99,6 @@ final class AuthController extends Controller
         // Buscar/crear cuenta mínima para Google
         $c = $this->clientes->buscarPorCorreo($email);
         if (!$c) {
-            // Método del modelo que inserta con valores seguros (verificado=1)
             $this->clientes->crearDesdeGoogle($name, $email);
             $c = $this->clientes->buscarPorCorreo($email);
             if (!$c) {
@@ -109,14 +108,19 @@ final class AuthController extends Controller
         }
 
         session_regenerate_id(true);
+
         $_SESSION['cliente'] = [
-            'id_cliente' => (int)($c['id_cliente'] ?? 0),
-            'nombres'    => $c['nombres'] ?: $name,
-            'correo'     => $c['correo'],
+            'id_cliente'    => (int)($c['id_cliente'] ?? 0),
+            'nombres'       => $c['nombres'] ?: $name,
+            'correo'        => $c['correo'],
+            // 👉 AQUÍ está la clave
+            'falta_cedula'  => empty(trim($c['cedula'] ?? '')),
         ];
 
         $this->redirect('/?r=home');
+
     }
+
 
     /** Procesa login tradicional */
     public function login(): void
@@ -147,12 +151,14 @@ final class AuthController extends Controller
 
         session_regenerate_id(true);
         $_SESSION['cliente'] = [
-            'id_cliente' => (int)$cliente['id_cliente'],
-            'nombres'    => $cliente['nombres'] ?? '',
-            'correo'     => $cliente['correo'],
+            'id_cliente'    => (int)$cliente['id_cliente'],
+            'nombres'       => $cliente['nombres'] ?? '',
+            'correo'        => $cliente['correo'],
+            'falta_cedula'  => empty(trim($cliente['cedula'] ?? '')),
         ];
 
         $this->redirect('/?r=home');
+
     }
 
     /** Endpoint AJAX: verifica existencia de correo/cedula */
@@ -186,7 +192,7 @@ final class AuthController extends Controller
                 'error'      => $error,
                 'full'       => true,
                 'carga_swal' => true, // <-- para que el layout cargue SweetAlert2
-                'extra_js'   => [ $base . '/assets/js/validarRegistro.js' ], // <-- tu JS
+                'extra_js'   => [  ], // <-- tu JS
             ],
             'Registro'
         );
@@ -213,6 +219,26 @@ final class AuthController extends Controller
         if ($data['cedula']==='' || $data['nombres']==='' || $data['correo']==='' || $data['password']==='') {
             if ($this->isAjax()) $this->json(['ok' => false, 'msg' => 'Completa los campos obligatorios.'], 400);
             $_SESSION['error'] = 'Completa los campos obligatorios.';
+            $this->redirect('/?r=register');
+
+            // Normalizar: solo dígitos
+            $data['cedula'] = preg_replace('/\D/', '', $data['cedula'] ?? '');
+
+            // Debe tener exactamente 8 o 10 dígitos
+            if (!preg_match('/^(\d{8}|\d{10})$/', $data['cedula'])) {
+                $msg = 'La cédula debe tener 8 o 10 dígitos numéricos.';
+                if ($this->isAjax()) {
+                    $this->json(['ok' => false, 'msg' => $msg], 400);
+                }
+                $_SESSION['error'] = $msg;
+                $this->redirect('/?r=register');
+            }
+
+        }
+        // 🚨 VALIDAR CÉDULA 8 O 10 DÍGITOS
+        if (!preg_match('/^\d{8,10}$/', $data['cedula'])) {
+            if ($this->isAjax()) $this->json(['ok' => false, 'msg' => 'La cédula debe tener 8 o 10 dígitos.'], 400);
+            $_SESSION['error'] = 'La cédula debe tener 8 o 10 dígitos.';
             $this->redirect('/?r=register');
         }
         if (!filter_var($data['correo'], FILTER_VALIDATE_EMAIL)) {
@@ -276,6 +302,62 @@ final class AuthController extends Controller
         session_regenerate_id(true);
         $this->redirect('/?r=login');
     }
+
+        /**
+     * Endpoint AJAX para guardar la cédula desde el modal obligatorio
+     */
+    // ======================================================================
+    // Completar cédula (AJAX obligatorio después de login con Google)
+    // ======================================================================
+    public function completarCedula(): void
+    {
+        // Debe ser POST + AJAX
+        if (!$this->isPost() || !$this->isAjax()) {
+            $this->json(['ok' => false, 'msg' => 'Método no permitido.'], 405);
+        }
+
+        // Debe haber cliente logueado
+        if (empty($_SESSION['cliente']['id_cliente'])) {
+            $this->json(['ok' => false, 'msg' => 'Sesión no válida.'], 401);
+        }
+
+        $idCliente = (int)$_SESSION['cliente']['id_cliente'];
+
+        // Normalizar cédula: solo dígitos
+        $raw     = (string)$this->post('cedula');
+        $limpia  = preg_replace('/\D/', '', $raw ?? '');
+
+        // Validar: exactamente 8 o 10 dígitos
+        if (!preg_match('/^(\d{8}|\d{10})$/', $limpia)) {
+            $this->json([
+                'ok'  => false,
+                'msg' => 'La cédula debe tener 8 o 10 dígitos numéricos.'
+            ], 400);
+        }
+
+        // Verificar que no exista en OTRO cliente
+        if ($this->clientes->cedulaExisteEnOtro($limpia, $idCliente)) {
+            $this->json([
+                'ok'  => false,
+                'msg' => 'La cédula ya está registrada en otro usuario.'
+            ], 409);
+        }
+
+        // Actualizar en BD
+        if (!$this->clientes->actualizarCedula($idCliente, $limpia)) {
+            $this->json([
+                'ok'  => false,
+                'msg' => 'No se pudo guardar la cédula. Intenta de nuevo.'
+            ], 500);
+        }
+
+        // Actualizar sesión para que no vuelva a pedirla
+        $_SESSION['cliente']['falta_cedula'] = false;
+
+        $this->json(['ok' => true]);
+    }
+
+
 
     // ================== Recuperación de contraseña ==================
 
