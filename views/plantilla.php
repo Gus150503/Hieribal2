@@ -219,9 +219,105 @@ $ui_tema_fallback = $ui_tema ?? 'light';
 <!-- Tu JS base -->
 <script src="<?= $asset('assets/js/app.js') ?>"></script>
 
-<!-- SweetAlert2 (solo cuando se pida desde la vista/controlador) -->
-<?php if (!empty($carga_swal)): ?>
+<?php
+// Necesito SweetAlert si la vista lo pide O si falta la cédula del cliente
+$needSwal = !empty($carga_swal)
+    || (!empty($_SESSION['cliente']['falta_cedula']) && $_SESSION['cliente']['falta_cedula']);
+?>
+
+<!-- SweetAlert2 -->
+<?php if ($needSwal): ?>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<?php endif; ?>
+
+<?php if (!empty($_SESSION['cliente']['falta_cedula']) && $_SESSION['cliente']['falta_cedula']): ?>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof Swal === 'undefined') return;
+  pedirCedulaObligatoria();
+});
+
+async function pedirCedulaObligatoria() {
+  while (true) {
+    const { value: cedula, isConfirmed } = await Swal.fire({
+      title: 'Completa tu cédula',
+      html: '<p style="font-size:14px;">Para continuar usando MI HIERIBAL necesitamos tu número de identificación.</p>',
+      input: 'text',
+      inputLabel: 'Cédula (8 o 10 dígitos)',
+      inputAttributes: {
+        autocapitalize: 'off',
+        inputmode: 'numeric',
+        maxlength: '10'
+      },
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      showCancelButton: false,
+      confirmButtonText: 'Guardar',
+      confirmButtonColor: '#22c55e'
+    });
+
+    if (!isConfirmed) {
+      continue; // no lo dejamos irse
+    }
+
+    const limpia = (cedula || '').replace(/\D/g, '');
+
+    if (!/^(\d{8}|\d{10})$/.test(limpia)) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Cédula inválida',
+        text: 'La cédula debe tener 8 o 10 dígitos numéricos.',
+        confirmButtonColor: '#ef4444'
+      });
+      continue;
+    }
+
+    try {
+      const fd = new FormData();
+      fd.append('cedula', limpia);
+
+      const res = await fetch('?r=completar_cedula', {
+        method: 'POST',
+        body: fd,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
+        }
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || !data.ok) {
+        await Swal.fire({
+          icon: 'error',
+          title: 'No se pudo guardar',
+          text: (data && data.msg) ? data.msg : 'Ocurrió un error al guardar la cédula.',
+          confirmButtonColor: '#ef4444'
+        });
+        continue;
+      }
+
+      await Swal.fire({
+        icon: 'success',
+        title: '¡Cédula guardada!',
+        text: 'Tu número de identificación se guardó correctamente.',
+        confirmButtonColor: '#22c55e'
+      });
+
+      window.location.reload();
+      break;
+
+    } catch (err) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error de conexión',
+        text: 'No pudimos comunicarnos con el servidor. Intenta de nuevo.',
+        confirmButtonColor: '#ef4444'
+      });
+    }
+  }
+}
+</script>
 <?php endif; ?>
 
 <!-- Scripts extra por página (después de SweetAlert2 para que Swal esté disponible) -->
@@ -231,11 +327,6 @@ $ui_tema_fallback = $ui_tema ?? 'light';
   <?php endforeach; ?>
 <?php endif; ?>
 
-<!-- Chart.js (si aplica en páginas admin/dashboard) -->
-<?php if (!empty($carga_chartjs)): ?>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-  <script src="<?= $asset('assets/js/admin-dashboard.js') ?>"></script>
-<?php endif; ?>
 
 </body>
 </html>
