@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 05-12-2025 a las 02:55:49
+-- Tiempo de generación: 10-12-2025 a las 20:22:14
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -44,7 +44,7 @@ CREATE TABLE `carrito` (
 
 INSERT INTO `carrito` (`id_carrito`, `id_producto`, `nombre_producto`, `cantidad`, `precio`, `fecha_agregado`, `id_cliente`) VALUES
 (1002, 3, 'Menta', 2, 1200.00, '2025-08-28 14:16:55', NULL),
-(3001, 2, 'Eucalipto', 4, 2000.00, '2025-08-28 14:27:37', 1);
+(3001, 2, 'Eucalipto', 4, 2000.00, '2025-08-28 14:27:37', NULL);
 
 -- --------------------------------------------------------
 
@@ -54,10 +54,10 @@ INSERT INTO `carrito` (`id_carrito`, `id_producto`, `nombre_producto`, `cantidad
 
 CREATE TABLE `clientes` (
   `id_cliente` int(11) NOT NULL,
-  `cedula` varchar(20) DEFAULT NULL,
+  `cedula` varchar(10) NOT NULL,
   `nombres` varchar(100) NOT NULL,
   `apellidos` varchar(100) NOT NULL,
-  `telefono` varchar(20) DEFAULT NULL,
+  `telefono` varchar(10) DEFAULT NULL,
   `correo` varchar(100) NOT NULL,
   `contraseña` varchar(255) NOT NULL,
   `estado` varchar(20) NOT NULL DEFAULT 'Activo',
@@ -73,10 +73,9 @@ CREATE TABLE `clientes` (
 --
 
 INSERT INTO `clientes` (`id_cliente`, `cedula`, `nombres`, `apellidos`, `telefono`, `correo`, `contraseña`, `estado`, `fecha_registro`, `verificado`, `token_verificacion`, `token_recuperacion`, `recuperacion_expira`) VALUES
-(1, '4123123132', 'ni idea', 'como quieras', NULL, 'holaa', '', 'Activo', '2025-12-01 19:12:27', 0, NULL, NULL, NULL),
-(43, '1223123123', 'jaiderstivenson', 'Pineda', '', 'jaiderpineda2003@gmail.com', '$2y$10$FB6kq7rjHjZCG5ctdnLxweFZgbB9aqbLGQFvGsQn9qZdlIjFGaWn2', 'Activo', '2025-11-12 18:16:18', 1, NULL, NULL, NULL),
 (44, '1023123123', 'michel', 'lugo', '2342424242', 'michel18lugo@gmail.com', '$2y$10$i4/.yXoV9J3qrXMSH2La4exjhq8UdcxoHMFT2ZMNpZedXykcVCX/u', 'Activo', '2025-11-29 08:13:34', 0, '9ed833e59821546fa690bbbe3f406e97f9dcbb94524f7d4863be30eb6b14e5e9', NULL, NULL),
-(45, '1231231231', 'Gustavo', 'Cuevas', '3132131312', 'gustavoalexiscuevas@gmail.com', '$2y$10$F7671oqeLkeLQEwS.uc/y.Zh2vZikwpEqewW29ikm.BZHGkWfmF/i', 'Activo', '2025-11-29 08:22:52', 1, NULL, NULL, NULL);
+(45, '1000789324', 'Gustavo', 'Cuevas', '3132131312', 'gustavoalexiscuevas@gmail.com', '$2y$10$F7671oqeLkeLQEwS.uc/y.Zh2vZikwpEqewW29ikm.BZHGkWfmF/i', 'Activo', '2025-11-29 08:22:52', 1, NULL, NULL, NULL),
+(67, '19493119', 'Gustavo Cuevas rico', '', '', 'gustavocuevas.1962@gmail.com', '$2y$10$7zYiWcTekozJK3GY0nDwQO1y8163O.Z/S/UQNfLjT6XJLuVcqeiaC', 'Activo', '2025-12-10 14:12:29', 1, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -486,7 +485,7 @@ ALTER TABLE `carrito`
 -- AUTO_INCREMENT de la tabla `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- AUTO_INCREMENT de la tabla `devoluciones`

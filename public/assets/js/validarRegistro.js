@@ -1,112 +1,148 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function () {
   const form = document.querySelector("form");
   if (!form) return;
 
-  const cedula = form.querySelector("[name='cedula']");
-  const nombres = form.querySelector("[name='nombres']");
+  const cedula    = form.querySelector("[name='cedula']");
+  const nombres   = form.querySelector("[name='nombres']");
   const apellidos = form.querySelector("[name='apellidos']");
-  const telefono = form.querySelector("[name='telefono']");
-  const correo = form.querySelector("[name='correo']");
-  const password = form.querySelector("[name='password']");
+  const telefono  = form.querySelector("[name='telefono']");
+  const correo    = form.querySelector("[name='correo']");
+  const password  = form.querySelector("[name='password']");
 
-  // RegEx
-  const regexNombre = /^[a-zA-ZÀ-ÿ\s]+$/;
-  const regexNumero = /^[0-9]+$/;
-  const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // ========= REGEX =========
+  const regexNombre   = /^[a-zA-ZÀ-ÿ\s]+$/;
+  const regexCorreo   = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const regexTelefono = /^\d{10}$/;
+const regexCedula   = /^(\d{8}|\d{10})$/;
+ // solo 8 a 10 dígitos
 
-  // --- utilidades ---
-  const createOrGetErrorBox = () => {
-    let box = form.querySelector(".error-msg");
+  // ========= UTILIDADES =========
+  function createOrGetErrorBox() {
+    let box = document.querySelector(".error-msg");
     if (!box) {
       box = document.createElement("div");
       box.className = "error-msg";
       form.prepend(box);
     }
     return box;
-  };
+  }
 
-  const showErrors = (msgs) => {
+  function showErrors(msgs) {
     const box = createOrGetErrorBox();
     box.innerHTML = msgs.map(m => `<div>• ${m}</div>`).join("");
     box.style.display = "block";
-  };
+  }
 
+  function clearErrors() {
+    document.querySelectorAll(".error-msg").forEach(box => {
+      box.innerHTML = "";
+      box.style.display = "none";
+    });
+  }
 
-  const clearErrors = () => {
-    const box = form.querySelector(".error-msg");
-    if (box) { box.innerHTML = ""; box.style.display = "none"; }
-  };
-
-  // --- restricciones en vivo ---
+  // ========= RESTRICCIONES EN VIVO =========
   if (cedula) {
     cedula.setAttribute("inputmode", "numeric");
-    cedula.addEventListener("input", () => {
+    cedula.addEventListener("input", function () {
       cedula.value = cedula.value.replace(/\D/g, "").slice(0, 10);
     });
   }
+
   if (telefono) {
     telefono.setAttribute("inputmode", "numeric");
     telefono.setAttribute("maxlength", "10");
-    telefono.addEventListener("input", () => {
+    telefono.addEventListener("input", function () {
       telefono.value = telefono.value.replace(/\D/g, "").slice(0, 10);
     });
   }
 
-  // --- helper de servidor (existencia de campos)
+  // ========= HELPER AJAX check_field =========
   async function checkField(type, value) {
     try {
       const url = `?r=check_field&type=${encodeURIComponent(type)}&value=${encodeURIComponent(value)}`;
       const res = await fetch(url, { headers: { "Accept": "application/json" } });
       if (!res.ok) return { exists: false };
       return await res.json();
-    } catch {
+    } catch (e) {
       return { exists: false };
     }
   }
 
-  // blur checks
-  cedula?.addEventListener("blur", async () => {
-    if (cedula.value.length === 10) {
-      const { exists } = await checkField("cedula", cedula.value);
-      if (exists) showErrors(["⚠️ La cédula ya está registrada."]);
-    }
-  });
+  // ========= BLUR CÉDULA =========
+  if (cedula) {
+    cedula.addEventListener("blur", async function () {
+      const valor = cedula.value.trim();
+      if (valor === "") return;
 
-  correo?.addEventListener("blur", async () => {
-    if (regexCorreo.test(correo.value.trim())) {
-      const { exists } = await checkField("correo", correo.value.trim());
-      if (exists) showErrors(["⚠️ El correo ya está registrado."]);
-    }
-  });
+      clearErrors();
 
-  // --- SUBMIT ---
-  form.addEventListener("submit", async (e) => {
+      if (!regexCedula.test(valor)) {
+        showErrors(["⚠️ La cédula debe tener entre 8 y 10 dígitos numéricos."]);
+        return;
+      }
+
+      const { exists } = await checkField("cedula", valor);
+      if (exists) {
+        showErrors(["⚠️ La cédula ya está registrada."]);
+      }
+    });
+  }
+
+  // ========= BLUR CORREO =========
+  if (correo) {
+    correo.addEventListener("blur", async function () {
+      const mail = correo.value.trim();
+      if (mail === "") return;
+
+      clearErrors();
+
+      if (!regexCorreo.test(mail)) {
+        showErrors(["⚠️ El correo no tiene un formato válido."]);
+        return;
+      }
+
+      const { exists } = await checkField("correo", mail);
+      if (exists) {
+        showErrors(["⚠️ El correo ya está registrado."]);
+      }
+    });
+  }
+
+  // ========= SUBMIT =========
+  form.addEventListener("submit", async function (e) {
     e.preventDefault();
     clearErrors();
 
     const mensajes = [];
 
-    // Validaciones
-    const c = (cedula?.value || "").trim();
-    if (!regexNumero.test(c)) mensajes.push("La cédula debe contener solo números.");
-    if (c.length !== 10) mensajes.push("La cédula debe tener exactamente 10 dígitos.");
+    const c    = cedula    ? cedula.value.trim()    : "";
+    const n    = nombres   ? nombres.value.trim()   : "";
+    const a    = apellidos ? apellidos.value.trim() : "";
+    const t    = telefono  ? telefono.value.trim()  : "";
+    const mail = correo    ? correo.value.trim()    : "";
+    const pass = password  ? password.value         : "";
 
-    const n = (nombres?.value || "").trim();
-    if (!regexNombre.test(n)) mensajes.push("El nombre solo debe contener letras y espacios.");
+    // --- Validaciones de formato ---
+    if (!regexCedula.test(c)) {
+      mensajes.push("La cédula debe tener entre 8 y 10 dígitos numéricos.");
+    }
+    if (!regexNombre.test(n)) {
+      mensajes.push("El nombre solo debe contener letras y espacios.");
+    }
+    if (a !== "" && !regexNombre.test(a)) {
+      mensajes.push("El apellido solo debe contener letras y espacios.");
+    }
+    if (!regexTelefono.test(t)) {
+      mensajes.push("El teléfono debe tener exactamente 10 dígitos.");
+    }
+    if (!regexCorreo.test(mail)) {
+      mensajes.push("El correo no es válido.");
+    }
+    if (!pass || pass.length < 8) {
+      mensajes.push("La contraseña debe tener mínimo 8 caracteres.");
+    }
 
-    const a = (apellidos?.value || "").trim();
-    if (a !== "" && !regexNombre.test(a)) mensajes.push("El apellido solo debe contener letras y espacios.");
-
-    const t = (telefono?.value || "").trim();
-    if (!regexTelefono.test(t)) mensajes.push("El teléfono debe tener exactamente 10 dígitos.");
-
-    const mail = (correo?.value || "").trim();
-    if (!regexCorreo.test(mail)) mensajes.push("El correo no es válido.");
-
-    if (!password || password.value.length < 8) mensajes.push("La contraseña debe tener mínimo 8 caracteres.");
-
-    // Si no hay errores de formato, verificamos existencia
+    // Si formato ok, revisar existencia en BD
     if (mensajes.length === 0) {
       const [cedulaRes, correoRes] = await Promise.all([
         checkField("cedula", c),
@@ -116,22 +152,24 @@ document.addEventListener("DOMContentLoaded", () => {
       if (correoRes.exists) mensajes.push("⚠️ El correo ya está registrado.");
     }
 
-    // Mostrar errores
     if (mensajes.length > 0) {
       showErrors(mensajes);
-      if (!regexNumero.test(c) || c.length !== 10) return cedula?.focus();
-      if (!regexNombre.test(n)) return nombres?.focus();
-      if (a !== "" && !regexNombre.test(a)) return apellidos?.focus();
-      if (!regexTelefono.test(t)) return telefono?.focus();
-      if (!regexCorreo.test(mail)) return correo?.focus();
-      if (!password || password.value.length < 8) return password?.focus();
+
+      if (!regexCedula.test(c)) { cedula && cedula.focus(); return; }
+      if (!regexNombre.test(n)) { nombres && nombres.focus(); return; }
+      if (a !== "" && !regexNombre.test(a)) { apellidos && apellidos.focus(); return; }
+      if (!regexTelefono.test(t)) { telefono && telefono.focus(); return; }
+      if (!regexCorreo.test(mail)) { correo && correo.focus(); return; }
+      if (!pass || pass.length < 8) { password && password.focus(); return; }
       return;
     }
 
-    // --- Envío AJAX real ---
+    // ========= Envío AJAX REAL =========
     const btn = form.querySelector(".submit-btn");
-    btn?.setAttribute("disabled", "");
-    if (btn) btn.textContent = "Procesando...";
+    if (btn) {
+      btn.setAttribute("disabled", "disabled");
+      btn.textContent = "Procesando...";
+    }
 
     try {
       const fd = new FormData(form);
@@ -144,41 +182,54 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
 
-      let data = null;
       const contentType = res.headers.get("content-type") || "";
+      let data = {};
 
-      if (contentType.includes("application/json")) {
+      if (contentType.indexOf("application/json") !== -1) {
         data = await res.json();
       } else {
-        // Si el backend devolvió HTML o redirect, lo tomamos como éxito
-        data = { ok: true };
-      }
-
-      if (res.ok && data.ok) {
-        if (window.Swal) {
-          await Swal.fire({
-            icon: "success",
-            title: "¡Registro exitoso!",
-            html: `<p style="font-size:15px;margin-top:10px;">Revisa tu correo Gmail para verificar tu cuenta.</p>`,
-            confirmButtonText: "Ir a iniciar sesión",
-            confirmButtonColor: "#4E73DF",
-            allowOutsideClick: false,
-            backdrop: true
-          });
-        }
-        window.location.href = "?r=login";
+        // respuesta HTML (error del servidor normal)
+        const html = await res.text();
+        document.open();
+        document.write(html);
+        document.close();
         return;
       }
 
-      // Error del backend
-      showErrors([data.msg || "No se pudo completar el registro."]);
-      btn?.removeAttribute("disabled");
-      if (btn) btn.textContent = "Crear cuenta";
+      // 👇 CLAVE: cualquier cosa que NO sea 2xx o ok true es ERROR
+      if (!res.ok || !data.ok) {
+        const msg = data.msg || "No se pudo completar el registro.";
+        showErrors([msg]);
+        if (btn) {
+          btn.removeAttribute("disabled");
+          btn.textContent = "Crear cuenta";
+        }
+        return;
+      }
+
+      // ✅ Solo aquí es éxito REAL
+      clearErrors();
+
+      if (window.Swal) {
+        await Swal.fire({
+          icon: "success",
+          title: "¡Registro exitoso!",
+          html: '<p style="font-size:15px;margin-top:10px;">Revisa tu correo Gmail para verificar tu cuenta.</p>',
+          confirmButtonText: "Ir a iniciar sesión",
+          confirmButtonColor: "#4E73DF",
+          allowOutsideClick: false,
+          backdrop: true
+        });
+      }
+
+      window.location.href = "?r=login";
 
     } catch (err) {
       showErrors(["Error de conexión. Intenta de nuevo."]);
-      btn?.removeAttribute("disabled");
-      if (btn) btn.textContent = "Crear cuenta";
+      if (btn) {
+        btn.removeAttribute("disabled");
+        btn.textContent = "Crear cuenta";
+      }
     }
   });
 });
