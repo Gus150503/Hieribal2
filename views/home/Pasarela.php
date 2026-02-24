@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,7 +31,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-image: 
+      background-image:
         radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
         radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
       pointer-events: none;
@@ -388,16 +389,27 @@
     }
 
     @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
     }
 
     @keyframes bounce-dots {
-      0%, 80%, 100% { 
+
+      0%,
+      80%,
+      100% {
         transform: scale(0);
         opacity: 0.5;
-      } 
-      40% { 
+      }
+
+      40% {
         transform: scale(1);
         opacity: 1;
       }
@@ -448,18 +460,37 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
     }
 
     @keyframes scaleIn {
-      from { transform: scale(0.8); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
 
     @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-20px); }
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-20px);
+      }
     }
 
     @media (max-width: 768px) {
@@ -478,6 +509,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="payment-container">
     <div class="payment-left">
@@ -711,7 +743,7 @@
     <div class="nequi-content">
       <div class="nequi-logo">💜</div>
       <h2>Realiza tu pago en Nequi</h2>
-      
+
       <div style="background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); padding: 1.5rem; border-radius: 16px; margin: 1.5rem 0;">
         <p style="color: #4a148c; font-size: 0.9rem; margin-bottom: 1rem;">Envía el pago a:</p>
         <div class="nequi-phone-display">
@@ -728,7 +760,7 @@
         <p style="font-weight: 700; margin-bottom: 1rem; color: #333;">📸 Sube tu comprobante de pago:</p>
         <input type="file" id="nequiReceipt" accept="image/*" style="width: 100%; padding: 0.8rem; border: 2px dashed #6a1b9a; border-radius: 8px; background: white; cursor: pointer;">
         <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">Acepta: JPG, PNG (Máx. 5MB)</p>
-        
+
         <div id="receiptPreview" style="display: none; margin-top: 1rem;">
           <p style="font-weight: 600; color: #2e7d32; margin-bottom: 0.5rem;">✅ Comprobante recibido</p>
           <img id="receiptImage" style="max-width: 100%; border-radius: 8px; border: 2px solid #2e7d32;">
@@ -765,7 +797,7 @@
 
     function selectMethod(method) {
       currentMethod = method;
-      
+
       // Actualizar botones
       document.querySelectorAll('.method-btn').forEach(btn => {
         btn.classList.remove('active');
@@ -781,18 +813,18 @@
 
     document.getElementById('paymentForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      
+
       const btn = document.querySelector('.submit-btn');
-      
+
       if (currentMethod === 'nequi') {
         // Mostrar pantalla de pago Nequi
         document.getElementById('nequiAnimation').classList.add('show');
-        
+
         // Configurar el botón de abrir Nequi
         document.getElementById('openNequiBtn').onclick = function() {
           openNequiApp();
         };
-        
+
       } else {
         // Proceso normal para otros métodos
         btn.textContent = '⏳ Procesando...';
@@ -810,17 +842,17 @@
       const phoneNumber = NEQUI_NUMBER;
       const amount = TOTAL_AMOUNT;
       const message = 'Pago MiHieribal - Pedido #' + Date.now().toString().slice(-6);
-      
+
       // Intentar abrir la app de Nequi con deep link
       // Formato: nequi://sendMoney?phone=NUMBER&amount=AMOUNT&message=MESSAGE
       const nequiDeepLink = `nequi://sendMoney?phone=${phoneNumber}&amount=${amount}&message=${encodeURIComponent(message)}`;
-      
+
       // Alternativa: URL que funciona en navegadores móviles
       const nequiWebLink = `https://nequi.com.co/send?phone=${phoneNumber}&amount=${amount}`;
-      
+
       // Intentar abrir el deep link
       window.location.href = nequiDeepLink;
-      
+
       // Fallback: abrir en nueva ventana después de 1 segundo si no funciona
       setTimeout(() => {
         // Mostrar instrucciones alternativas
@@ -837,13 +869,13 @@
           alert('El archivo es muy grande. Máximo 5MB');
           return;
         }
-        
+
         // Validar tipo
         if (!file.type.startsWith('image/')) {
           alert('Por favor sube una imagen');
           return;
         }
-        
+
         // Mostrar preview
         const reader = new FileReader();
         reader.onload = function(event) {
@@ -860,29 +892,29 @@
       const customerPhone = document.getElementById('nequiPhone').value;
       const customerName = document.getElementById('nequiName').value;
       const receiptFile = document.getElementById('nequiReceipt').files[0];
-      
+
       if (!receiptFile) {
         alert('Por favor sube el comprobante de pago');
         return;
       }
-      
+
       // Aquí deberías enviar los datos a tu backend
       // Por ahora simulamos el proceso
       this.textContent = '⏳ Verificando pago...';
       this.disabled = true;
-      
+
       setTimeout(() => {
         // Cerrar modal de Nequi y mostrar éxito
         document.getElementById('nequiAnimation').classList.remove('show');
         document.getElementById('successAnimation').classList.add('show');
-        
+
         // En producción, aquí enviarías:
         // - receiptFile (imagen del comprobante)
         // - customerPhone
         // - customerName
         // - TOTAL_AMOUNT
         // a tu servidor para verificación manual
-        
+
         console.log('Datos para enviar al servidor:', {
           phone: customerPhone,
           name: customerName,
@@ -941,4 +973,5 @@
     });
   </script>
 </body>
+
 </html>
