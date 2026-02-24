@@ -1,4 +1,5 @@
 <?php
+
 namespace Controllers;
 
 use Core\Controller;
@@ -19,6 +20,25 @@ final class HomeController extends Controller
             'Inicio'
         );
     }
+
+    public function pagoInstrucciones(): void
+    {
+        $base   = rtrim((string)($this->config['app']['base_url'] ?? ''), '/');
+        $metodo = $_GET['metodo'] ?? '';
+        $total  = isset($_GET['total']) ? (float)$_GET['total'] : 0.0;
+
+        $this->render(
+            'home/pago_instrucciones',
+            [
+                'metodo' => $metodo,
+                'total'  => $total,
+                // si creaste un CSS para esta vista, descomenta:
+                // 'extra_css' => [$base . '/assets/css/pago_instrucciones.css'],
+            ],
+            'Detalles de pago'
+        );
+    }
+
 
     /** Panel con productos (carrito visual) */
     public function dashboard(): void

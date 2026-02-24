@@ -1,35 +1,116 @@
 <?php
+
 namespace Models;
 
-use Core\Model;
+use Core\Database;
+use PDO;
+use PDOException;
+use RuntimeException;
 
-class Carrito extends Model
+final class Carrito
 {
-    public function guardar(array $data, int $clienteId): bool
+    private PDO $pdo;
+
+    public function __construct(array $config)
     {
-        $sql = "INSERT INTO carrito (cliente_id, producto_id, cantidad, precio)
-                VALUES (:cliente_id, :producto_id, :cantidad, :precio)";
+        if (empty($config['db'])) {
+            throw new RuntimeException('Configuración de BD no encontrada');
+        }
 
-        $stmt = $this->db->prepare($sql);
+        // 👈 Igual que Cliente.php
+        $this->pdo = Database::get($config['db']);
+    }
 
-        return $stmt->execute([
-            ':cliente_id'  => $clienteId,
-            ':producto_id' => $data['producto_id'],
-            ':cantidad'    => $data['cantidad'],
-            ':precio'      => $data['precio']
-        ]);
+    /**
+     * Guarda TODOS los items del carrito.
+     */
+    public function guardar(
+        array $items,
+        int $clienteId,
+        string $telefono,
+        string $direccion,
+        string $pago,
+        string $notas = ''
+    ): bool {
+        if (empty($items)) return false;
+
+        $sql = "INSERT INTO carrito (
+            id_producto,
+            nombre_producto,
+            cantidad,
+            precio,
+            subtotal,
+            id_cliente,
+            fecha_agregado,
+            telefono_envio,
+            direccion_envio,
+            metodo_pago,
+            notas
+        ) VALUES (
+            :id_producto,
+            :nombre_producto,
+            :cantidad,
+            :precio,
+            :subtotal,
+            :id_cliente,
+            NOW(),
+            :telefono_envio,
+            :direccion_envio,
+            :metodo_pago,
+            :notas
+        )";
+
+
+        try {
+            $this->pdo->beginTransaction();
+            $stmt = $this->pdo->prepare($sql);
+
+            foreach ($items as $item) {
+                $idProducto = (int)$item['id'];
+                $nombre     = (string)$item['nombre'];
+                $cantidad   = (int)$item['cantidad'];
+                $precio     = (float)$item['precio'];
+                $subtotal   = $precio * $cantidad;
+
+                $stmt->execute([
+                    ':id_producto'     => $idProducto,
+                    ':nombre_producto' => $nombre,
+                    ':cantidad'        => $cantidad,
+                    ':precio'          => $precio,
+                    ':subtotal'        => $subtotal,
+                    ':id_cliente'      => $clienteId,
+                    ':telefono_envio'  => $telefono,
+                    ':direccion_envio' => $direccion,
+                    ':metodo_pago'     => $pago,
+                    ':notas'           => $notas,
+                ]);
+            }
+
+            $this->pdo->commit();
+            return true;
+        } catch (PDOException $e) {
+            $this->pdo->rollBack();
+            throw $e;
+        }
     }
 
     public function listar(int $clienteId): array
     {
-        $sql = "SELECT c.id, p.nombre, p.img, c.cantidad, c.precio
-                FROM carrito c
-                INNER JOIN productos p ON c.producto_id = p.id
-                WHERE c.cliente_id = :cliente";
+        $sql = "SELECT 
+                    id_carrito,
+                    id_producto,
+                    nombre_producto,
+                    cantidad,
+                    precio,
+                    subtotal,
+                    fecha_agregado
+                FROM carrito
+                WHERE id_cliente = :cliente
+                ORDER BY fecha_agregado DESC";
 
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':cliente' => $clienteId]);
 
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
