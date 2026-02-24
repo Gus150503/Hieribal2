@@ -315,3 +315,16 @@ catButtons.forEach(btn => {
 if (checkoutBtn) {
     checkoutBtn.addEventListener("click", checkout);
 }
+
+document.addEventListener("click", function(e){
+  const checkoutModal = document.getElementById("checkoutModal");
+  const paymentModal  = document.getElementById("paymentModal");
+
+  if (checkoutModal && checkoutModal.style.display === "flex" && e.target === checkoutModal) {
+    cerrarModal();
+  }
+
+  if (paymentModal && paymentModal.style.display === "flex" && e.target === paymentModal) {
+    cerrarPaymentModal();
+  }
+});
