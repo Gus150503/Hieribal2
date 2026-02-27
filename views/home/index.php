@@ -97,11 +97,8 @@
 <!-- QUIÉNES SOMOS -->
 <main id="quienes-somos" class="main-content">
     <div class="image-section">
-        <video autoplay loop playsinline controls class="video-pequeno">
-            <source src="assets/video/presentacion.mp4" type="video/mp4">
-            Tu navegador no soporta videos en HTML5.
-        </video>
-    </div>
+    <img src="assets/img/atencion.png" alt="Equipo MI HIERBAL asesorando clientes">
+</div>
 
     <section class="text-section">
         <h1>¿Quiénes somos?</h1>
@@ -129,41 +126,41 @@
     <div class="categorias-grid">
         <div class="categoria-card">
             <div class="categoria-imagen">
-                <img src="" alt="Suplementos" onerror="this.src='">
+                <img src="assets/img/gym3.png" alt="Suplementos" onerror="this.src='">
                 <div class="categoria-overlay">
                     <h3>Suplementos</h3>
-                    <p>Vitaminas y minerales</p>
-                    <a href="?r=productos&cat=suplementos" class="btn-categoria">Ver productos</a>
+                    <p>Proteinas y Creatinas</p>
+                    <a href="http://localhost/Hieribal2/public/?r=login" class="btn-categoria">Ver productos</a>
                 </div>
             </div>
         </div>
         <div class="categoria-card">
             <div class="categoria-imagen">
-                <img src="" alt="Plantas Medicinales" onerror="this.src='">
+                <img src="assets/img/img1.png" alt="Plantas Medicinales" onerror="this.src='">
                 <div class="categoria-overlay">
                     <h3>Plantas Medicinales</h3>
                     <p>Hierbas y extractos</p>
-                    <a href="?r=productos&cat=plantas" class="btn-categoria">Ver productos</a>
+                    <a href="http://localhost/Hieribal2/public/?r=login" class="btn-categoria">Ver productos</a>
                 </div>
             </div>
         </div>
         <div class="categoria-card">
             <div class="categoria-imagen">
-                <img src="" alt="Cosméticos Naturales" onerror="this.src='">
+                <img src="assets/img/Crema de lavanda.png" alt="Cosméticos Naturales" onerror="this.src='">
                 <div class="categoria-overlay">
                     <h3>Cosmética Natural</h3>
                     <p>Cuidado personal</p>
-                    <a href="?r=productos&cat=cosmeticos" class="btn-categoria">Ver productos</a>
+                    <a href="http://localhost/Hieribal2/public/?r=login" class="btn-categoria">Ver productos</a>
                 </div>
             </div>
         </div>
         <div class="categoria-card">
             <div class="categoria-imagen">
-                <img src="" alt="Tés e Infusiones" onerror="this.src='">
+                <img src="assets/img/Miel.png" alt="Tés e Infusiones" onerror="this.src='">
                 <div class="categoria-overlay">
-                    <h3>Tés e Infusiones</h3>
-                    <p>Bebidas saludables</p>
-                    <a href="?r=productos&cat=tes" class="btn-categoria">Ver productos</a>
+                    <h3>Cosas Naturales</h3>
+                    <p>Mieles</p>
+                    <a href="http://localhost/Hieribal2/public/?r=login" class="btn-categoria">Ver productos</a>
                 </div>
             </div>
         </div>
@@ -171,18 +168,30 @@
 </section>
 
 <!-- MISIÓN, VISIÓN Y COMPROMISO -->
-<section id="nosotros" class="nosotros-section">
-    <div class="nosotros-about-section">
-        <div>
-            <div class="nosotros-text-block">
-                <h2>Misión</h2>
-                <p>Nuestra misión es mejorar la calidad de vida de nuestros clientes...</p>
-            </div>
-            <div class="nosotros-text-block">
-                <h2>Visión</h2>
-                <p>Ser la droguería naturista líder en la zona...</p>
-            </div>
+
+<section class="mision-vision-section">
+    <div class="mision-vision-container">
+
+        <div class="mv-card">
+            <h2>Misión</h2>
+            <p>
+                Nuestra misión es mejorar la calidad de vida de nuestros clientes,
+                promoviendo la salud natural y el equilibrio entre cuerpo y mente,
+                ofreciendo productos orgánicos de alta calidad y asesoramiento
+                para un estilo de vida saludable.
+            </p>
         </div>
+
+        <div class="mv-card">
+            <h2>Visión</h2>
+            <p>
+                Ser la droguería naturista líder en la región,
+                reconocida por nuestra amplia gama de productos naturales,
+                compromiso con la salud y soluciones personalizadas
+                para cada cliente.
+            </p>
+        </div>
+
     </div>
 </section>
 
@@ -334,74 +343,6 @@
         <button type="submit">Suscribirse</button>
     </div>
 </section>
-
-<script>
-// Animación de números contadores
-const animateCounters = () => {
-    const counters = document.querySelectorAll('.stat-number');
-    counters.forEach(counter => {
-        const target = parseInt(counter.getAttribute('data-target'));
-        const duration = 2000;
-        const step = target / (duration / 16);
-        let current = 0;
-        
-        const updateCounter = () => {
-            current += step;
-            if (current < target) {
-                counter.textContent = Math.floor(current) + '+';
-                requestAnimationFrame(updateCounter);
-            } else {
-                counter.textContent = target + '+';
-            }
-        };
-        updateCounter();
-    });
-};
-
-// Observer para animar cuando sea visible
-const statsObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            animateCounters();
-            statsObserver.unobserve(entry.target);
-        }
-    });
-});
-
-const statsSection = document.querySelector('.stats-section');
-if (statsSection) {
-    statsObserver.observe(statsSection);
-}
-
-// FAQ Accordion
-document.querySelectorAll('.faq-pregunta').forEach(button => {
-    button.addEventListener('click', () => {
-        const faqItem = button.parentElement;
-        const isActive = faqItem.classList.contains('active');
-        
-        // Cerrar todos los FAQ
-        document.querySelectorAll('.faq-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        
-        // Abrir el clickeado si no estaba activo
-        if (!isActive) {
-            faqItem.classList.add('active');
-        }
-    });
-});
-
-// Desvanecer y eliminar el mensaje después de unos segundos
-window.addEventListener('DOMContentLoaded', () => {
-    const alerta = document.getElementById('alertaFlash');
-    if (alerta) {
-        setTimeout(() => {
-            alerta.style.opacity = '0';
-            setTimeout(() => alerta.remove(), 300);
-        }, 4000);
-    }
-});
-</script>
 
 </body>
 </html>
