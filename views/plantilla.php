@@ -128,8 +128,10 @@ $ui_tema_fallback = $ui_tema ?? 'light';
           <a class="logo" href="<?= htmlspecialchars($base) ?>/?r=home" aria-label="Ir al inicio">
             <img src="<?= $asset('assets/img/logo1.png') ?>" alt="Logo MI HIERBAL" style="height:50px;">
           </a>
-          <nav aria-label="Navegación principal">
-            <ul class="menu-publico">
+          <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">☰</button>
+
+<nav aria-label="Navegación principal">
+  <ul class="menu-publico" id="menuPublico">
               <li><a href="<?= htmlspecialchars($base) ?>/?r=home#top">Inicio</a></li>
               <li><a href="<?= htmlspecialchars($base) ?>/?r=home#quienes-somos">Quiénes Somos</a></li>
               <?php if (!empty($_SESSION['cliente'])): ?>
@@ -242,6 +244,19 @@ $ui_tema_fallback = $ui_tema ?? 'light';
       });
     </script>
   <?php endif; ?>
+
+  <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById("menuToggle");
+    const menu = document.getElementById("menuPublico");
+
+    if (toggle && menu) {
+        toggle.addEventListener("click", function () {
+            menu.classList.toggle("active");
+        });
+    }
+});
+</script>
 
   <!-- Tu JS base -->
   <script src="<?= $asset('assets/js/app.js') ?>"></script>
