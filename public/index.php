@@ -16,9 +16,6 @@ use Controllers\CarritoAdminController;
 use Controllers\AdminCajeroController;
 use Controllers\AdminReportesController;   // 👈 agrega esto
 
-
-
-
 /* =============================
  *  ENTORNO Y AUTOLOAD
  * ============================= */
@@ -143,6 +140,37 @@ $adminD = new AdminDashboardController($config);
 $r = $_GET['r'] ?? 'home';
 $r = trim(str_replace('/', '_', $r), '_');
 
+/* ==================================================
+ *  BLOQUEO GLOBAL: PERFIL INCOMPLETO (POST GOOGLE)
+ * ================================================== */
+$publicRoutes = [
+    'home',
+    'dashboard',
+    'pago_instrucciones', // puedes dejar home libre para mostrar el modal
+    'login',
+    'do_login',
+    'register',
+    'do_register',
+    'google_start',
+    'google_callback',
+    'completar_perfil',
+    'logout',
+    'forgot',
+    'do_forgot',
+    'reset',
+    'do_reset',
+    'verify'
+];
+
+if (
+    !empty($_SESSION['force_profile']) &&
+    $_SESSION['force_profile'] === true &&
+    !in_array($r, $publicRoutes, true)
+) {
+    header('Location: ' . (($config['app']['base_url'] ?? '') . '/?r=home'), true, 302);
+    exit;
+}
+
 switch ($r) {
 
     /* ====== Público / Home ====== */
@@ -155,7 +183,6 @@ switch ($r) {
     case 'pago_instrucciones':
         $home->pagoInstrucciones();
         break;
-
 
     /* ====== Auth de clientes ====== */
     case 'login':
@@ -194,6 +221,12 @@ switch ($r) {
     case 'google_callback':
         $auth->googleCallback();
         break;
+
+    // 🔒 PERFIL OBLIGATORIO POST GOOGLE (AJAX)
+    case 'completar_perfil':
+        $auth->completarPerfil();
+        break;
+
     case 'verify':
         $auth->verify();
         break;
@@ -253,7 +286,6 @@ switch ($r) {
         (new AdminProducto($config))->api();
         break;
 
-
     /* ====== Ventas ====== */
     case 'admin_ventas':
         (new AdminVentasController($config))->index();
@@ -270,7 +302,6 @@ switch ($r) {
     case 'admin_carrito_listar':
         (new \Controllers\CarritoAdminController($config))->listar();
         break;
-
 
     /* ====== Devoluciones ====== */
     case 'admin_devoluciones':
@@ -289,7 +320,6 @@ switch ($r) {
         (new AdminProveedores($config))->api();
         break;
 
-
     case 'admin_cajero':
         (new AdminCajeroController($config))->index();
         break;
@@ -302,7 +332,6 @@ switch ($r) {
         (new AdminCajeroController($config))->factura();
         break;
 
-
     /* ====== Compat ====== */
     case 'usuarioadmin':
         header('Location: ' . (($config['app']['base_url'] ?? '') . '/?r=admin_usuarios'), true, 302);
@@ -313,11 +342,9 @@ switch ($r) {
         (new \Controllers\AdminConfigApiController())->handle();
         break;
 
-
     case 'admin_reportes':
         (new AdminReportesController($config))->index();
         break;
-
 
     case 'admin_reportes_inventario_excel':
         (new AdminReportesController($config))->inventarioExcel();
@@ -342,7 +369,6 @@ switch ($r) {
     case 'admin_reportes_devoluciones_excel':
         (new AdminReportesController($config))->devolucionesExcel();
         break;
-
 
     /* ====== 404 ====== */
     default:
