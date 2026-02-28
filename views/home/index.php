@@ -446,6 +446,10 @@ $nombreUsuario = $logueado ? htmlspecialchars($_SESSION['cliente']['nombres']) :
                 const btn = document.getElementById('perfilBtn');
                 const msg = document.getElementById('perfilMsg');
 
+                const inpCedula = form?.querySelector('input[name="cedula"]');
+                const inpApe = form?.querySelector('input[name="apellidos"]');
+                const inpTel = form?.querySelector('input[name="telefono"]');
+
                 function showMsg(text, ok = false) {
                     msg.style.display = 'block';
                     msg.textContent = text;
@@ -454,9 +458,195 @@ $nombreUsuario = $logueado ? htmlspecialchars($_SESSION['cliente']['nombres']) :
                     msg.style.border = ok ? '1px solid #bde8c7' : '1px solid #ffc2c2';
                 }
 
+                // ========= VALIDACIONES EN VIVO =========
+
+                // CÉDULA: solo números, máximo 10
+                if (inpCedula) {
+                    inpCedula.setAttribute('maxlength', '10');
+                    inpCedula.addEventListener('input', () => {
+                        inpCedula.value = inpCedula.value.replace(/\D+/g, '').slice(0, 10);
+                    });
+                    inpCedula.addEventListener('paste', (e) => {
+                        e.preventDefault();
+                        const text = (e.clipboardData || window.clipboardData).getData('text') || '';
+                        inpCedula.value = text.replace(/\D+/g, '').slice(0, 10);
+                        inpCedula.dispatchEvent(new Event('input'));
+                    });
+                }
+
+                // TELÉFONO: solo números, máximo 15
+                if (inpTel) {
+                    inpTel.setAttribute('maxlength', '15');
+                    inpTel.addEventListener('input', () => {
+                        inpTel.value = inpTel.value.replace(/\D+/g, '').slice(0, 15);
+                    });
+                    inpTel.addEventListener('paste', (e) => {
+                        e.preventDefault();
+                        const text = (e.clipboardData || window.clipboardData).getData('text') || '';
+                        inpTel.value = text.replace(/\D+/g, '').slice(0, 15);
+                        inpTel.dispatchEvent(new Event('input'));
+                    });
+                }
+
+                // APELLIDOS: solo letras (incluye tildes y ñ) + espacios, quita dobles espacios
+                if (inpApe) {
+                    inpApe.addEventListener('input', () => {
+                        inpApe.value = inpApe.value
+                            .replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]/g, '') // SOLO letras + espacio
+                            .replace(/\s{2,}/g, ' ') // sin dobles espacios
+                            .trimStart(); // no comenzar con espacio
+                    });
+                    inpApe.addEventListener('paste', (e) => {
+                        e.preventDefault();
+                        const text = (e.clipboardData || window.clipboardData).getData('text') || '';
+                        inpApe.value = text
+                            .replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]/g, '')
+                            .replace(/\s{2,}/g, ' ')
+                            .trimStart();
+                        inpApe.dispatchEvent(new Event('input'));
+                    });
+                }
+
+                function validarAntesDeEnviar() {
+                    // Cedula: 8 o 10 dígitos (si existe el input)
+                    if (inpCedula) {
+                        const c = (inpCedula.value || '').trim();
+                        if (!/^\d{8}(\d{2})?$/.test(c)) {
+                            showMsg('La cédula debe tener 8 o 10 dígitos.');
+                            inpCedula.focus();
+                            return false;
+                        }
+                    }
+
+                    // Apellidos: mínimo 2 letras, solo letras/espacios (si existe input)
+                    if (inpApe) {
+                        const a = (inpApe.value || '').trim();
+                        if (a.length < 2) {
+                            showMsg('Los apellidos deben tener al menos 2 letras.');
+                            inpApe.focus();
+                            return false;
+                        }
+                        if (!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]+$/.test(a)) {
+                            showMsg('Apellidos inválidos. Solo letras y espacios.');
+                            inpApe.focus();
+                            return false;
+                        }
+                    }
+
+                    // Teléfono: 7 a 15 dígitos (si existe input)
+                    if (inpTel) {
+                        const t = (inpTel.value || '').trim();
+                        if (!/^\d{7,15}$/.test(t)) {
+                            showMsg('El teléfono debe tener entre 7 y 15 dígitos.');
+                            inpTel.focus();
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+
+                // ========= CONFIRM MODAL + ÉXITO =========
+
+                function confirmDialog(text) {
+                    return new Promise((resolve) => {
+                        const back = document.createElement('div');
+                        back.style.cssText = `
+        position:fixed; inset:0; background:rgba(0,0,0,.55);
+        display:flex; align-items:center; justify-content:center;
+        z-index:10000;
+      `;
+                        const box = document.createElement('div');
+                        box.style.cssText = `
+        width:min(520px, 92vw);
+        background:#fff; border-radius:18px;
+        padding:18px 18px 14px;
+        box-shadow:0 20px 60px rgba(0,0,0,.25);
+        font-family:Poppins, system-ui, Arial;
+      `;
+                        box.innerHTML = `
+        <h3 style="margin:0 0 8px; font-size:18px;">Confirmar</h3>
+        <p style="margin:0 0 16px; color:#555; font-size:14px; line-height:1.45;">${text}</p>
+        <div style="display:flex; gap:10px; justify-content:flex-end;">
+          <button id="cCancel" style="
+            border:1px solid #ddd; background:#fff; color:#333;
+            padding:10px 14px; border-radius:12px; font-weight:600; cursor:pointer;
+          ">Cancelar</button>
+          <button id="cOk" style="
+            border:none; background:#5aa837; color:#fff;
+            padding:10px 14px; border-radius:12px; font-weight:700; cursor:pointer;
+          ">Sí, guardar</button>
+        </div>
+      `;
+                        back.appendChild(box);
+                        document.body.appendChild(back);
+
+                        const close = (val) => {
+                            back.remove();
+                            resolve(val);
+                        };
+                        back.addEventListener('click', (e) => {
+                            if (e.target === back) close(false);
+                        });
+                        box.querySelector('#cCancel').addEventListener('click', () => close(false));
+                        box.querySelector('#cOk').addEventListener('click', () => close(true));
+                    });
+                }
+
+                function successDialog(text) {
+                    return new Promise((resolve) => {
+                        const back = document.createElement('div');
+                        back.style.cssText = `
+        position:fixed; inset:0; background:rgba(0,0,0,.55);
+        display:flex; align-items:center; justify-content:center;
+        z-index:10001;
+      `;
+                        const box = document.createElement('div');
+                        box.style.cssText = `
+        width:min(520px, 92vw);
+        background:#fff; border-radius:18px;
+        padding:18px 18px 14px;
+        box-shadow:0 20px 60px rgba(0,0,0,.25);
+        font-family:Poppins, system-ui, Arial;
+      `;
+                        box.innerHTML = `
+        <h3 style="margin:0 0 8px; font-size:18px;">✅ Guardado con éxito</h3>
+        <p style="margin:0 0 16px; color:#555; font-size:14px; line-height:1.45;">${text}</p>
+        <div style="display:flex; justify-content:flex-end;">
+          <button id="sOk" style="
+            border:none; background:#5aa837; color:#fff;
+            padding:10px 14px; border-radius:12px; font-weight:700; cursor:pointer;
+          ">Continuar</button>
+        </div>
+      `;
+                        back.appendChild(box);
+                        document.body.appendChild(back);
+
+                        const close = () => {
+                            back.remove();
+                            resolve(true);
+                        };
+                        back.addEventListener('click', (e) => {
+                            if (e.target === back) close();
+                        });
+                        box.querySelector('#sOk').addEventListener('click', close);
+
+                        // auto-cerrar en 1.2s
+                        setTimeout(close, 1200);
+                    });
+                }
+
                 form?.addEventListener('submit', async (e) => {
                     e.preventDefault();
+                    msg.style.display = 'none';
+
+                    if (!validarAntesDeEnviar()) return;
+
+                    const ok = await confirmDialog('¿Estás seguro de guardar estos datos?');
+                    if (!ok) return;
+
                     btn.disabled = true;
+                    const oldText = btn.textContent;
                     btn.textContent = 'Guardando...';
 
                     const fd = new FormData(form);
@@ -475,19 +665,17 @@ $nombreUsuario = $logueado ? htmlspecialchars($_SESSION['cliente']['nombres']) :
                         if (!res.ok || !data.ok) {
                             showMsg(data.msg || 'No se pudo guardar. Intenta de nuevo.');
                             btn.disabled = false;
-                            btn.textContent = 'Guardar y continuar';
+                            btn.textContent = oldText;
                             return;
                         }
 
-                        showMsg('✅ Listo, perfil completado.', true);
-
-                        // Recargar para que ya no aparezca el modal
-                        setTimeout(() => window.location.reload(), 600);
+                        await successDialog('Tu perfil fue completado correctamente.');
+                        window.location.reload();
 
                     } catch (err) {
                         showMsg('Error de red. Intenta de nuevo.');
                         btn.disabled = false;
-                        btn.textContent = 'Guardar y continuar';
+                        btn.textContent = oldText;
                     }
                 });
             })();
