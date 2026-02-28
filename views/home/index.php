@@ -1,3 +1,12 @@
+<?php
+// No rompe nada si la sesión ya está iniciada en tu layout
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$logueado = isset($_SESSION['cliente']) && !empty($_SESSION['cliente']['nombres']);
+$nombreUsuario = $logueado ? htmlspecialchars($_SESSION['cliente']['nombres']) : '';
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,17 +21,25 @@
 <!-- HERO / BIENVENIDA -->
 <section id="top" class="bienvenida">
     <div class="texto-bienvenida">
-        <h1>¡Hola <span>somos Hieribal</span>!</h1>
+
+        <h1>
+            <?php if ($logueado): ?>
+                ¡Hola <span><?= $nombreUsuario ?></span> 👋!
+            <?php else: ?>
+                ¡Hola <span>somos Hieribal</span>!
+            <?php endif; ?>
+        </h1>
+
         <p>Cuidarte naturalmente es la mejor forma de quererte. Hierbal lo hace posible.</p>
 
-        <!-- Usuario NO logueado -->
-        <a href="?r=login" class="btn-ver-todo">Iniciar sesión (Cliente)</a>
-        <a href="?r=admin_login" class="btn-ver-todo">Modo Administrador</a>
-        
-        <!-- Si está logueado, cambiar por estos botones:
-        <a href="?r=dashboard" class="btn-ver-todo">Ir a mi panel</a>
-        <a href="?r=logout" class="btn-ver-todo" style="background:#444;">Cerrar sesión</a>
-        -->
+        <?php if ($logueado): ?>
+            <a href="?r=dashboard" class="btn-ver-todo">Ir a mi panel</a>
+            <a href="?r=logout" class="btn-ver-todo" style="background:#444;">Cerrar sesión</a>
+        <?php else: ?>
+            <a href="?r=login" class="btn-ver-todo">Iniciar sesión (Cliente)</a>
+            <a href="?r=admin_login" class="btn-ver-todo">Modo Administrador</a>
+        <?php endif; ?>
+
     </div>
 
     <div class="imagenes-bienvenida">
@@ -126,7 +143,7 @@
     <div class="categorias-grid">
         <div class="categoria-card">
             <div class="categoria-imagen">
-                <img src="assets/img/gym3.png" alt="Suplementos" onerror="this.src='">
+                <img src="assets/img/gym3.png" alt="Suplementos">
                 <div class="categoria-overlay">
                     <h3>Suplementos</h3>
                     <p>Proteinas y Creatinas</p>
@@ -136,7 +153,7 @@
         </div>
         <div class="categoria-card">
             <div class="categoria-imagen">
-                <img src="assets/img/img1.png" alt="Plantas Medicinales" onerror="this.src='">
+                <img src="assets/img/img1.png" alt="Plantas Medicinales">
                 <div class="categoria-overlay">
                     <h3>Plantas Medicinales</h3>
                     <p>Hierbas y extractos</p>
@@ -146,7 +163,7 @@
         </div>
         <div class="categoria-card">
             <div class="categoria-imagen">
-                <img src="assets/img/Crema de lavanda.png" alt="Cosméticos Naturales" onerror="this.src='">
+                <img src="assets/img/Crema de lavanda.png" alt="Cosméticos Naturales">
                 <div class="categoria-overlay">
                     <h3>Cosmética Natural</h3>
                     <p>Cuidado personal</p>
@@ -156,7 +173,7 @@
         </div>
         <div class="categoria-card">
             <div class="categoria-imagen">
-                <img src="assets/img/Miel.png" alt="Tés e Infusiones" onerror="this.src='">
+                <img src="assets/img/Miel.png" alt="Tés e Infusiones">
                 <div class="categoria-overlay">
                     <h3>Cosas Naturales</h3>
                     <p>Mieles</p>
