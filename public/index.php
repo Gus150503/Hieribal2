@@ -14,7 +14,8 @@ use Controllers\AdminVentasController;
 use Controllers\AdminDevolucionesController;
 use Controllers\CarritoAdminController;
 use Controllers\AdminCajeroController;
-use Controllers\AdminReportesController;   // 👈 agrega esto
+use Controllers\AdminReportesController; 
+use Controllers\PerfilController;  // 👈 agrega esto
 
 /* =============================
  *  ENTORNO Y AUTOLOAD
@@ -180,6 +181,9 @@ switch ($r) {
     case 'dashboard':
         $home->dashboard();
         break;
+    case 'perfil':
+        (new PerfilController($config))->index();
+        break;    
     case 'pago_instrucciones':
         $home->pagoInstrucciones();
         break;
