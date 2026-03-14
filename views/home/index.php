@@ -35,7 +35,7 @@ $nombreUsuario = $logueado ? htmlspecialchars($_SESSION['cliente']['nombres']) :
             <p>Cuidarte naturalmente es la mejor forma de quererte. Hierbal lo hace posible.</p>
 
             <?php if ($logueado): ?>
-                <a href="?r=dashboard" class="btn-ver-todo">Ir a mi panel</a>
+                <a href="?r=perfil" class="btn-ver-todo">Ir a mi Perfil</a>
                 <a href="?r=logout" class="btn-ver-todo" style="background:#444;">Cerrar sesión</a>
             <?php else: ?>
                 <a href="?r=login" class="btn-ver-todo">Iniciar sesión (Cliente)</a>

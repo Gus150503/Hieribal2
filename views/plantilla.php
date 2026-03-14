@@ -135,7 +135,7 @@ $ui_tema_fallback = $ui_tema ?? 'light';
               <li><a href="<?= htmlspecialchars($base) ?>/?r=home#top">Inicio</a></li>
               <li><a href="<?= htmlspecialchars($base) ?>/?r=home#quienes-somos">Quiénes Somos</a></li>
               <?php if (!empty($_SESSION['cliente'])): ?>
-                <li><a class="nav-link" href="<?= htmlspecialchars($base) ?>/?r=dashboard">Panel</a></li>
+                <li><a class="nav-link" href="<?= htmlspecialchars($base) ?>/?r=dashboard">Comprar</a></li>
                 <li><a class="btn btn-sm btn-ghost" href="<?= htmlspecialchars($base) ?>/?r=logout">Salir</a></li>
               <?php else: ?>
                 <li><a class="btn btn-sm" href="<?= htmlspecialchars($base) ?>/?r=login">Ingresar</a></li>
