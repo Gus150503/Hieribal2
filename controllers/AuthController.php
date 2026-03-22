@@ -38,11 +38,15 @@ final class AuthController extends Controller
         exit;
     }
 
+    /* ================= LOGIN ================= */
+
     /** Muestra formulario de login */
     public function loginForm(): void
     {
-        $error = $_SESSION['error'] ?? null; unset($_SESSION['error']);
-        $msg   = $_SESSION['msg']   ?? null; unset($_SESSION['msg']);
+        $error = $_SESSION['error'] ?? null;
+        unset($_SESSION['error']);
+        $msg   = $_SESSION['msg']   ?? null;
+        unset($_SESSION['msg']);
         $this->render('auth/login', ['error' => $error, 'msg' => $msg, 'full' => true], 'Login');
     }
 
@@ -91,6 +95,7 @@ final class AuthController extends Controller
 
         $email = $me->email ?? '';
         $name  = $me->name  ?? '';
+
         if ($email === '') {
             $_SESSION['error'] = 'Google no devolvió un correo válido.';
             $this->redirect('/?r=login');
@@ -101,6 +106,7 @@ final class AuthController extends Controller
         if (!$c) {
             $this->clientes->crearDesdeGoogle($name, $email);
             $c = $this->clientes->buscarPorCorreo($email);
+
             if (!$c) {
                 $_SESSION['error'] = 'No se pudo crear el perfil con Google.';
                 $this->redirect('/?r=login');
@@ -110,24 +116,35 @@ final class AuthController extends Controller
         session_regenerate_id(true);
 
         $_SESSION['cliente'] = [
-            'id_cliente'    => (int)($c['id_cliente'] ?? 0),
-            'nombres'       => $c['nombres'] ?: $name,
-            'correo'        => $c['correo'],
-            // 👉 AQUÍ está la clave
-            'falta_cedula'  => empty(trim($c['cedula'] ?? '')),
+            'id_cliente' => (int)($c['id_cliente'] ?? 0),
+            'nombres'    => trim((string)($c['nombres'] ?? '')) !== '' ? $c['nombres'] : $name,
+            'correo'     => $c['correo'],
+
+            // ✅ banderas de campos obligatorios
+            'falta_cedula'    => empty(trim((string)($c['cedula'] ?? ''))),
+            'falta_apellidos' => empty(trim((string)($c['apellidos'] ?? ''))),
+            'falta_telefono'  => empty(trim((string)($c['telefono'] ?? ''))),
         ];
 
+        // ✅ bandera global
+        $_SESSION['force_profile'] = (
+            $_SESSION['cliente']['falta_cedula'] ||
+            $_SESSION['cliente']['falta_apellidos'] ||
+            $_SESSION['cliente']['falta_telefono']
+        );
+
         $this->redirect('/?r=home');
-
     }
-
 
     /** Procesa login tradicional */
     public function login(): void
     {
-        if (!$this->isPost()) { $this->redirect('/?r=login'); }
+        if (!$this->isPost()) {
+            $this->redirect('/?r=login');
+        }
 
         unset($_SESSION['cliente']);
+        unset($_SESSION['force_profile']);
 
         $email = trim((string)$this->post('correo'));
         $pass  = (string)$this->post('password');
@@ -150,21 +167,44 @@ final class AuthController extends Controller
         }
 
         session_regenerate_id(true);
+
         $_SESSION['cliente'] = [
-            'id_cliente'    => (int)$cliente['id_cliente'],
-            'nombres'       => $cliente['nombres'] ?? '',
-            'correo'        => $cliente['correo'],
-            'falta_cedula'  => empty(trim($cliente['cedula'] ?? '')),
+            'id_cliente' => (int)($cliente['id_cliente'] ?? 0),
+            'nombres'    => $cliente['nombres'] ?? '',
+            'correo'     => $cliente['correo'] ?? '',
+
+            // ✅ banderas de campos obligatorios
+            'falta_cedula'    => empty(trim((string)($cliente['cedula'] ?? ''))),
+            'falta_apellidos' => empty(trim((string)($cliente['apellidos'] ?? ''))),
+            'falta_telefono'  => empty(trim((string)($cliente['telefono'] ?? ''))),
         ];
 
-        $this->redirect('/?r=home');
+        // ✅ bandera global
+        $_SESSION['force_profile'] = (
+            $_SESSION['cliente']['falta_cedula'] ||
+            $_SESSION['cliente']['falta_apellidos'] ||
+            $_SESSION['cliente']['falta_telefono']
+        );
 
+        $this->redirect('/?r=home');
     }
+
+    /** Logout */
+    public function logout(): void
+    {
+        unset($_SESSION['cliente']);
+        unset($_SESSION['force_profile']);
+        session_regenerate_id(true);
+        $this->redirect('/?r=login');
+    }
+
+    /* ================= REGISTRO ================= */
 
     /** Endpoint AJAX: verifica existencia de correo/cedula */
     public function checkField(): void
     {
         header('Content-Type: application/json; charset=utf-8');
+
         $type   = $_GET['type']  ?? '';
         $value  = $_GET['value'] ?? '';
         $exists = false;
@@ -183,16 +223,16 @@ final class AuthController extends Controller
     /** Muestra formulario de registro */
     public function registroForm(): void
     {
-        $error = $_SESSION['error'] ?? null; unset($_SESSION['error']);
+        $error = $_SESSION['error'] ?? null;
+        unset($_SESSION['error']);
 
-        $base = $this->config['app']['base_url'];
         $this->render(
             'auth/registro',
             [
                 'error'      => $error,
                 'full'       => true,
-                'carga_swal' => true, // <-- para que el layout cargue SweetAlert2
-                'extra_js'   => [  ], // <-- tu JS
+                'carga_swal' => true,
+                'extra_js'   => [],
             ],
             'Registro'
         );
@@ -215,42 +255,35 @@ final class AuthController extends Controller
             'password'  => (string)$this->post('password'),
         ];
 
+        // Normalizar cédula
+        $data['cedula'] = preg_replace('/\D/', '', $data['cedula'] ?? '');
+
         // Validaciones mínimas
-        if ($data['cedula']==='' || $data['nombres']==='' || $data['correo']==='' || $data['password']==='') {
+        if ($data['cedula'] === '' || $data['nombres'] === '' || $data['correo'] === '' || $data['password'] === '') {
             if ($this->isAjax()) $this->json(['ok' => false, 'msg' => 'Completa los campos obligatorios.'], 400);
             $_SESSION['error'] = 'Completa los campos obligatorios.';
             $this->redirect('/?r=register');
-
-            // Normalizar: solo dígitos
-            $data['cedula'] = preg_replace('/\D/', '', $data['cedula'] ?? '');
-
-            // Debe tener exactamente 8 o 10 dígitos
-            if (!preg_match('/^(\d{8}|\d{10})$/', $data['cedula'])) {
-                $msg = 'La cédula debe tener 8 o 10 dígitos numéricos.';
-                if ($this->isAjax()) {
-                    $this->json(['ok' => false, 'msg' => $msg], 400);
-                }
-                $_SESSION['error'] = $msg;
-                $this->redirect('/?r=register');
-            }
-
         }
-        // 🚨 VALIDAR CÉDULA 8 O 10 DÍGITOS
-        if (!preg_match('/^\d{8,10}$/', $data['cedula'])) {
+
+        // Cédula 8 o 10 dígitos
+        if (!preg_match('/^(\d{8}|\d{10})$/', $data['cedula'])) {
             if ($this->isAjax()) $this->json(['ok' => false, 'msg' => 'La cédula debe tener 8 o 10 dígitos.'], 400);
             $_SESSION['error'] = 'La cédula debe tener 8 o 10 dígitos.';
             $this->redirect('/?r=register');
         }
+
         if (!filter_var($data['correo'], FILTER_VALIDATE_EMAIL)) {
             if ($this->isAjax()) $this->json(['ok' => false, 'msg' => 'Correo inválido.'], 400);
             $_SESSION['error'] = 'Correo inválido.';
             $this->redirect('/?r=register');
         }
+
         if ($this->clientes->correoExiste($data['correo'])) {
             if ($this->isAjax()) $this->json(['ok' => false, 'msg' => 'El correo ya está registrado.'], 409);
             $_SESSION['error'] = 'El correo ya está registrado.';
             $this->redirect('/?r=register');
         }
+
         if ($this->clientes->cedulaExiste($data['cedula'])) {
             if ($this->isAjax()) $this->json(['ok' => false, 'msg' => 'La cédula ya está registrada.'], 409);
             $_SESSION['error'] = 'La cédula ya está registrada.';
@@ -268,12 +301,10 @@ final class AuthController extends Controller
         $mailer = new ServicioCorreo($this->config);
         $mailer->enviarVerificacion($data['correo'], $data['nombres'], $link);
 
-        // === Responder según tipo de petición ===
         if ($this->isAjax()) {
-            $this->json(['ok' => true]); // <-- esto leerá tu JS para mostrar el modal y luego redirigir
+            $this->json(['ok' => true]);
         }
 
-        // Flujo normal (no AJAX)
         $_SESSION['msg'] = '✅ Perfil creado con éxito. Te enviamos un correo para activar tu cuenta.';
         $this->redirect('/?r=login');
     }
@@ -292,80 +323,162 @@ final class AuthController extends Controller
         } else {
             $_SESSION['error'] = 'El enlace no es válido o ya fue utilizado.';
         }
+
         $this->redirect('/?r=login');
     }
 
-    /** Logout */
-    public function logout(): void
-    {
-        unset($_SESSION['cliente']);
-        session_regenerate_id(true);
-        $this->redirect('/?r=login');
-    }
+    /* ================= PERFIL OBLIGATORIO (GOOGLE) ================= */
 
-        /**
-     * Endpoint AJAX para guardar la cédula desde el modal obligatorio
+    /**
+     * Endpoint AJAX para guardar cédula + apellidos + teléfono (modal obligatorio)
+     * Ruta sugerida: ?r=completar_perfil
      */
-    // ======================================================================
-    // Completar cédula (AJAX obligatorio después de login con Google)
-    // ======================================================================
-    public function completarCedula(): void
+    public function completarPerfil(): void
     {
-        // Debe ser POST + AJAX
+        // ✅ Solo POST + AJAX
         if (!$this->isPost() || !$this->isAjax()) {
             $this->json(['ok' => false, 'msg' => 'Método no permitido.'], 405);
         }
 
-        // Debe haber cliente logueado
+        // ✅ Sesión válida
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        if (empty($_SESSION['cliente']['id_cliente'])) {
+            $this->json(['ok' => false, 'msg' => 'Sesión no válida.'], 401);
+        }
+
+        $idCliente = (int) $_SESSION['cliente']['id_cliente'];
+
+        // =========================
+        //  INPUTS
+        // =========================
+        $cedulaRaw   = (string) ($this->post('cedula') ?? '');
+        $apellidosRaw = (string) ($this->post('apellidos') ?? '');
+        $telefonoRaw = (string) ($this->post('telefono') ?? '');
+
+        $cedula   = trim($cedulaRaw);
+        $apellidos = trim($apellidosRaw);
+        $telefono = trim($telefonoRaw);
+
+        // =========================
+        //  VALIDACIÓN (BACKEND)
+        // =========================
+
+        // ✅ Cédula: solo números + 8 o 10 dígitos
+        if ($cedula === '') {
+            $this->json(['ok' => false, 'msg' => 'Ingresa tu cédula.'], 400);
+        }
+        if (!preg_match('/^\d+$/', $cedula)) {
+            $this->json(['ok' => false, 'msg' => 'La cédula solo debe contener números.'], 400);
+        }
+        if (!preg_match('/^(\d{8}|\d{10})$/', $cedula)) {
+            $this->json(['ok' => false, 'msg' => 'La cédula debe tener 8 o 10 dígitos.'], 400);
+        }
+
+        // ✅ Apellidos: solo letras (incluye tildes/ñ) + espacios
+        if ($apellidos === '' || mb_strlen($apellidos) < 2) {
+            $this->json(['ok' => false, 'msg' => 'Ingresa tus apellidos (mínimo 2 letras).'], 400);
+        }
+        if (!preg_match('/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]+$/u', $apellidos)) {
+            $this->json(['ok' => false, 'msg' => 'Apellidos inválidos. Solo letras y espacios.'], 400);
+        }
+        // normaliza espacios dobles
+        $apellidos = preg_replace('/\s{2,}/', ' ', $apellidos);
+
+        // ✅ Teléfono: solo números + 7 a 15 dígitos
+        if ($telefono === '') {
+            $this->json(['ok' => false, 'msg' => 'Ingresa tu teléfono.'], 400);
+        }
+        if (!preg_match('/^\d+$/', $telefono)) {
+            $this->json(['ok' => false, 'msg' => 'El teléfono solo debe contener números.'], 400);
+        }
+        if (!preg_match('/^\d{7,15}$/', $telefono)) {
+            $this->json(['ok' => false, 'msg' => 'El teléfono debe tener entre 7 y 15 dígitos.'], 400);
+        }
+
+        // ✅ Cédula no repetida en otro cliente
+        if ($this->clientes->cedulaExisteEnOtro($cedula, $idCliente)) {
+            $this->json(['ok' => false, 'msg' => 'La cédula ya está registrada en otro usuario.'], 409);
+        }
+
+        // =========================
+        //  GUARDAR (DB)
+        // =========================
+        // Este método debe existir en Models\Cliente
+        $ok = $this->clientes->actualizarPerfilObligatorio($idCliente, $cedula, $apellidos, $telefono);
+
+        if (!$ok) {
+            $this->json(['ok' => false, 'msg' => 'No se pudo guardar. Intenta de nuevo.'], 500);
+        }
+
+        // =========================
+        //  ACTUALIZAR SESIÓN
+        // =========================
+        $_SESSION['cliente']['cedula'] = $cedula;
+        $_SESSION['cliente']['apellidos'] = $apellidos;
+        $_SESSION['cliente']['telefono'] = $telefono;
+
+        $_SESSION['cliente']['falta_cedula'] = false;
+        $_SESSION['cliente']['falta_apellidos'] = false;
+        $_SESSION['cliente']['falta_telefono'] = false;
+
+        $_SESSION['force_profile'] = false;
+
+        $this->json(['ok' => true, 'msg' => 'Perfil actualizado']);
+    }
+
+    /**
+     * (Opcional) Endpoint antiguo: solo cédula
+     * Si ya lo usas, lo dejamos.
+     */
+    public function completarCedula(): void
+    {
+        if (!$this->isPost() || !$this->isAjax()) {
+            $this->json(['ok' => false, 'msg' => 'Método no permitido.'], 405);
+        }
+
         if (empty($_SESSION['cliente']['id_cliente'])) {
             $this->json(['ok' => false, 'msg' => 'Sesión no válida.'], 401);
         }
 
         $idCliente = (int)$_SESSION['cliente']['id_cliente'];
 
-        // Normalizar cédula: solo dígitos
-        $raw     = (string)$this->post('cedula');
-        $limpia  = preg_replace('/\D/', '', $raw ?? '');
+        $raw    = (string)$this->post('cedula');
+        $cedula = preg_replace('/\D/', '', $raw ?? '');
 
-        // Validar: exactamente 8 o 10 dígitos
-        if (!preg_match('/^(\d{8}|\d{10})$/', $limpia)) {
-            $this->json([
-                'ok'  => false,
-                'msg' => 'La cédula debe tener 8 o 10 dígitos numéricos.'
-            ], 400);
+        if (!preg_match('/^(\d{8}|\d{10})$/', $cedula)) {
+            $this->json(['ok' => false, 'msg' => 'La cédula debe tener 8 o 10 dígitos.'], 400);
         }
 
-        // Verificar que no exista en OTRO cliente
-        if ($this->clientes->cedulaExisteEnOtro($limpia, $idCliente)) {
-            $this->json([
-                'ok'  => false,
-                'msg' => 'La cédula ya está registrada en otro usuario.'
-            ], 409);
+        if ($this->clientes->cedulaExisteEnOtro($cedula, $idCliente)) {
+            $this->json(['ok' => false, 'msg' => 'La cédula ya está registrada en otro usuario.'], 409);
         }
 
-        // Actualizar en BD
-        if (!$this->clientes->actualizarCedula($idCliente, $limpia)) {
-            $this->json([
-                'ok'  => false,
-                'msg' => 'No se pudo guardar la cédula. Intenta de nuevo.'
-            ], 500);
+        if (!$this->clientes->actualizarCedula($idCliente, $cedula)) {
+            $this->json(['ok' => false, 'msg' => 'No se pudo guardar la cédula.'], 500);
         }
 
-        // Actualizar sesión para que no vuelva a pedirla
         $_SESSION['cliente']['falta_cedula'] = false;
+
+        $_SESSION['force_profile'] = (
+            $_SESSION['cliente']['falta_cedula'] ||
+            ($_SESSION['cliente']['falta_apellidos'] ?? false) ||
+            ($_SESSION['cliente']['falta_telefono'] ?? false)
+        );
 
         $this->json(['ok' => true]);
     }
 
-
-
-    // ================== Recuperación de contraseña ==================
+    /* ================= RECUPERACIÓN DE CONTRASEÑA ================= */
 
     /** Formulario: "olvidé mi contraseña" */
     public function forgotForm(): void
     {
-        $error = $_SESSION['error'] ?? null; unset($_SESSION['error']);
-        $msg   = $_SESSION['msg']   ?? null; unset($_SESSION['msg']);
+        $error = $_SESSION['error'] ?? null;
+        unset($_SESSION['error']);
+        $msg   = $_SESSION['msg']   ?? null;
+        unset($_SESSION['msg']);
 
         $this->render('auth/forgot', ['error' => $error, 'msg' => $msg, 'full' => true], 'Recuperar contraseña');
     }
@@ -373,7 +486,9 @@ final class AuthController extends Controller
     /** Procesa solicitud: genera token + expiración y envía correo */
     public function forgot(): void
     {
-        if (!$this->isPost()) { $this->redirect('/?r=forgot'); }
+        if (!$this->isPost()) {
+            $this->redirect('/?r=forgot');
+        }
 
         $correo = trim((string)$this->post('correo'));
         if ($correo === '' || !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
@@ -383,6 +498,7 @@ final class AuthController extends Controller
 
         $token  = bin2hex(random_bytes(32));
         $expira = (new \DateTime('+1 hour'));
+
         $this->clientes->setTokenRecuperacion($correo, $token, $expira);
 
         $base = rtrim($this->config['app']['base_url'], '/');
@@ -399,7 +515,9 @@ final class AuthController extends Controller
     public function resetForm(): void
     {
         $token = $_GET['token'] ?? '';
-        if ($token === '') { $this->redirect('/?r=forgot'); }
+        if ($token === '') {
+            $this->redirect('/?r=forgot');
+        }
 
         $cliente = $this->clientes->buscarPorTokenRecuperacion($token);
         if (!$cliente) {
@@ -411,14 +529,17 @@ final class AuthController extends Controller
             $this->redirect('/?r=forgot');
         }
 
-        $error = $_SESSION['error'] ?? null; unset($_SESSION['error']);
+        $error = $_SESSION['error'] ?? null;
+        unset($_SESSION['error']);
         $this->render('auth/reset', ['token' => $token, 'error' => $error, 'full' => true], 'Restablecer contraseña');
     }
 
     /** Procesa reseteo: guarda nueva contraseña e invalida token */
     public function reset(): void
     {
-        if (!$this->isPost()) { $this->redirect('/?r=forgot'); }
+        if (!$this->isPost()) {
+            $this->redirect('/?r=forgot');
+        }
 
         $token = (string)$this->post('token');
         $pass1 = (string)$this->post('password');
@@ -450,6 +571,14 @@ final class AuthController extends Controller
                 'nombres'    => $cliente['nombres'] ?? '',
                 'correo'     => $cliente['correo'],
             ];
+
+            // recalcular force_profile por si el usuario aún está incompleto
+            $_SESSION['force_profile'] = (
+                empty(trim((string)($cliente['cedula'] ?? ''))) ||
+                empty(trim((string)($cliente['apellidos'] ?? ''))) ||
+                empty(trim((string)($cliente['telefono'] ?? '')))
+            );
+
             $this->redirect('/?r=home');
         } else {
             $_SESSION['error'] = 'No se pudo actualizar la contraseña.';

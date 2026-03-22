@@ -1,18 +1,22 @@
 <?php
+
 namespace Models;
 
 use Core\Database;
 use PDO;
 
-final class Cliente {
+final class Cliente
+{
     private PDO $pdo;
 
-    public function __construct(array $config) {
+    public function __construct(array $config)
+    {
         $this->pdo = Database::get($config['db']);
     }
 
     // ---------------- EXISTENTES ---------------- //
-    public function buscarPorCorreo(string $correo): ?array {
+    public function buscarPorCorreo(string $correo): ?array
+    {
         $email = trim(mb_strtolower($correo));
         $st = $this->pdo->prepare(
             'SELECT * 
@@ -25,7 +29,8 @@ final class Cliente {
         return $row ?: null;
     }
 
-    public function correoExiste(string $correo): bool {
+    public function correoExiste(string $correo): bool
+    {
         $email = trim(mb_strtolower($correo));
         $st = $this->pdo->prepare(
             'SELECT 1 
@@ -37,7 +42,8 @@ final class Cliente {
         return $st->fetchColumn() !== false;
     }
 
-    public function cedulaExiste(string $cedula): bool {
+    public function cedulaExiste(string $cedula): bool
+    {
         $doc = trim($cedula);
         $st = $this->pdo->prepare(
             'SELECT 1 
@@ -52,7 +58,8 @@ final class Cliente {
     /**
      * Verifica si la cédula existe en OTRO cliente (para actualizar).
      */
-    public function cedulaExisteEnOtro(string $cedula, int $idCliente): bool {
+    public function cedulaExisteEnOtro(string $cedula, int $idCliente): bool
+    {
         $doc = trim($cedula);
         $st = $this->pdo->prepare(
             'SELECT 1
@@ -71,7 +78,8 @@ final class Cliente {
     /**
      * Actualiza la cédula de un cliente concreto.
      */
-    public function actualizarCedula(int $idCliente, string $cedula): bool {
+    public function actualizarCedula(int $idCliente, string $cedula): bool
+    {
         $doc = trim($cedula);
         $st = $this->pdo->prepare(
             'UPDATE clientes
@@ -84,25 +92,52 @@ final class Cliente {
         ]);
     }
 
+    /**
+     * ✅ Nuevo: Actualiza cédula + apellidos + teléfono (perfil obligatorio post Google)
+     */
+    public function actualizarPerfilObligatorio(int $idCliente, string $cedula, string $apellidos, string $telefono): bool
+    {
+        $doc       = trim($cedula);
+        $apellidos = trim($apellidos);
+        $telefono  = trim($telefono);
 
-    public function crear(array $d): int {
+        $st = $this->pdo->prepare(
+            'UPDATE clientes
+             SET cedula = :cedula,
+                 apellidos = :apellidos,
+                 telefono = :telefono
+             WHERE id_cliente = :id
+             LIMIT 1'
+        );
+
+        return $st->execute([
+            ':cedula'    => $doc,
+            ':apellidos' => $apellidos,
+            ':telefono'  => $telefono,
+            ':id'        => $idCliente,
+        ]);
+    }
+
+    public function crear(array $d): int
+    {
         $hash = password_hash($d['password'], PASSWORD_DEFAULT);
         $st = $this->pdo->prepare(
-          'INSERT INTO clientes (cedula, nombres, apellidos, telefono, correo, `contraseña`, fecha_registro, verificado)
+            'INSERT INTO clientes (cedula, nombres, apellidos, telefono, correo, `contraseña`, fecha_registro, verificado)
            VALUES (:cedula, :nombres, :apellidos, :telefono, :correo, :pass, NOW(), 1)'
         );
         $st->execute([
-          ':cedula'    => $d['cedula'],
-          ':nombres'   => $d['nombres'],
-          ':apellidos' => $d['apellidos'],
-          ':telefono'  => $d['telefono'],
-          ':correo'    => $d['correo'],
-          ':pass'      => $hash,
+            ':cedula'    => $d['cedula'],
+            ':nombres'   => $d['nombres'],
+            ':apellidos' => $d['apellidos'],
+            ':telefono'  => $d['telefono'],
+            ':correo'    => $d['correo'],
+            ':pass'      => $hash,
         ]);
         return (int)$this->pdo->lastInsertId();
     }
 
-    public function verificarPassword(string $correo, string $plain): false|array {
+    public function verificarPassword(string $correo, string $plain): false|array
+    {
         $c = $this->buscarPorCorreo($correo);
         if (!$c) return false;
         $hash = $c['contraseña'] ?? '';
@@ -113,84 +148,91 @@ final class Cliente {
     }
 
     // ---------------- NUEVOS PARA GOOGLE ---------------- //
-  public function crearDesdeGoogle(string $nombre, string $correo): int {
-    $st = $this->pdo->prepare(
-      'INSERT INTO clientes (cedula, nombres, apellidos, telefono, correo, `contraseña`, fecha_registro, verificado)
-       VALUES (NULL, :nombres, "", "", :correo, :pass, NOW(), 1)'
-    );
-    $st->execute([
-      ':nombres' => $nombre,
-      ':correo'  => $correo,
-      ':pass'    => password_hash(bin2hex(random_bytes(8)), PASSWORD_DEFAULT)
-    ]);
-    return (int)$this->pdo->lastInsertId();
-}
-
-    // ---------------- NUEVOS PARA VERIFICACIÓN POR EMAIL ---------------- //
-    public function crearConVerificacion(array $d, string $token): int {
-        $hash = password_hash($d['password'], PASSWORD_DEFAULT);
+    public function crearDesdeGoogle(string $nombre, string $correo): int
+    {
         $st = $this->pdo->prepare(
-          'INSERT INTO clientes (cedula, nombres, apellidos, telefono, correo, `contraseña`, fecha_registro, verificado, token_verificacion)
-           VALUES (:cedula, :nombres, :apellidos, :telefono, :correo, :pass, NOW(), 0, :token)'
+            'INSERT INTO clientes (cedula, nombres, apellidos, telefono, correo, `contraseña`, fecha_registro, verificado)
+           VALUES (NULL, :nombres, "", "", :correo, :pass, NOW(), 1)'
         );
         $st->execute([
-          ':cedula'    => $d['cedula'],
-          ':nombres'   => $d['nombres'],
-          ':apellidos' => $d['apellidos'],
-          ':telefono'  => $d['telefono'],
-          ':correo'    => $d['correo'],
-          ':pass'      => $hash,
-          ':token'     => $token,
+            ':nombres' => $nombre,
+            ':correo'  => $correo,
+            ':pass'    => password_hash(bin2hex(random_bytes(8)), PASSWORD_DEFAULT)
         ]);
         return (int)$this->pdo->lastInsertId();
     }
 
-    public function marcarVerificadoPorToken(string $token): bool {
+    // ---------------- NUEVOS PARA VERIFICACIÓN POR EMAIL ---------------- //
+    public function crearConVerificacion(array $d, string $token): int
+    {
+        $hash = password_hash($d['password'], PASSWORD_DEFAULT);
         $st = $this->pdo->prepare(
-          'UPDATE clientes SET verificado = 1, token_verificacion = NULL WHERE token_verificacion = :t'
+            'INSERT INTO clientes (cedula, nombres, apellidos, telefono, correo, `contraseña`, fecha_registro, verificado, token_verificacion)
+           VALUES (:cedula, :nombres, :apellidos, :telefono, :correo, :pass, NOW(), 0, :token)'
         );
-        $st->execute([':t'=>$token]);
+        $st->execute([
+            ':cedula'    => $d['cedula'],
+            ':nombres'   => $d['nombres'],
+            ':apellidos' => $d['apellidos'],
+            ':telefono'  => $d['telefono'],
+            ':correo'    => $d['correo'],
+            ':pass'      => $hash,
+            ':token'     => $token,
+        ]);
+        return (int)$this->pdo->lastInsertId();
+    }
+
+    public function marcarVerificadoPorToken(string $token): bool
+    {
+        $st = $this->pdo->prepare(
+            'UPDATE clientes SET verificado = 1, token_verificacion = NULL WHERE token_verificacion = :t'
+        );
+        $st->execute([':t' => $token]);
         return $st->rowCount() > 0;
     }
 
     // ---------------- NUEVOS PARA RECUPERAR CONTRASEÑA ---------------- //
-    public function setTokenRecuperacion(string $correo, string $token, \DateTime $expira): bool {
+    public function setTokenRecuperacion(string $correo, string $token, \DateTime $expira): bool
+    {
         $st = $this->pdo->prepare(
-          'UPDATE clientes SET token_recuperacion = :t, recuperacion_expira = :e WHERE correo = :c'
+            'UPDATE clientes SET token_recuperacion = :t, recuperacion_expira = :e WHERE correo = :c'
         );
         return $st->execute([
-          ':t'=>$token,
-          ':e'=>$expira->format('Y-m-d H:i:s'),
-          ':c'=>$correo,
+            ':t' => $token,
+            ':e' => $expira->format('Y-m-d H:i:s'),
+            ':c' => $correo,
         ]);
     }
 
-    public function buscarPorTokenRecuperacion(string $token): ?array {
+    public function buscarPorTokenRecuperacion(string $token): ?array
+    {
         $st = $this->pdo->prepare(
-          'SELECT * FROM clientes WHERE token_recuperacion = :t LIMIT 1'
+            'SELECT * FROM clientes WHERE token_recuperacion = :t LIMIT 1'
         );
-        $st->execute([':t'=>$token]);
+        $st->execute([':t' => $token]);
         $row = $st->fetch(PDO::FETCH_ASSOC);
         return $row ?: null;
     }
 
-    public function actualizarPasswordPorToken(string $token, string $nueva): bool {
+    public function actualizarPasswordPorToken(string $token, string $nueva): bool
+    {
         $hash = password_hash($nueva, PASSWORD_DEFAULT);
         $st = $this->pdo->prepare(
-          'UPDATE clientes
+            'UPDATE clientes
            SET `contraseña` = :pwd, token_recuperacion = NULL, recuperacion_expira = NULL
            WHERE token_recuperacion = :t'
         );
         return $st->execute([
-          ':pwd'=>$hash,
-          ':t'=>$token,
+            ':pwd' => $hash,
+            ':t' => $token,
         ]);
     }
 
     // ---------------- KPIs PARA EL DASHBOARD ---------------- //
 
     /** Total de clientes (sin filtros) */
-    public function total(): int {
+    public function total(): int
+    {
         return (int)$this->pdo->query("SELECT COUNT(*) FROM clientes")->fetchColumn();
     }
 
@@ -199,7 +241,8 @@ final class Cliente {
      * Usa 'verificado = 1' porque esa columna sí existe en tu esquema.
      * Si usas otra convención (p. ej. 'estado'), ajusta el WHERE.
      */
-    public function totalActivos(): int {
+    public function totalActivos(): int
+    {
         return (int)$this->pdo->query("SELECT COUNT(*) FROM clientes WHERE verificado = 1")->fetchColumn();
     }
 }
