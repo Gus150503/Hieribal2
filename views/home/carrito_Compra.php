@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 $base = rtrim((string)($this->config['app']['base_url'] ?? ''), '/');
 $productos = $productos ?? [];
 
@@ -18,11 +22,20 @@ foreach ($productos as $p) {
 /* =======================================
    Función para resolver imágenes
 ======================================= */
-function resolverImagen(string $img, string $base): string {
+function resolverImagen(?string $img, string $base): string
+{
+    // Si viene null o vacío → usar una imagen por defecto
+    if ($img === null || trim($img) === '') {
+        return $base . "/assets/img/no-image.png";
+    }
+
+    $img = trim($img);
+
     // Si NO es URL → generar ruta normal
     if (!filter_var($img, FILTER_VALIDATE_URL)) {
         return $base . "/assets/img/" . ltrim($img, '/');
     }
+
     // Si ya es URL → devolverla
     return $img;
 }
@@ -60,53 +73,53 @@ function resolverImagen(string $img, string $base): string {
     <div class="products-container">
 
         <?php foreach ($categorias as $catNombre => $items): ?>
-        <section class="category-section" data-category="<?= $catNombre ?>">
+            <section class="category-section" data-category="<?= $catNombre ?>">
 
-            <div class="category-header">
-                <span class="emoji">📦</span>
-                <h2><?= ucfirst($catNombre) ?></h2>
-            </div>
+                <div class="category-header">
+                    <span class="emoji">📦</span>
+                    <h2><?= ucfirst($catNombre) ?></h2>
+                </div>
 
-            <div class="products-grid">
+                <div class="products-grid">
 
-                <?php foreach ($items as $prod): ?>
+                    <?php foreach ($items as $prod): ?>
 
-                    <?php
-                    // Obtener la imagen final lista para mostrar
-                    $imgFinal = resolverImagen($prod['imagen'], $base);
-                    ?>
+                        <?php
+                        // Obtener la imagen final lista para mostrar
+                        $imgFinal = resolverImagen($prod['imagen'], $base);
+                        ?>
 
-                    <div class="product-card">
+                        <div class="product-card">
 
-                        <!-- Imagen -->
-                        <img src="<?= $imgFinal ?>"
-                             alt="<?= htmlspecialchars($prod['nombre']) ?>"
-                             class="product-image"
-                             onerror="this.src='<?= $base ?>/assets/img/no-image.png'">
+                            <!-- Imagen -->
+                            <img src="<?= $imgFinal ?>"
+                                alt="<?= htmlspecialchars($prod['nombre']) ?>"
+                                class="product-image"
+                                onerror="this.src='<?= $base ?>/assets/img/no-image.png'">
 
-                        <!-- Nombre -->
-                        <h3><?= htmlspecialchars($prod['nombre']) ?></h3>
+                            <!-- Nombre -->
+                            <h3><?= htmlspecialchars($prod['nombre']) ?></h3>
 
-                        <!-- Precio -->
-                        <div class="product-price">
-                            $<?= number_format($prod['precio_venta'], 0, ',', '.') ?>
-                        </div>
+                            <!-- Precio -->
+                            <div class="product-price">
+                                $<?= number_format($prod['precio_venta'], 0, ',', '.') ?>
+                            </div>
 
-                        <!-- Botón Carrito -->
-                        <button onclick="addToCart(
+                            <!-- Botón Carrito -->
+                            <button onclick="addToCart(
                             <?= $prod['id'] ?>,
                             '<?= addslashes($prod['nombre']) ?>',
                             <?= $prod['precio_venta'] ?>,
                             '<?= $imgFinal ?>'
                         )">
-                            🛒 Añadir al carrito
-                        </button>
-                    </div>
+                                🛒 Añadir al carrito
+                            </button>
+                        </div>
 
-                <?php endforeach; ?>
+                    <?php endforeach; ?>
 
-            </div>
-        </section>
+                </div>
+            </section>
         <?php endforeach; ?>
 
     </div>
@@ -141,4 +154,76 @@ function resolverImagen(string $img, string $base): string {
 
 </div>
 
-<script src="<?= $base ?>/assets/js/carrito.js"></script>
+
+<div id="checkoutModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <h2>Finalizar Pedido</h2>
+
+        <form id="checkoutForm">
+
+            <label>Nombre:</label>
+            <input type="text"
+                value="<?= $_SESSION['cliente']['nombres'] ?? '' ?>"
+                readonly>
+
+            <label>Correo:</label>
+            <input type="email"
+                value="<?= $_SESSION['cliente']['correo'] ?? '' ?>"
+                readonly>
+
+            <label>Teléfono:</label>
+            <input type="tel"
+                id="telefono"
+                required
+                maxlength="10"
+                placeholder="Ingresa tu número (10 dígitos)">
+
+            <label>Dirección de envío:</label>
+            <input type="text"
+                id="direccion"
+                required
+                placeholder="Ingresa tu dirección completa">
+
+            <label>Método de pago:</label>
+            <select id="pago" required>
+                <option value="">Seleccione...</option>
+                <option value="Contra entrega">Contra entrega</option>
+                <option value="Nequi">Nequi</option>
+                <option value="Transferencia bancaria">Transferencia bancaria</option>
+            </select>
+
+            <label>Notas adicionales:</label>
+            <textarea id="notas" placeholder="Opcional"></textarea>
+
+            <div class="modal-buttons">
+                <button type="button" onclick="cerrarModal()">Cancelar</button>
+                <button type="submit">Confirmar pedido</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ================================
+     MODAL DE INSTRUCCIONES DE PAGO
+================================ -->
+<div id="paymentModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <h2>✅ Pedido registrado</h2>
+
+        <p>Gracias por tu compra. A continuación encontrarás las instrucciones para completar el pago.</p>
+
+        <div class="pago-total">
+            <span>Total a pagar:</span>
+            <strong id="paymentTotal"></strong>
+        </div>
+
+        <div id="paymentInstructions"></div>
+
+        <div class="modal-buttons">
+            <button type="button" onclick="cerrarPaymentModal()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+
+<script src="<?= $base ?>/assets/js/carrito.js?v=7"></script>

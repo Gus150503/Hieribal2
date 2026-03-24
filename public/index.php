@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 use Controllers\AuthController;
@@ -10,17 +11,16 @@ use Controllers\AdminInventario;
 use Controllers\AdminProducto;
 use Controllers\AdminProveedores;
 use Controllers\AdminVentasController;
-use Controllers\AdminDevolucionesController;  
-use Controllers\CarritoAdminController;       
-use Controllers\AdminCajeroController;  
-use Controllers\AdminReportesController;   // 👈 agrega esto
-
-
-
+use Controllers\AdminDevolucionesController;
+use Controllers\CarritoAdminController;
+use Controllers\AdminCajeroController;
+use Controllers\AdminReportesController; 
+use Controllers\PerfilController;  // 👈 agrega esto
 
 /* =============================
  *  ENTORNO Y AUTOLOAD
  * ============================= */
+
 define('APP_ENV', 'local');
 date_default_timezone_set('America/Bogota');
 
@@ -31,7 +31,8 @@ if (APP_ENV === 'local') {
 }
 
 /* ---------- LOG CENTRAL ---------- */
-function app_log(string $text): void {
+function app_log(string $text): void
+{
     $file = __DIR__ . '/../storage/logs/app.log';
     if (!is_dir(dirname($file))) @mkdir(dirname($file), 0775, true);
     if (file_exists($file) && filesize($file) > 5 * 1024 * 1024) {
@@ -47,7 +48,8 @@ set_error_handler(function (int $severity, string $message, string $file, int $l
 });
 
 set_exception_handler(function (Throwable $e) {
-    $line = sprintf("[%s] Uncaught: %s in %s:%d\nTrace:\n%s\n",
+    $line = sprintf(
+        "[%s] Uncaught: %s in %s:%d\nTrace:\n%s\n",
         date('Y-m-d H:i:s'),
         $e->getMessage(),
         $e->getFile(),
@@ -90,7 +92,8 @@ register_shutdown_function(function () {
     $fatal = [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR];
     if (!in_array($err['type'], $fatal, true)) return;
 
-    $line = sprintf("[%s] Fatal: %s in %s:%d\n",
+    $line = sprintf(
+        "[%s] Fatal: %s in %s:%d\n",
         date('Y-m-d H:i:s'),
         $err['message'],
         $err['file'],
@@ -138,67 +141,173 @@ $adminD = new AdminDashboardController($config);
 $r = $_GET['r'] ?? 'home';
 $r = trim(str_replace('/', '_', $r), '_');
 
+/* ==================================================
+ *  BLOQUEO GLOBAL: PERFIL INCOMPLETO (POST GOOGLE)
+ * ================================================== */
+$publicRoutes = [
+    'home',
+    'dashboard',
+    'pago_instrucciones', // puedes dejar home libre para mostrar el modal
+    'login',
+    'do_login',
+    'register',
+    'do_register',
+    'google_start',
+    'google_callback',
+    'completar_perfil',
+    'logout',
+    'forgot',
+    'do_forgot',
+    'reset',
+    'do_reset',
+    'verify'
+];
+
+if (
+    !empty($_SESSION['force_profile']) &&
+    $_SESSION['force_profile'] === true &&
+    !in_array($r, $publicRoutes, true)
+) {
+    header('Location: ' . (($config['app']['base_url'] ?? '') . '/?r=home'), true, 302);
+    exit;
+}
+
 switch ($r) {
 
     /* ====== Público / Home ====== */
-    case 'home':        $home->index();      break;
-    case 'dashboard':   $home->dashboard();  break;
+    case 'home':
+        $home->index();
+        break;
+    case 'dashboard':
+        $home->dashboard();
+        break;
+    case 'perfil':
+        (new PerfilController($config))->index();
+        break;    
+    case 'pago_instrucciones':
+        $home->pagoInstrucciones();
+        break;
 
     /* ====== Auth de clientes ====== */
-    case 'login':            $auth->loginForm();     break;
-    case 'do_login':         $auth->login();         break;
-    case 'register':         $auth->registroForm();  break;
-    case 'do_register':      $auth->registrar();     break;
-    case 'logout':           $auth->logout();        break;
-    case 'check_field':      $auth->checkField();    break;
-    case 'forgot':           $auth->forgotForm();    break;
-    case 'do_forgot':        $auth->forgot();        break;
-    case 'reset':            $auth->resetForm();     break;
-    case 'do_reset':         $auth->reset();         break;
-    case 'google_start':     $auth->googleStart();   break;
-    case 'google_callback':  $auth->googleCallback();break;
-    case 'verify':           $auth->verify();        break;
-    case 'completar_cedula': $auth->completarCedula(); break;
+    case 'login':
+        $auth->loginForm();
+        break;
+    case 'do_login':
+        $auth->login();
+        break;
+    case 'register':
+        $auth->registroForm();
+        break;
+    case 'do_register':
+        $auth->registrar();
+        break;
+    case 'logout':
+        $auth->logout();
+        break;
+    case 'check_field':
+        $auth->checkField();
+        break;
+    case 'forgot':
+        $auth->forgotForm();
+        break;
+    case 'do_forgot':
+        $auth->forgot();
+        break;
+    case 'reset':
+        $auth->resetForm();
+        break;
+    case 'do_reset':
+        $auth->reset();
+        break;
+    case 'google_start':
+        $auth->googleStart();
+        break;
+    case 'google_callback':
+        $auth->googleCallback();
+        break;
+
+    // 🔒 PERFIL OBLIGATORIO POST GOOGLE (AJAX)
+    case 'completar_perfil':
+        $auth->completarPerfil();
+        break;
+
+    case 'verify':
+        $auth->verify();
+        break;
 
     /* ====== Admin (auth + dashboard) ====== */
-    case 'admin_login':         $adminA->loginForm();     break;
-    case 'admin_do_login':      $adminA->login();         break;
-    case 'admin_logout':        $adminA->logout();        break;
-    case 'admin_dashboard':     $adminD->index();         break;
-    case 'admin_configuracion': $adminD->configuracion(); break;
+    case 'admin_login':
+        $adminA->loginForm();
+        break;
+    case 'admin_do_login':
+        $adminA->login();
+        break;
+    case 'admin_logout':
+        $adminA->logout();
+        break;
+    case 'admin_dashboard':
+        $adminD->index();
+        break;
+    case 'admin_configuracion':
+        $adminD->configuracion();
+        break;
 
     /* ====== Usuarios ====== */
-    case 'admin_usuarios':               (new AdminUsuariosController($config))->index();              break;
-    case 'admin_usuarios_api':           (new AdminUsuariosController($config))->api();                break;
-    case 'admin_usuarios_verify_email':  (new AdminUsuariosController($config))->verifyEmail();        break;
-    case 'admin_usuarios_resend_verif':  (new AdminUsuariosController($config))->resendVerification(); break;
+    case 'admin_usuarios':
+        (new AdminUsuariosController($config))->index();
+        break;
+    case 'admin_usuarios_api':
+        (new AdminUsuariosController($config))->api();
+        break;
+    case 'admin_usuarios_verify_email':
+        (new AdminUsuariosController($config))->verifyEmail();
+        break;
+    case 'admin_usuarios_resend_verif':
+        (new AdminUsuariosController($config))->resendVerification();
+        break;
 
     /* ====== Clientes ====== */
-    case 'admin_clientes':      (new \Controllers\AdminClientesController($config))->index(); break;
-    case 'admin_clientes_api':  (new \Controllers\AdminClientesController($config))->api();   break;
+    case 'admin_clientes':
+        (new \Controllers\AdminClientesController($config))->index();
+        break;
+    case 'admin_clientes_api':
+        (new \Controllers\AdminClientesController($config))->api();
+        break;
 
     /* ====== Inventario ====== */
-    case 'admin_inventario':      (new AdminInventario($config))->index(); break;
-    case 'admin_inventario_api':  (new AdminInventario($config))->api();   break;
+    case 'admin_inventario':
+        (new AdminInventario($config))->index();
+        break;
+    case 'admin_inventario_api':
+        (new AdminInventario($config))->api();
+        break;
 
     /* ====== Productos ====== */
-    case 'admin_productos':       (new AdminProducto($config))->index(); break;
-    case 'admin_productos_api':   (new AdminProducto($config))->api();   break;
+    case 'admin_productos':
+        (new AdminProducto($config))->index();
+        break;
+    case 'admin_productos_api':
+        (new AdminProducto($config))->api();
+        break;
 
+    /* ====== Ventas ====== */
+    case 'admin_ventas':
+        (new AdminVentasController($config))->index();
+        break;
+    case 'admin_ventas_api':
+        (new AdminVentasController($config))->api();
+        break;
 
-        /* ====== Ventas ====== */
-        case 'admin_ventas':      (new AdminVentasController($config))->index(); break;
-        case 'admin_ventas_api':  (new AdminVentasController($config))->api();   break;
+    /* ====== Carrito Admin ====== */
+    case 'admin_carrito_guardar':
+        (new \Controllers\CarritoAdminController($config))->guardar();
+        break;
 
-        /* ====== Carrito Admin ====== */
-        case 'admin_carrito_guardar':
-            (new \Controllers\CarritoAdminController($config))->guardar(); break;
+    case 'admin_carrito_listar':
+        (new \Controllers\CarritoAdminController($config))->listar();
+        break;
 
-        case 'admin_carrito_listar':
-            (new \Controllers\CarritoAdminController($config))->listar(); break;
-
-
-            /* ====== Devoluciones ====== */
+    /* ====== Devoluciones ====== */
     case 'admin_devoluciones':
         (new AdminDevolucionesController($config))->index();
         break;
@@ -208,9 +317,12 @@ switch ($r) {
         break;
 
     /* ====== Proveedores ====== */
-    case 'admin_proveedores':        (new AdminProveedores($config))->index(); break;
-    case 'admin_proveedores_api':    (new AdminProveedores($config))->api();   break; 
-
+    case 'admin_proveedores':
+        (new AdminProveedores($config))->index();
+        break;
+    case 'admin_proveedores_api':
+        (new AdminProveedores($config))->api();
+        break;
 
     case 'admin_cajero':
         (new AdminCajeroController($config))->index();
@@ -224,7 +336,6 @@ switch ($r) {
         (new AdminCajeroController($config))->factura();
         break;
 
-
     /* ====== Compat ====== */
     case 'usuarioadmin':
         header('Location: ' . (($config['app']['base_url'] ?? '') . '/?r=admin_usuarios'), true, 302);
@@ -235,36 +346,33 @@ switch ($r) {
         (new \Controllers\AdminConfigApiController())->handle();
         break;
 
+    case 'admin_reportes':
+        (new AdminReportesController($config))->index();
+        break;
 
-case 'admin_reportes':
-    (new AdminReportesController($config))->index();
-    break;
+    case 'admin_reportes_inventario_excel':
+        (new AdminReportesController($config))->inventarioExcel();
+        break;
 
+    case 'admin_reportes_ventas_excel':
+        (new AdminReportesController($config))->ventasExcel();
+        break;
 
-case 'admin_reportes_inventario_excel':
-    (new AdminReportesController($config))->inventarioExcel();
-    break;
+    case 'admin_reportes_proveedores_excel':
+        (new AdminReportesController($config))->proveedoresExcel();
+        break;
 
-case 'admin_reportes_ventas_excel':
-    (new AdminReportesController($config))->ventasExcel();
-    break;
+    case 'admin_reportes_clientes_excel':
+        (new AdminReportesController($config))->clientesExcel();
+        break;
 
-case 'admin_reportes_proveedores_excel':
-    (new AdminReportesController($config))->proveedoresExcel();
-    break;
+    case 'admin_reportes_usuarios_excel':
+        (new AdminReportesController($config))->usuariosExcel();
+        break;
 
-case 'admin_reportes_clientes_excel':
-    (new AdminReportesController($config))->clientesExcel();
-    break;
-
-case 'admin_reportes_usuarios_excel':
-    (new AdminReportesController($config))->usuariosExcel();
-    break;
-
-case 'admin_reportes_devoluciones_excel':
-    (new AdminReportesController($config))->devolucionesExcel();
-    break;
-
+    case 'admin_reportes_devoluciones_excel':
+        (new AdminReportesController($config))->devolucionesExcel();
+        break;
 
     /* ====== 404 ====== */
     default:
