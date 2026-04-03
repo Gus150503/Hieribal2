@@ -105,7 +105,32 @@ $puedeGestionarProductos = ($rol === 'admin');
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Categoría</label>
-                            <input class="form-control" name="categoria" id="categoria" maxlength="100">
+                            <input list="listaCategorias" name="categoria" class="form-control" placeholder="Seleccione o escriba una categoría">
+                            <datalist id="listaCategorias">
+                                <option value="Aceites y Grasas Saludables">
+                                <option value="Aminoácidos">
+                                <option value="Antioxidantes">
+                                <option value="Bebidas Vegetales">
+                                <option value="Cápsulas de Plantas">
+                                <option value="Creatinas">
+                                <option value="Energizantes">
+                                <option value="Endulzantes Naturales">
+                                <option value="Extractos y Tinturas Madre">
+                                <option value="Fibras">
+                                <option value="Frutos Secos y Deshidratados">
+                                <option value="Gotas y Esencias">
+                                <option value="Granos, Semillas y Cereales">
+                                <option value="Harinas Especiales">
+                                <option value="Jarabes Naturales">
+                                <option value="Laxantes">
+                                <option value="Minerales">
+                                <option value="Multivitamínicos">
+                                <option value="Plantas Medicinales y Hierbas">
+                                <option value="Probióticos">
+                                <option value="Snacks Saludables">
+                                <option value="Tés e Infusiones">
+                                <option value="Vitaminas">
+                            </datalist>
                             <div class="invalid-feedback">Categoría requerida.</div>
                         </div>
                         <div class="col-md-4">
@@ -115,7 +140,18 @@ $puedeGestionarProductos = ($rol === 'admin');
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Presentación</label>
-                            <input class="form-control" name="presentacion" id="presentacion" maxlength="100">
+                            <input list="listaPresentacion" name="presentacion" class="form-control" placeholder="Seleccione o escriba una presentación">
+                            <datalist id="listaPresentacion">
+                                <option value="Atado">
+                                <option value="Bolsa">
+                                <option value="Caja">
+                                <option value="Capsulas">
+                                <option value="Frasco">
+                                <option value="Frasco vidrio">
+                                <option value="Gotero">
+                                <option value="Liquido">
+                                <option value="Sachet">
+                            </datalist>
                         </div>
 
                         <div class="col-md-4">
@@ -148,16 +184,24 @@ $puedeGestionarProductos = ($rol === 'admin');
                         </div>
 
                         <div class="col-md-3">
+                            <label class="form-label">IVA</label><br>
+
+                            <input type="radio" name="iva" value="1" id="iva_si" checked>
+                            <label for="iva_si">Con IVA</label>
+
+                            <input type="radio" name="iva" value="0" id="iva_no" style="margin-left:10px;">
+                            <label for="iva_no">Sin IVA</label>
+
+                            <small id="info_iva" style="display:block; margin-top:5px; color:#6c757d;">
+                                IVA (19%): 0 <br> Neto: 0
+                            </small>
+                        </div>
+                        
+                        <div class="col-md-3">
                             <label class="form-label">Precio Venta</label>
                             <input type="number" step="0.01" class="form-control" name="precio_venta"
                                    id="precio_venta" min="0.01" value="" required>
                             <div class="invalid-feedback">Precio Venta requerido.</div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label">IVA (%)</label>
-                            <input type="number" step="0.01" class="form-control" name="iva" id="iva"
-                                   min="0" value="0">
                         </div>
 
                         <div class="col-md-3">
@@ -315,3 +359,5 @@ $puedeGestionarProductos = ($rol === 'admin');
 </script>
 
 <script src="<?= $base ?>/assets/js/admin_productos.js?v=5" defer></script>
+
+

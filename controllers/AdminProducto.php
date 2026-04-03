@@ -422,9 +422,7 @@ final class AdminProducto extends Controller
             ? (float) $in['precio_venta']
             : 0.0;
 
-        $iva = is_numeric($in['iva'] ?? null)
-            ? (float) $in['iva']
-            : 0.0;
+        $iva = ($in['iva'] ?? '0') == '1' ? 1.0 : 0.0;
 
         // Otros campos de texto
         $lote       = trim($in['lote'] ?? '');
