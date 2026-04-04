@@ -41,6 +41,7 @@ $ACL = [
   'cajero'   => [
     'dashboard',
     'cajero',
+    'inventario.view',
     'productos.view',
     'clientes.view'
   ],
@@ -108,14 +109,6 @@ $can = function (string $perm) use ($rol, $ACL): bool {
       <li class="<?= $active('productos') ?>">
         <a href="?r=admin/productos" aria-current="<?= $sec==='productos'?'page':'false' ?>">
           <i class="bi bi-bag"></i><span class="label">Productos</span>
-        </a>
-      </li>
-    <?php endif; ?>
-
-    <?php if ($can('ventas')): ?>
-      <li class="<?= $active('ventas') ?>">
-        <a href="?r=admin/ventas" aria-current="<?= $sec==='ventas'?'page':'false' ?>">
-          <i class="bi bi-receipt-cutoff"></i><span class="label">Reporte Ventas</span>
         </a>
       </li>
     <?php endif; ?>
