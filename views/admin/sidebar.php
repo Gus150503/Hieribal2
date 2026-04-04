@@ -113,14 +113,6 @@ $can = function (string $perm) use ($rol, $ACL): bool {
       </li>
     <?php endif; ?>
 
-    <?php if ($can('ventas')): ?>
-      <li class="<?= $active('ventas') ?>">
-        <a href="?r=admin/ventas" aria-current="<?= $sec==='ventas'?'page':'false' ?>">
-          <i class="bi bi-receipt-cutoff"></i><span class="label">Reporte Ventas</span>
-        </a>
-      </li>
-    <?php endif; ?>
-
     <?php if ($can('reportes')): ?>
   <li class="<?= $active('reportes') ?>">
     <a href="?r=admin/reportes">
