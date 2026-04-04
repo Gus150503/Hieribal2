@@ -1,90 +1,64 @@
 <div class="perfil-dashboard">
 
-<!-- STATS -->
-<div class="stats-row">
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-label">Mis pedidos</div>
+            <div class="stat-num green"><?= $usuario['total_pedidos'] ?? 0 ?></div>
+        </div>
 
-<div class="stat-card">
-<div class="stat-label">Mis pedidos</div>
-<div class="stat-num green">148</div>
-</div>
+        <div class="stat-card">
+            <div class="stat-label">Total gastado</div>
+            <div class="stat-num gold">$<?= number_format($usuario['total_gastado'] ?? 0, 0, ',', '.') ?></div>
+        </div>
 
-<div class="stat-card">
-<div class="stat-label">Total gastado</div>
-<div class="stat-num gold">$2.847.500</div>
-</div>
+        <div class="stat-card">
+            <div class="stat-label">En carrito</div>
+            <div class="stat-num"><?= $totalCarrito ?? 0 ?> items</div>
+        </div>
 
-<div class="stat-card">
-<div class="stat-label">En carrito</div>
-<div class="stat-num">3 items</div>
-</div>
+        <div class="stat-card">
+            <div class="stat-label">Devoluciones</div>
+            <div class="stat-num"><?= $usuario['devoluciones'] ?? 0 ?></div>
+        </div>
+    </div>
 
-<div class="stat-card">
-<div class="stat-label">Devoluciones</div>
-<div class="stat-num">2</div>
-</div>
+    <div class="mid-row">
+        <div class="card">
+            <div class="card-title">Mis compras por mes</div>
+            <div class="chart-wrap">
+                <canvas id="chartPedidos"></canvas>
+            </div>
+        </div>
 
-</div>
+        <div class="card">
+            <div class="profile-mini">
+                <div class="profile-ava-big">
+                    <?= strtoupper(substr($usuario['nombre'] ?? 'U', 0, 1)) ?>
+                </div>
+                <div>
+                    <div class="profile-name">
+                        <?= htmlspecialchars($usuario['nombre'] ?? 'Usuario') ?>
+                    </div>
+                    <div class="profile-role">
+                        Cliente Hieribal <?= !empty($usuario['es_pro']) ? '<span class="pro-badge">PRO</span>' : '' ?>
+                    </div>
+                </div>
+            </div>
 
+            <div class="pf-row">
+                <span class="pf-label">Email</span>
+                <span class="pf-val"><?= htmlspecialchars($usuario['email'] ?? 'No disponible') ?></span>
+            </div>
 
-<!-- FILA CENTRAL -->
-<div class="mid-row">
+            <div class="pf-row">
+                <span class="pf-label">Teléfono</span>
+                <span class="pf-val"><?= htmlspecialchars($usuario['telefono'] ?? 'No disponible') ?></span>
+            </div>
 
-<div class="card">
-
-<div class="card-title">
-Mis compras por mes
-</div>
-
-<div class="chart-wrap">
-<canvas id="chartPedidos"></canvas>
-</div>
-
-</div>
-
-
-<div class="card">
-
-<div class="profile-mini">
-
-<div class="profile-ava-big">
-<?= strtoupper(substr($cliente['usuario'] ?? 'U',0,1)) ?>
-</div>
-
-<div>
-
-<div class="profile-name">
-<?= htmlspecialchars($cliente['nombre'] ?? $cliente['usuario'] ?? 'Usuario') ?>
-</div>
-
-<div class="profile-role">
-Cliente Hieribal
-</div>
-
-</div>
-
-</div>
-
-
-<div class="pf-row">
-<span class="pf-label">Email</span>
-<span class="pf-val">
-<?= htmlspecialchars($cliente['email'] ?? 'No disponible') ?>
-</span>
-</div>
-
-<div class="pf-row">
-<span class="pf-label">Usuario</span>
-<span class="pf-val">
-<?= htmlspecialchars($cliente['usuario'] ?? 'No disponible') ?>
-</span>
-</div>
-
-<button class="btn-edit">
-Editar perfil
-</button>
-
-</div>
-
-</div>
+            <button class="btn-edit">
+                <i class="fas fa-edit"></i> Editar perfil 
+            </button>
+        </div>
+    </div>
 
 </div>
