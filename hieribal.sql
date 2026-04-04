@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 04-04-2026 a las 23:59:23
+-- Tiempo de generación: 05-04-2026 a las 01:26:16
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -20,19 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `hieribal`
 --
-
-DELIMITER $$
---
--- Procedimientos
---
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_ActualizarStockProducto` (IN `p_id_producto` INT, IN `p_cantidad_vendida` INT)   BEGIN
-    -- Actualiza el stock restando la cantidad vendida
-    UPDATE productos 
-    SET stock_actual = stock_actual - p_cantidad_vendida 
-    WHERE id = p_id_producto;
-END$$
-
-DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -80,7 +67,14 @@ INSERT INTO `carrito` (`id_carrito`, `id_producto`, `nombre_producto`, `cantidad
 (3025, 23, 'Aceite de té de arbol', 1, 16000.00, '2025-12-13 17:25:46', 49, '3132254044', 'Calle71 sur ·87-10', 'Contra entrega', 'Tener cuidado con los productos'),
 (3026, 17, 'Proteína de fresa', 1, 250000.00, '2025-12-13 17:25:46', 49, '3132254044', 'Calle71 sur ·87-10', 'Contra entrega', 'Tener cuidado con los productos'),
 (3027, 24, 'Aceite de oliva', 1, 18000.00, '2025-12-13 17:45:29', 49, '3132254044', 'Calle71 sur ·87-10', 'Contra entrega', 'Tener cuidado con los productos'),
-(3028, 23, 'Aceite de té de arbol', 1, 16000.00, '2026-02-14 01:56:06', 45, '4523423423', '23423423', 'Contra entrega', '42424');
+(3028, 23, 'Aceite de té de arbol', 1, 16000.00, '2026-02-14 01:56:06', 45, '4523423423', '23423423', 'Contra entrega', '42424'),
+(3029, 24, 'Aceite de oliva', 5, 18000.00, '2026-04-04 21:37:51', 55, '3223467187', 'Centro de Bogotá', 'Contra entrega', ''),
+(3030, 24, 'Aceite de oliva', 8, 18000.00, '2026-04-04 21:38:48', 55, '3223467187', 'Centro de Bogotá', 'Contra entrega', ''),
+(3031, 2, 'Proteína', 1, 100000.00, '2026-04-04 22:10:31', 55, '3223467187', 'Centro de Bogotá', 'Contra entrega', ''),
+(3032, 13, 'Vitamina C', 1, 50000.00, '2026-04-04 22:10:31', 55, '3223467187', 'Centro de Bogotá', 'Contra entrega', ''),
+(3033, 5, 'Manzanilla', 1, 2000.00, '2026-04-04 22:10:31', 55, '3223467187', 'Centro de Bogotá', 'Contra entrega', ''),
+(3034, 4, 'Toronjil', 1, 2000.00, '2026-04-04 22:10:31', 55, '3223467187', 'Centro de Bogotá', 'Contra entrega', ''),
+(3035, 3, 'Menta', 6, 1200.00, '2026-04-04 23:20:02', 55, '3134405383', 'Centro de Bogotá', 'Contra entrega', '');
 
 -- --------------------------------------------------------
 
@@ -109,7 +103,13 @@ CREATE TABLE `clientes` (
 --
 
 INSERT INTO `clientes` (`id_cliente`, `cedula`, `nombres`, `apellidos`, `telefono`, `correo`, `contraseña`, `estado`, `fecha_registro`, `verificado`, `token_verificacion`, `token_recuperacion`, `recuperacion_expira`) VALUES
-(58, '1000789324', 'gustavo cuevas', 'Cuevas Morales', '3143299147', 'gustavoalexiscuevas@gmail.com', '$2y$10$rITT1UyRZpg3KRx67LP.Gu.0YU5KZ0UEKlfUx4V9LQrpsbKy/AtUG', 'Activo', '2026-03-24 11:22:53', 1, NULL, NULL, NULL);
+(45, '1231231231', 'Gustavo', 'Cuevas', '3132131312', 'gustavoalexiscuevas@gmail.com', '$2y$10$F7671oqeLkeLQEwS.uc/y.Zh2vZikwpEqewW29ikm.BZHGkWfmF/i', 'Activo', '2025-11-29 08:22:52', 1, NULL, NULL, NULL),
+(48, '12231231', 'jaiderstivenson', 'Pineda', '3145970986', 'jaiderpineda203@gmail.com', '$2y$10$eI7NTRIWTO3SbrdX/b0YQ.f9xlJgIhDCBDl.o7trvd8EYNld7CwhG', 'Activo', '2025-12-05 05:43:09', 1, NULL, NULL, NULL),
+(49, NULL, 'jaiderstivenson Pineda', '', '', 'jaiderpineda2003@gmail.com', '$2y$10$YJiVg0dJWRKHUfXp3MyJ1uehPjn.0EN4YnRdCSNGmSGK5LaKtrql2', 'Activo', '2025-12-05 07:44:14', 1, NULL, NULL, NULL),
+(52, '7962931231', 'Nestor guillermo', 'Montaño', '4234234234', 'ngmonta@gmail.com', '$2y$10$/jymox/p8HxGZgXFNFM3xuPHqRXfi8P62S2xVFU1445.yWXLsPDuW', 'Activo', '2025-12-05 15:29:30', 1, NULL, NULL, NULL),
+(53, '1134292423', 'Jaider', 'Pineda', '3132523414', 'jaiderpineda2004@gmail.com', '$2y$10$xTUglVIAUsFo0l6Nl8W7ne.RAemPp3mxEId2v6BmeJJh1NLZT9ynW', 'Activo', '2025-12-05 15:32:57', 0, '14cf84d39616a768b1c3e946f7f2726ac60441ff2db48f996bceeacb8603b19a', NULL, NULL),
+(54, NULL, 'Jaider Pineda avila', '', '', 'pinedaavilajaider@gmail.com', '$2y$10$waeqEYqP33m2.SNMnh7JXe2SDTJnIztHtG7A32udMs5WZE/h3fcWy', 'Activo', '2025-12-06 07:10:03', 1, NULL, NULL, NULL),
+(55, '1054539695', 'cristian camilo ulloa real', 'Ulloa Real', '3223467187', 'cristiancamiloulloa06@gmail.com', '$2y$10$xUA4NDsZSkk0Rua6vkaAIegoRDraTEAwMpzKcsw44PhPX7nGdmYk.', 'Activo', '2025-12-11 16:05:34', 1, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -144,6 +144,30 @@ INSERT INTO `config` (`clave`, `valor`, `tipo`, `actualizado_en`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `detalle_venta`
+--
+
+CREATE TABLE `detalle_venta` (
+  `id` int(11) NOT NULL,
+  `id_venta` int(11) NOT NULL,
+  `id_producto` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL,
+  `precio` decimal(10,2) NOT NULL,
+  `subtotal` decimal(10,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `detalle_venta`
+--
+
+INSERT INTO `detalle_venta` (`id`, `id_venta`, `id_producto`, `cantidad`, `precio`, `subtotal`) VALUES
+(1, 5022, 4, 1, 2000.00, 2000.00),
+(2, 5023, 4, 1, 2000.00, 2000.00),
+(3, 5023, 3, 1, 1200.00, 1200.00);
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `devoluciones`
 --
 
@@ -169,7 +193,8 @@ CREATE TABLE `devoluciones` (
 INSERT INTO `devoluciones` (`id`, `cliente_id`, `proveedor_id`, `producto_id`, `cantidad`, `numero_orden`, `motivo_devolucion`, `origen`, `fecha_compra`, `fecha_devolucion`, `estado`, `observaciones`) VALUES
 (1, 44, NULL, 6, 1, 'ni idea', 'ni idea', 'cliente', '2025-12-05', '2025-12-13', 'aprobada', 'no viene bien'),
 (6, NULL, 5, 13, 1, '78994', 'Tapa abierta', 'interno', '2025-12-04', '2025-12-04', 'pendiente', NULL),
-(7, NULL, 5, 14, 12, '75785', 'Fecha vencida', 'interno', '2025-12-06', '2025-12-07', 'aprobada', NULL);
+(7, NULL, 5, 14, 12, '75785', 'Fecha vencida', 'interno', '2025-12-06', '2025-12-07', 'aprobada', NULL),
+(8, NULL, 5, 23, 2, '1232', 'esta vencido', 'interno', '2026-04-05', '2026-04-11', 'aprobada', 'NA');
 
 -- --------------------------------------------------------
 
@@ -216,7 +241,7 @@ INSERT INTO `inventario` (`id`, `id_producto`, `codigo_interno`, `stock`, `stock
 (34, 13, 'INV-16-4351', 15, 4, 20, 5, 'Vitrina 8', 'pendiente'),
 (36, 14, 'INV-2-2057', 0, 0, 0, 0, '', 'agotado'),
 (39, 16, 'INV-16-9478', 7, 10, 20, 3, 'Vitrina 1', 'disponible'),
-(41, 25, 'INV-3-1903', 4, 1, 12, 3, 'Vitrina 7', 'agotado');
+(43, 24, 'INV-24-1678', 10, 5, 15, 6, 'Vitrina 2', 'pendiente');
 
 -- --------------------------------------------------------
 
@@ -251,8 +276,8 @@ CREATE TABLE `productos` (
 
 INSERT INTO `productos` (`id`, `nombre`, `categoria`, `marca`, `presentacion`, `descripcion`, `stock_minimo`, `lote`, `f_vencimiento`, `precio_compra`, `precio_venta`, `iva`, `codigo_sku`, `ubicacion`, `estado`, `imagen`, `creado`, `stock_actual`) VALUES
 (2, 'Proteína', 'Proteínas', 'Whey', 'En tarro', 'Para ganar masa muscular', 100, 'N/A', '2025-12-11', 80.00, 100000.00, 0.00, '78789878', 'Vitrina 4', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_69330b07e8a319.39923359.png', '2025-08-27 23:37:31', 49),
-(3, 'Menta', 'Hierbas', 'Casera', 'Ramas x manojo', 'Frescura', 100, 'N/A', '2025-12-11', 1000.00, 1200.00, 0.00, NULL, 'Vitrina 1', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_69330a004d3f24.37455647.png', '2025-08-28 14:14:42', 48),
-(4, 'Toronjil', 'Hierbas', 'Casera', 'Ramas x manojo', 'Hierba aromática para nervios', 100, 'N/A', '2025-12-11', 1000.00, 2000.00, 0.00, NULL, 'Vitrina 1', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_6933085d325098.97524870.png', '2025-08-28 14:15:14', 49),
+(3, 'Menta', 'Hierbas', 'Casera', 'Ramas x manojo', 'Frescura', 100, 'N/A', '2025-12-11', 1000.00, 1200.00, 0.00, NULL, 'Vitrina 1', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_69330a004d3f24.37455647.png', '2025-08-28 14:14:42', 45),
+(4, 'Toronjil', 'Hierbas', 'Casera', 'Ramas x manojo', 'Hierba aromática para nervios', 100, 'N/A', '2025-12-11', 1000.00, 2000.00, 0.00, NULL, 'Vitrina 1', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_6933085d325098.97524870.png', '2025-08-28 14:15:14', 47),
 (5, 'Manzanilla', 'Hierbas', 'Casera', 'Ramas x manojo', 'Aromática', 99, 'N/A', '2025-12-11', 1000.00, 2000.00, 0.00, NULL, 'Vitrina 1', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_693308e292ece7.64431140.png', '2025-08-28 14:15:56', 48),
 (6, 'Diente de leon', 'Hierbas', 'Casera', 'Ramas x manojo', 'Trastornos digestivos leves', 100, 'N/A', '2025-12-11', 500.00, 1500.00, 0.00, NULL, 'Vitrina 1', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_6933094692c640.26469423.png', '2025-08-28 14:15:56', 47),
 (13, 'Vitamina C', 'Vitaminas', 'Healthy America Colombia SAS', 'Capsula 1000MG', 'ES UN SUPLEMENTO DIETARIO', 2, 'SD2015-0003704', '2025-12-10', 25000.00, 50000.00, 0.00, '565465', 'Mueble 8', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_693309c5a2f846.50062225.png', '2025-12-05 01:01:23', 50),
@@ -263,8 +288,7 @@ INSERT INTO `productos` (`id`, `nombre`, `categoria`, `marca`, `presentacion`, `
 (19, 'Combo de Proteínas', 'Proteínas', 'Variada', 'En tarro', 'Ganancia muscular y para tonificación', 70, '234532', '2027-01-27', 150000.00, 270000.00, 0.01, '445789644', 'Vitrina 4', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_693317934703e3.29337760.png', '2025-12-05 17:34:11', 0),
 (20, 'Proteína Total', 'Proteínas', 'Total', 'En tarro', 'Crecimiento Muscular', 30, '31', '2027-02-10', 600000.00, 800000.00, 0.00, NULL, '', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_693318d8664984.87811284.png', '2025-12-05 17:39:36', 0),
 (23, 'Aceite de té de arbol', 'Aceites', 'Eva natur', 'Fascro de vidrio', 'Es para el uso de masajes', 20, 'N/A', '2027-01-14', 10000.00, 16000.00, 0.00, '4567743245', 'Vitrina 2', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_693d9e5603f763.08128365.jpg', '2025-12-13 17:11:49', 0),
-(24, 'Aceite de oliva', 'Aceites', 'Olitalia', 'En tarro', 'Aceite extra virgen naturista', 10, 'N/A', '2027-02-24', 11000.00, 18000.00, 0.00, '56575454364', 'Vitrina 2', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_693da022350321.63513223.jpg', '2025-12-13 17:18:29', 0),
-(25, 'Miel de propóleo', 'Mieles', 'Sierra', 'En frasco', 'Esta miel es orgánica en su totalidad', 5, 'N/A', '2026-07-22', 20000.00, 30000.00, 0.00, '578838394', 'Vitrina 3', 'inactivo', 'https://hieribal.byethost3.com/public/assets/img/prod_693da1312fed03.75398652.jpg', '2025-12-13 17:24:01', 0);
+(24, 'Aceite de oliva', 'Aceites', 'Olitalia', 'En tarro', 'Aceite extra virgen naturista', 10, 'N/A', '2027-02-24', 7800.00, 18000.00, 1.00, '56575454364', 'Vitrina 2', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_693da022350321.63513223.jpg', '2025-12-13 17:18:29', 0);
 
 -- --------------------------------------------------------
 
@@ -291,7 +315,8 @@ CREATE TABLE `proveedores` (
 --
 
 INSERT INTO `proveedores` (`id`, `empresa`, `nit`, `nombre_contacto`, `telefono`, `email`, `direccion`, `ciudad`, `condiciones_pago`, `estado`, `creado`) VALUES
-(5, 'Healthy America Colombia SAS', '9990151546', 'Roberto Perez', '3134405383', 'robertoperez@healthyamerica.com', 'Centro de Bogotá', 'Bogota DC', 'Daviplata  Nequi  Efectivo', 'activo', '2025-12-05 01:16:48');
+(5, 'Healthy America Colombia SAS', '9990151546', 'Roberto Perez', '3134405383', 'robertoperez@healthyamerica.com', 'Centro de Bogotá', 'Bogota DC', 'Daviplata  Nequi  Efectivo', 'activo', '2025-12-05 01:16:48'),
+(8, 'OCHOMIL', '34243', 'frbr', '453453', 'juliana03@gmail.com', 'Cwentro de medallo moor', 'Medelliin', 'Nequi  Efectivo', 'activo', '2026-04-04 03:49:22');
 
 -- --------------------------------------------------------
 
@@ -316,8 +341,12 @@ INSERT INTO `proveedor_producto` (`id`, `proveedor_id`, `producto_id`, `precio_c
 (3, 3, 2, 2000.00, 1, '2025-12-04 21:16:52'),
 (5, 4, 5, 100000.00, 1, '2025-12-04 22:55:15'),
 (6, 4, 3, 5000.00, 1, '2025-12-04 22:55:15'),
-(9, 5, 13, 50000.00, 1, '2025-12-05 23:12:56'),
-(10, 5, 14, 80000.00, 1, '2025-12-05 23:12:56');
+(11, 5, 14, 80000.00, 1, '2026-04-04 03:32:30'),
+(12, 5, 13, 50000.00, 1, '2026-04-04 03:32:30'),
+(13, 5, 23, 10000.00, 1, '2026-04-04 03:32:30'),
+(14, 7, 5, 1000.00, 1, '2026-04-04 03:47:16'),
+(17, 8, 23, 10000.00, 1, '2026-04-04 03:54:30'),
+(18, 8, 14, 20000.00, 1, '2026-04-04 03:54:30');
 
 -- --------------------------------------------------------
 
@@ -346,8 +375,8 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id_usuario`, `usuario`, `password`, `rol`, `nombres`, `apellidos`, `correo`, `correo_verificado`, `correo_verificacion_token`, `correo_verificacion_expira`, `fecha_creacion`, `estado`, `token_recuperacion`) VALUES
-(41, 'Cajero', '$2y$10$4jxWXVLCXSGTMDyot5zimeBGsF7/WdlkHkUjLAaedzMGKgNbWDIHi', 'Cajero', 'Juan Pepito', 'Martinez Hernandezz', 'gustavoalexis@gmail.com', 0, '9fc34c171c710ac435f2928dc91dc195', '2025-11-20 19:15:22', '2024-12-04 20:40:29', 'Activo', NULL),
-(48, 'Admin2', '$2y$10$Lu2Vp7ehIGMrgCoFGYRQReRj7Yg3V9PFArO5lNlzKdIACJr2IrzFK', 'Admin', 'Gustavo', 'Cuevas', 'gustavoalexiscuevas@gmail.com', 0, '3fea4396412e6030b56e7fb91f070238', '2026-03-16 15:20:00', '2025-11-19 19:44:44', 'Activo', NULL);
+(41, 'Cajero', '$2y$10$2C643W7F6WAOxs3e4XhWWe24/YbwmPTkXyNpQCsp0ZEmG/UTpRdD2', 'Cajero', 'Juan Pepito', 'Martinez Hernandezz', 'gustavoalexis@gmail.com', 0, '9fc34c171c710ac435f2928dc91dc195', '2025-11-20 19:15:22', '2024-12-04 20:40:29', 'Activo', NULL),
+(48, 'Admin2', '$2y$10$Lu2Vp7ehIGMrgCoFGYRQReRj7Yg3V9PFArO5lNlzKdIACJr2IrzFK', 'Admin', 'Gustavo', 'Cuevas', 'gustavoalexiscuevas@gmail.com', 1, NULL, NULL, '2025-11-19 19:44:44', 'Activo', NULL);
 
 -- --------------------------------------------------------
 
@@ -383,7 +412,10 @@ INSERT INTO `ventas` (`id_venta`, `id_carrito`, `total`, `pago_con`, `cambio`, `
 (5015, NULL, 1200.00, 4000.00, 2800.00, '2025-12-05 17:02:46', 'efectivo', 'cristian', 'cuevas', '1000789322'),
 (5016, NULL, 1200.00, 1200.00, 0.00, '2025-12-05 17:05:36', 'efectivo', 'Maria', 'Ecobar', '2354267777'),
 (5017, NULL, 2000.00, 4000.00, 2000.00, '2025-12-05 17:06:42', 'efectivo', 'Maria', 'Ecobar', '2354267777'),
-(5018, NULL, 3500.00, 50000.00, 46500.00, '2025-12-05 23:42:44', 'efectivo', 'Pepito', 'Perez', '1111111111');
+(5018, NULL, 3500.00, 50000.00, 46500.00, '2025-12-05 23:42:44', 'efectivo', 'Pepito', 'Perez', '1111111111'),
+(5019, NULL, 2400.00, 5000.00, 2600.00, '2026-04-03 01:48:30', 'efectivo', 'mivh', NULL, '789654123'),
+(5022, NULL, 2000.00, 5000.00, 3000.00, '2026-04-04 22:40:29', 'efectivo', 'Sra', 'dfdg', '2424324324'),
+(5023, NULL, 3200.00, 4000.00, 800.00, '2026-04-04 22:56:49', 'tarjeta', 'JJUan', 'dgregregre', '2345678');
 
 --
 -- Índices para tablas volcadas
@@ -410,6 +442,12 @@ ALTER TABLE `clientes`
 --
 ALTER TABLE `config`
   ADD PRIMARY KEY (`clave`);
+
+--
+-- Indices de la tabla `detalle_venta`
+--
+ALTER TABLE `detalle_venta`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `devoluciones`
@@ -479,19 +517,25 @@ ALTER TABLE `ventas`
 -- AUTO_INCREMENT de la tabla `carrito`
 --
 ALTER TABLE `carrito`
-  MODIFY `id_carrito` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3029;
+  MODIFY `id_carrito` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3036;
 
 --
 -- AUTO_INCREMENT de la tabla `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+
+--
+-- AUTO_INCREMENT de la tabla `detalle_venta`
+--
+ALTER TABLE `detalle_venta`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `devoluciones`
 --
 ALTER TABLE `devoluciones`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `historial_pedido`
@@ -503,31 +547,31 @@ ALTER TABLE `historial_pedido`
 -- AUTO_INCREMENT de la tabla `inventario`
 --
 ALTER TABLE `inventario`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- AUTO_INCREMENT de la tabla `productos`
 --
 ALTER TABLE `productos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT de la tabla `proveedores`
 --
 ALTER TABLE `proveedores`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `proveedor_producto`
 --
 ALTER TABLE `proveedor_producto`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de la tabla `ventas`
 --
 ALTER TABLE `ventas`
-  MODIFY `id_venta` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5019;
+  MODIFY `id_venta` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5024;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
