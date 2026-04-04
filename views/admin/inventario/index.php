@@ -22,7 +22,7 @@ $base = $this->config['app']['base_url'] ?? '';
     <div class="input-group mb-3" style="max-width:520px;">
       <span class="input-group-text"><i class="bi bi-search"></i></span>
       <input id="qInventario" type="search" class="form-control"
-             placeholder="Buscar por código interno, producto o ubicación…">
+             placeholder="Buscar por código interno o ubicación…">
       <button id="btnBuscarInventario" class="btn btn-outline-primary">Buscar</button>
     </div>
 

@@ -1173,3 +1173,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
     calcularIVA();
 });
+// ===============================
+// CALCULO GANANCIA
+// ===============================
+const inputCompra = document.getElementById('precio_compra');
+const inputVenta = document.getElementById('precio_venta');
+const mensajeGanancia = document.getElementById('mensajeGanancia');
+
+function calcularGanancia() {
+    const compra = parseFloat(inputCompra.value);
+    const venta = parseFloat(inputVenta.value);
+
+    if (!compra || !venta) {
+        mensajeGanancia.innerHTML = '';
+        mensajeGanancia.className = 'mensaje-ganancia';
+        return;
+    }
+
+    const ganancia = ((venta - compra) / compra) * 100;
+    let texto = '';
+    let clase = '';
+
+    if (ganancia < 0) {
+        texto = `Perdida ${ganancia.toFixed(2)}%`;
+        clase = 'rojo';
+    } else if (ganancia <= 30) {
+        texto = `Ganancia baja: ${ganancia.toFixed(2)}%`;
+        clase = 'amarillo';
+    } else {
+        texto = `Buena ganancia: ${ganancia.toFixed(2)}%`;
+        clase = 'verde';
+    }
+
+    mensajeGanancia.innerHTML = texto;
+    mensajeGanancia.className = `mensaje-ganancia ${clase}`;
+}
+
+// Eventos
+inputCompra.addEventListener('input', calcularGanancia);
+inputVenta.addEventListener('input', calcularGanancia);

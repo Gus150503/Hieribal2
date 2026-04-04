@@ -27,15 +27,16 @@ $puedeGestionarProductos = ($rol === 'admin');
         </div>
 
         <!-- Buscador -->
-        <div class="input-group mb-3" style="max-width:520px;">
+        <div class="input-group input-group-sm mb-3" style="max-width:400px;">
             <span class="input-group-text"><i class="bi bi-search"></i></span>
             <input id="qProd" type="search" class="form-control"
-                   placeholder="Buscar por nombre, SKU, marca o categoría…">
+                placeholder="Buscar...">
             <button id="btnBuscarProd" class="btn btn-outline-success">Buscar</button>
         </div>
-
-        <!-- Tabla -->
-        <div class="table-responsive">
+    <!-- ===================================== -->
+    <!-- CONTENEDOR SCROLL PARA TABLA PRODUCTOS -->
+    <!-- ===================================== -->
+    <div class="contenedor-tabla-productos">
             <table id="tblProductos" class="table table-sm align-middle table-hover">
                 <thead class="table-light position-sticky" style="top:0; z-index:1;">
                 <tr>
@@ -63,7 +64,7 @@ $puedeGestionarProductos = ($rol === 'admin');
                 </thead>
                 <tbody></tbody>
             </table>
-
+    </div>                   
             <div class="d-flex align-items-center justify-content-between mt-3">
                 <div class="d-flex align-items-center gap-2">
                     <label class="text-muted small me-1">Mostrar</label>
@@ -202,6 +203,7 @@ $puedeGestionarProductos = ($rol === 'admin');
                             <input type="number" step="0.01" class="form-control" name="precio_venta"
                                    id="precio_venta" min="0.01" value="" required>
                             <div class="invalid-feedback">Precio Venta requerido.</div>
+                            <div id="mensajeGanancia" class="mensaje-ganancia"></div>
                         </div>
 
                         <div class="col-md-3">
@@ -294,23 +296,67 @@ $puedeGestionarProductos = ($rol === 'admin');
     }
 
     /* Tabla amplia y legible */
+    /* ===================================== */
+    /* AJUSTE REAL DE TAMAÑO TABLA PRODUCTOS */
+    /* ===================================== */
+
     #tblProductos {
-        width: 100%;
-        min-width: 1500px;
+        font-size: 12px; /* 🔥 reduce tamaño general */
     }
 
+    /* Reduce espacio interno */
     #tblProductos th,
     #tblProductos td {
-        vertical-align: middle;
-        white-space: nowrap;
+        padding: 6px 8px; /* antes Bootstrap usa más grande */
     }
 
-    #tblProductos td.descripcion {
-        white-space: normal;
-        max-width: 250px;
-        overflow-wrap: break-word;
-        text-align: left;
+    /* Encabezado un poquito más pequeño */
+    #tblProductos thead th {
+        font-size: 12px;
     }
+
+    /* Ajuste especial para textos largos */
+    #tblProductos td.descripcion {
+        font-size: 12px;
+    }
+
+    /* Opcional: botones más compactos */
+    #tblProductos .btn {
+        padding: 3px 6px;
+        font-size: 12px;
+    }
+/* ===================================== */
+/* REDUCIR TAMAÑO DE TABLA PRODUCTOS */
+/* ===================================== */
+
+    #tblProductos th {
+        font-size: 12.5px;
+    }
+
+    #tblProductos td {
+        padding: 6px 8px; /* menos espacio */
+    }
+        /* ===================================== */
+        /* SCROLL PARA TABLA PRODUCTOS */
+        /* ===================================== */
+    .contenedor-tabla-productos {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: 500px;
+    }
+
+    /* Opcional: mejora visual del scroll */
+    .contenedor-tabla-productos::-webkit-scrollbar {
+        height: 8px;
+        width: 8px;
+    }
+
+    .contenedor-tabla-productos::-webkit-scrollbar-thumb {
+        background-color: #198754;
+        border-radius: 4px;
+    }
+    
 
     /* Imagen miniatura */
     .producto-img {
@@ -349,7 +395,22 @@ $puedeGestionarProductos = ($rol === 'admin');
     #seccionURL {
         display: none !important;
     }
+    .mensaje-ganancia {
+        margin-top: 5px;
+        font-size: 14px;
+    }
 
+    .mensaje-ganancia.rojo {
+        color: #e74c3c;
+    }
+
+    .mensaje-ganancia.amarillo {
+        color: #f1c40f;
+    }
+
+    .mensaje-ganancia.verde {
+        color: #2ecc71;
+    }
 
 </style>
 

@@ -40,19 +40,51 @@ final class AdminReportesController extends Controller
     public function inventarioExcel(): void
     {
         $rows = $this->repo->inventario();
-        $this->sendExcel('reporte_inventario.xls', function () use ($rows) {
+        $this->sendExcel('Reporte_Inventario.xls', function () use ($rows) {
+          echo "<table border='0' width='100%'>
+            <tr>
+            <td colspan='9' style='
+                background-color:#0d6efd;
+                color:white;
+                font-size:18px;
+                font-weight:bold;
+                text-align:center;
+                padding:10px;
+            '>
+                REPORTE DE INVENTARIO
+            </td>
+            </tr>
+            </table>";
+echo "<table border='0' width='100%' align='center'>
+<tr>
+<td style='
+border-bottom:2px solid #0d6efd;
+    background-color:#cfe2ff;
+    color:#084298;
+    font-size:13px;
+    text-align:center;
+    padding:8px;
+    font-weight:500;
+    ' align='center'
+'>
+    Generado el: " . date('d/m/Y H:i') . "
+</td>
+</tr>
+</table>";
+
+
             echo "<table border='1'>
-                    <tr>
-                        <th>ID</th>
-                        <th>ID producto</th>
-                        <th>Código interno</th>
-                        <th>Stock</th>
-                        <th>Stock mínimo</th>
-                        <th>Stock máximo</th>
-                        <th>Punto de reorden</th>
-                        <th>Ubicación</th>
-                        <th>Estado</th>
-                    </tr>";
+            <tr>
+                <th style='background-color:#0d6efd;color:#000000;'>ID</th>
+                <th style='background-color:#0d6efd;color:#000000;'>ID producto</th>
+                <th style='background-color:#0d6efd;color:#000000;'>Código interno</th>
+                <th style='background-color:#0d6efd;color:#000000;'>Stock</th>
+                <th style='background-color:#0d6efd;color:#000000;'>Stock mínimo</th>
+                <th style='background-color:#0d6efd;color:#000000;'>Stock máximo</th>
+                <th style='background-color:#0d6efd;color:#000000;'>Punto de reorden</th>
+                <th style='background-color:#0d6efd;color:#000000;'>Ubicación</th>
+                <th style='background-color:#0d6efd;color:#000000;'>Estado</th>
+            </tr>";
             foreach ($rows as $r) {
                 echo "<tr>
                         <td>{$r['id']}</td>
@@ -73,20 +105,20 @@ final class AdminReportesController extends Controller
     public function ventasExcel(): void
     {
         $rows = $this->repo->ventas();
-        $this->sendExcel('reporte_ventas.xls', function () use ($rows) {
+        $this->sendExcel('Reporte_Ventas.xls', function () use ($rows) {
             echo "<table border='1'>
-                    <tr>
-                        <th>ID venta</th>
-                        <th>ID carrito</th>
-                        <th>Total</th>
-                        <th>Paga con</th>
-                        <th>Cambio</th>
-                        <th>Fecha venta</th>
-                        <th>Método de pago</th>
-                        <th>Nombre cliente</th>
-                        <th>Apellido cliente</th>
-                        <th>Cédula cliente</th>
-                    </tr>";
+            <tr>
+                <th style='background-color:#fbff00;color:#000000;'>ID Venta</th>
+                <th style='background-color:#fbff00;color:#000000;'>ID Carrito</th>               
+                <th style='background-color:#fbff00;color:#000000;'>Total </th>
+                <th style='background-color:#fbff00;color:#000000;'>Pago con</th>
+                <th style='background-color:#fbff00;color:#000000;'>Cambio</th>
+                <th style='background-color:#fbff00;color:#000000;'>Fecha de venta</th>               
+                <th style='background-color:#fbff00;color:#000000;'>Metodo de Pago</th>
+                <th style='background-color:#fbff00;color:#000000;'>Nombre Cliente</th>
+                <th style='background-color:#fbff00;color:#000000;'>Apellido Cliente </th>
+                <th style='background-color:#fbff00;color:#000000;'>Cedula Cliente</th>
+            </tr>";
             foreach ($rows as $r) {
                 echo "<tr>
                         <td>{$r['id_venta']}</td>
@@ -108,21 +140,21 @@ final class AdminReportesController extends Controller
     public function proveedoresExcel(): void
     {
         $rows = $this->repo->proveedores();
-        $this->sendExcel('reporte_proveedores.xls', function () use ($rows) {
+        $this->sendExcel('Reporte_Proveedores.xls', function () use ($rows) {
             echo "<table border='1'>
-                    <tr>
-                        <th>ID</th>
-                        <th>Empresa</th>
-                        <th>NIT</th>
-                        <th>Nombre contacto</th>
-                        <th>Teléfono</th>
-                        <th>Email</th>
-                        <th>Dirección</th>
-                        <th>Ciudad</th>
-                        <th>Condiciones pago</th>
-                        <th>Estado</th>
-                        <th>Creado</th>
-                    </tr>";
+            <tr>
+                <th style='background-color:#226700;color:#000000;'>ID Venta</th>
+                <th style='background-color:#226700;color:#000000;'>Empresa</th>               
+                <th style='background-color:#226700;color:#000000;'>NIT</th>
+                <th style='background-color:#226700;color:#000000;'>Nombre Contacto</th>
+                <th style='background-color:#226700;color:#000000;'>Telefono</th>
+                <th style='background-color:#226700;color:#000000;'>Email</th>
+                <th style='background-color:#226700;color:#000000;'>Direccion</th>
+                <th style='background-color:#226700;color:#000000;'>Ciudad</th>
+                <th style='background-color:#226700;color:#000000;'>Condiciones de Pago</th>
+                <th style='background-color:#226700;color:#000000;'>Estado</th>
+                <th style='background-color:#226700;color:#000000;'>Creado</th>
+            </tr>";
             foreach ($rows as $r) {
                 echo "<tr>
                         <td>{$r['id']}</td>
@@ -146,18 +178,18 @@ public function clientesExcel(): void
 {
     $rows = $this->repo->clientes();
 
-    $this->sendExcel('reporte_clientes.xls', function () use ($rows) {
-        echo "<table border='1'>
-                <tr>
-                    <th>ID Cliente</th>
-                    <th>Cédula</th>
-                    <th>Nombres</th>
-                    <th>Apellidos</th>
-                    <th>Teléfono</th>
-                    <th>Correo</th>
-                    <th>Estado</th>
-                    <th>Fecha registro</th>
-                </tr>";
+    $this->sendExcel('Reporte_Clientes.xls', function () use ($rows) {
+            echo "<table border='1'>
+            <tr>
+                <th style='background-color:#696e67;color:#000000;'>ID Cliente</th>
+                <th style='background-color:#696e67;color:#000000;'>Cedula</th>               
+                <th style='background-color:#696e67;color:#000000;'>Nombres</th>
+                <th style='background-color:#696e67;color:#000000;'>Apellidos</th>
+                <th style='background-color:#696e67;color:#000000;'>Telefono</th>
+                <th style='background-color:#696e67;color:#000000;'>Correo</th>
+                <th style='background-color:#696e67;color:#000000;'>Estado</th>
+                <th style='background-color:#696e67;color:#000000;'>Fecha de Registro</th>
+            </tr>";
         foreach ($rows as $r) {
             echo "<tr>
                     <td>{$r['id_cliente']}</td>
@@ -178,19 +210,19 @@ public function clientesExcel(): void
     public function usuariosExcel(): void
     {
         $rows = $this->repo->usuarios();
-        $this->sendExcel('reporte_usuarios.xls', function () use ($rows) {
+        $this->sendExcel('Reporte_Usuarios.xls', function () use ($rows) {
             echo "<table border='1'>
-                    <tr>
-                        <th>ID usuario</th>
-                        <th>Usuario</th>
-                        <th>Rol</th>
-                        <th>Nombres</th>
-                        <th>Apellidos</th>
-                        <th>Correo</th>
-                        <th>Correo verificado</th>
-                        <th>Fecha creación</th>
-                        <th>Estado</th>
-                    </tr>";
+            <tr>
+                <th style='background-color:#00b1b8;color:#000000;'>ID Usuario</th>
+                <th style='background-color:#00b1b8;color:#000000;'>Usuario</th>
+                <th style='background-color:#00b1b8;color:#000000;'>Rol</th>                            
+                <th style='background-color:#00b1b8;color:#000000;'>Nombres</th>
+                <th style='background-color:#00b1b8;color:#000000;'>Apellidos</th>
+                <th style='background-color:#00b1b8;color:#000000;'>Correo</th>
+                <th style='background-color:#00b1b8;color:#000000;'>Correo Verificado</th>
+                <th style='background-color:#00b1b8;color:#000000;'>Fecha de Creacion</th>
+                <th style='background-color:#00b1b8;color:#000000;'>Estado</th>
+            </tr>";
             foreach ($rows as $r) {
                 echo "<tr>
                         <td>{$r['id_usuario']}</td>
@@ -211,22 +243,22 @@ public function clientesExcel(): void
     public function devolucionesExcel(): void
     {
         $rows = $this->repo->devoluciones();
-        $this->sendExcel('reporte_devoluciones.xls', function () use ($rows) {
+        $this->sendExcel('Reporte_Devoluciones.xls', function () use ($rows) {
             echo "<table border='1'>
-                    <tr>
-                        <th>ID</th>
-                        <th>ID cliente</th>
-                        <th>ID proveedor</th>
-                        <th>ID producto</th>
-                        <th>Cantidad</th>
-                        <th>Número orden</th>
-                        <th>Motivo devolución</th>
-                        <th>Origen</th>
-                        <th>Fecha compra</th>
-                        <th>Fecha devolución</th>
-                        <th>Estado</th>
-                        <th>Observaciones</th>
-                    </tr>";
+            <tr>
+                <th style='background-color:#a50404;color:#000000;'>ID</th>
+                <th style='background-color:#a50404;color:#000000;'>ID Cliente</th>  
+                <th style='background-color:#a50404;color:#000000;'>ID Proveedor</th>         
+                <th style='background-color:#a50404;color:#000000;'>ID Producto</th>       
+                <th style='background-color:#a50404;color:#000000;'>Cantidad</th>
+                <th style='background-color:#a50404;color:#000000;'>N° Orden</th>
+                <th style='background-color:#a50404;color:#000000;'>Motivo de Devolucion</th>
+                <th style='background-color:#a50404;color:#000000;'>Origen</th>
+                <th style='background-color:#a50404;color:#000000;'>Fecha de Compra</th>
+                <th style='background-color:#a50404;color:#000000;'>Fecha de Devolucion</th>
+                <th style='background-color:#a50404;color:#000000;'>Estado</th>
+                <th style='background-color:#a50404;color:#000000;'>Observaciones</th>
+            </tr>";
             foreach ($rows as $r) {
                 echo "<tr>
                         <td>{$r['id']}</td>
@@ -257,8 +289,39 @@ public function clientesExcel(): void
         header('Pragma: no-cache');
         header('Expires: 0');
 
-        echo "<meta charset='UTF-8'>";
+        echo "
+        <meta charset='UTF-8'>
+        <style>
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            th {
+                color: #dee2e6;
+                font-weight: bold;
+                text-align: center;
+                padding: 8px;
+                border: 1px solid #000000;
+            }
+
+            td {
+                padding: 6px;
+                border: 1px solid #dee2e6;
+                text-align: center;
+            }
+
+            tr:nth-child(even) {
+                background-color: #f8f9fa;
+            }
+
+            tr:hover td {
+                background-color: #e9f2ff;
+            }
+        </style>
+        ";       
+
         $printer();
         exit;
+        }
     }
-}
