@@ -6,8 +6,8 @@
 
   'use strict';
 
-  const API_BASE = window.PROVEEDOR_API
-    || (location.pathname.replace(/\/public\/?$/, '') + '/public/?r=admin_proveedores_api');
+  const API_BASE = window.PROVEEDOR_API;
+    (location.pathname.replace(/\/public\/?$/, '') + '/public/?r=admin_proveedores_api');
   const api = (params = '') => `${API_BASE}&${params}`;
 
   const state = { page: 1, per: 10, total: 0, q: '' };

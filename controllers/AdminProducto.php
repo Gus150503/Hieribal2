@@ -198,23 +198,28 @@ final class AdminProducto extends Controller
      *
      * @return void
      */
-    public function index(): void
-    {
-        $this->ensureAdmin();
+            public function index(): void
+        {
+            $this->ensureAdmin();
 
-        $base = rtrim($this->config['app']['base_url'] ?? '', '/');
+            $base = rtrim($this->config['app']['base_url'] ?? '', '/');
 
-        $this->render(
-            'admin/productos/index',
-            [
-                'page_title' => 'Productos',
-                'esAdmin'    => true,
-                'extra_css'  => [$base . '/assets/css/admin_productos.css?v=1'],
-                'extra_js'   => [$base . '/assets/js/admin_productos.js?v=2'],
-            ]
-        );
-    }
+            // Igual que proveedores
+            $titulo     = "Productos";
+            $modulo     = "productos";
+            $esAdmin    = true;
+            $extra_css  = [
+                'assets/css/AdminProductos.css?v=1'
+            ];
+            $extra_js   = [
+                'assets/js/admin_productos.js?v=2'
+            ];
 
+            $this->render(
+                'admin/productos/index',
+                compact('titulo','modulo','esAdmin','extra_css','extra_js')
+            );
+        }
     /* ============================================================== *
      * API CRUD (JSON)                                                *
      * ============================================================== */
@@ -422,9 +427,7 @@ final class AdminProducto extends Controller
             ? (float) $in['precio_venta']
             : 0.0;
 
-        $iva = is_numeric($in['iva'] ?? null)
-            ? (float) $in['iva']
-            : 0.0;
+        $iva = ($in['iva'] ?? '0') == '1' ? 1.0 : 0.0;
 
         // Otros campos de texto
         $lote       = trim($in['lote'] ?? '');
