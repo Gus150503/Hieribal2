@@ -41,7 +41,6 @@ $ACL = [
   'cajero'   => [
     'dashboard',
     'cajero',
-    'inventario.view',
     'productos.view',
     'clientes.view'
   ],
