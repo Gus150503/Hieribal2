@@ -1,7 +1,6 @@
 <?php
-// views/admin/productos/index.php
+// views/admin/inventario/index.php
 // MODULO INVENTARIO / Juliana Lugo / vista de index de inventario 
-$base = $this->config['app']['base_url'] ?? '';
 ?>
 <section class="card shadow-sm ui-pro border-0 rounded-4">
   <div class="card-body">
@@ -165,28 +164,20 @@ $base = $this->config['app']['base_url'] ?? '';
     </div>
   </div>
 </div>
-
-<style>
-
-  /* INVENTARIO – encabezado azul forzado */
-  #tblInventario thead.table-light {
-    background-color: #0d6efd !important;
-  }
-  #tblInventario thead.table-light th {
-    background-color: #0d6efd !important;
-    color: #ffffff !important;
-    border-color: rgba(255,255,255,.25) !important;
-  }
-
-
-</style>
-
-<!-- Endpoints para que el JS pegue al controlador correcto -->
 <script>
-  window.INVENTARIO_API = '<?= $base ?>/?r=admin_inventario_api';
-  window.PRODUCTO_API   = '<?= $base ?>/?r=admin_productos_api';
+  window.INVENTARIO_API = '<?= htmlspecialchars($this->config['app']['base_url']) ?>/public/?r=admin_inventario_api';
+  window.PRODUCTO_API   = '<?= htmlspecialchars($this->config['app']['base_url']) ?>/public/?r=admin_productos_api';
 </script>
+<?php
+    $titulo = "Inventario";
+    $esAdmin = true;
 
+        /* AQUÍ AGREGAMOS LOS CSS Y JS CORRECTAMENTE PARA EL USO DE LA PLANTILLA*/
+      $extra_css = [
+          $this->config['app']['base_url'] . '/assets/css/AdminInventario.css'
+      ];
 
-<!-- JS específico -->
-<script src="<?= $base ?>/assets/js/admin_inventario.js?v=3" defer></script>
+      $extra_js = [
+          $this->config['app']['base_url'] . '/assets/js/admin_inventario.js?v=6'
+      ];
+?>

@@ -1,7 +1,6 @@
 <?php
 // views/admin/productos/index.php
-// MODULO PRODUCTOS / Juliana Lugo / vista de index de productos 
-$base = $this->config['app']['base_url'] ?? '';
+// MODULO PRODUCTOS / Juliana Lugo / Vista de index de productos 
 
 // === Rol / permisos (igual que clientes) ===
 if (session_status() !== PHP_SESSION_ACTIVE) {
@@ -30,7 +29,7 @@ $puedeGestionarProductos = ($rol === 'admin');
         <div class="input-group input-group-sm mb-3" style="max-width:400px;">
             <span class="input-group-text"><i class="bi bi-search"></i></span>
             <input id="qProd" type="search" class="form-control"
-                placeholder="Buscar...">
+                placeholder="Buscar por Nombre, Categoria o Codigo">
             <button id="btnBuscarProd" class="btn btn-outline-success">Buscar</button>
         </div>
     <!-- ===================================== -->
@@ -279,146 +278,17 @@ $puedeGestionarProductos = ($rol === 'admin');
     </div>
 </div>
 
-<style>
-    /* Encabezado verde productos */
-    #tblProductos thead.table-light {
-        --bs-table-bg: #198754;
-        --bs-table-color: #fff;
-        --bs-table-border-color: rgba(255, 255, 255, .25);
-        background-color: #198754 !important;
-        color: #fff !important;
-    }
+<script>window.PRODUCTO_API = '<?= htmlspecialchars($this->config['app']['base_url']) ?>/public/?r=admin_productos_api';</script> 
+    <?php
+    $titulo = "Productos";
+    $esAdmin = true;
 
-    #tblProductos thead.table-light th {
-        background-color: #198754 !important;
-        color: #ffffff !important;
-        border-color: rgba(255,255,255,.25) !important;
-    }
+    /* AQUÍ AGREGAMOS LOS CSS Y JS CORRECTAMENTE PARA EL USO DE LA PLANTILLA*/
+    $extra_css = [
+        'assets/css/AdminProducto.css'
+    ];
 
-    /* Tabla amplia y legible */
-    /* ===================================== */
-    /* AJUSTE REAL DE TAMAÑO TABLA PRODUCTOS */
-    /* ===================================== */
-
-    #tblProductos {
-        font-size: 12px; /* 🔥 reduce tamaño general */
-    }
-
-    /* Reduce espacio interno */
-    #tblProductos th,
-    #tblProductos td {
-        padding: 6px 8px; /* antes Bootstrap usa más grande */
-    }
-
-    /* Encabezado un poquito más pequeño */
-    #tblProductos thead th {
-        font-size: 12px;
-    }
-
-    /* Ajuste especial para textos largos */
-    #tblProductos td.descripcion {
-        font-size: 12px;
-    }
-
-    /* Opcional: botones más compactos */
-    #tblProductos .btn {
-        padding: 3px 6px;
-        font-size: 12px;
-    }
-/* ===================================== */
-/* REDUCIR TAMAÑO DE TABLA PRODUCTOS */
-/* ===================================== */
-
-    #tblProductos th {
-        font-size: 12.5px;
-    }
-
-    #tblProductos td {
-        padding: 6px 8px; /* menos espacio */
-    }
-        /* ===================================== */
-        /* SCROLL PARA TABLA PRODUCTOS */
-        /* ===================================== */
-    .contenedor-tabla-productos {
-        width: 100%;
-        overflow-x: auto;
-        overflow-y: auto;
-        max-height: 500px;
-    }
-
-    /* Opcional: mejora visual del scroll */
-    .contenedor-tabla-productos::-webkit-scrollbar {
-        height: 8px;
-        width: 8px;
-    }
-
-    .contenedor-tabla-productos::-webkit-scrollbar-thumb {
-        background-color: #198754;
-        border-radius: 4px;
-    }
-    
-
-    /* Imagen miniatura */
-    .producto-img {
-        width: 55px;
-        height: 55px;
-        object-fit: cover;
-        border-radius: 8px;
-        border: 2px solid #e9ecef;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
-        transition: transform .2s, box-shadow .2s;
-    }
-
-    .producto-img:hover {
-        transform: scale(1.8);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, .2);
-        z-index: 10;
-        cursor: pointer;
-    }
-
-    .producto-img-placeholder {
-        width: 55px;
-        height: 55px;
-        border-radius: 8px;
-        background: linear-gradient(135deg, #f5f7fa, #e9ecef);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #adb5bd;
-        font-size: 24px;
-        border: 2px dashed #dee2e6;
-    }
-
-    /* Ocultar opción URL y su sección de input */
-    #tipoURL,
-    label[for="tipoURL"],
-    #seccionURL {
-        display: none !important;
-    }
-    .mensaje-ganancia {
-        margin-top: 5px;
-        font-size: 14px;
-    }
-
-    .mensaje-ganancia.rojo {
-        color: #e74c3c;
-    }
-
-    .mensaje-ganancia.amarillo {
-        color: #f1c40f;
-    }
-
-    .mensaje-ganancia.verde {
-        color: #2ecc71;
-    }
-
-</style>
-
-<!-- Endpoint API; el JS lo usa -->
-<script>
-    window.PRODUCTO_API = '<?= $base ?>/?r=admin_productos_api';
-</script>
-
-<script src="<?= $base ?>/assets/js/admin_productos.js?v=5" defer></script>
-
-
+    $extra_js = [
+        'assets/js/admin_productos.js?v=6'
+    ];
+    ?>
