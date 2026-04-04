@@ -15,7 +15,9 @@ use Models\UsuarioInventario;
  * - Obtener un registro
  * - Crear, actualizar y eliminar
  * - Cambiar el estado disponible/agotado
+ * 
  */
+
 final class AdminInventario extends Controller
 {
     /**
