@@ -36,7 +36,30 @@ final class AdminReportesController extends Controller
     /* ===========================
        EXPORTADORES EXCEL
        =========================== */
+        public function obtenerParaExcel(): array
+        {
+            $sql = "
+                SELECT 
+                    v.id_venta,
+                    v.fecha_venta,
+                    v.metodo_pago,
+                    v.nombre_cliente,
+                    v.apellido_cliente,
+                    v.cedula_cliente,
+                    d.id_producto,
+                    p.nombre AS producto,
+                    d.cantidad,
+                    d.precio,
+                    d.subtotal,
+                    v.total
+                FROM detalle_venta d
+                INNER JOIN ventas v ON v.id_venta = d.id_venta
+                INNER JOIN productos p ON p.id = d.id_producto
+                ORDER BY v.fecha_venta DESC
+            ";
 
+            return $this->db->query($sql)->fetchAll();
+        }
     public function inventarioExcel(): void
     {
         $rows = $this->repo->inventario();
@@ -105,7 +128,7 @@ final class AdminReportesController extends Controller
     public function ventasExcel(): void
     {
         $rows = $this->repo->ventas();
-        $this->sendExcel('Reporte_Ventas.xls', function () use ($rows) {
+        $this->sendExcel('Reporte_Ventas_Cajero.xls', function () use ($rows) {
           echo "<table border='0' width='100%'>
         <tr>
         <td colspan='10' style='
@@ -116,7 +139,7 @@ final class AdminReportesController extends Controller
                 text-align:center;
                 padding:10px;
             '>
-                REPORTE DE VENTAS   
+                REPORTE DE VENTAS DE CAJERO
         </td>
         </tr>
         </table>";
