@@ -1,19 +1,7 @@
 <?php
 // views/admin/proveedores/index.php
 // MODULO PROVEDORES / Juliana Lugo / vista de index de proveedores
-$base = $this->config['app']['base_url'] ?? '';
 ?>
-<style>
-  /* Encabezado amarillo */
-  #tblProveedor thead.table-light{
-    --bs-table-bg: #ffc107;
-    --bs-table-color:#fff;
-    --bs-table-border-color: rgba(255,255,255,.25);
-    background:#ffc107!important; color:#fff!important; background-image:none!important;
-  }
-  #tblProveedor thead.table-light th{ color:#fff!important; }
-</style>
-
 <section class="card shadow-sm ui-pro border-0 rounded-4">
   <div class="card-body">
     <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
@@ -52,6 +40,7 @@ $base = $this->config['app']['base_url'] ?? '';
         </thead>
         <tbody></tbody>
       </table>
+
       <div class="d-flex align-items-center justify-content-between mt-3">
         <div class="d-flex align-items-center gap-2">
           <label class="text-muted small me-1">Mostrar</label>
@@ -63,7 +52,8 @@ $base = $this->config['app']['base_url'] ?? '';
           </select>
           <span id="totalProveedores" class="text-muted small ms-2"></span>
         </div>
-        <nav aria-label="Paginación">
+
+        <nav>
           <ul id="paginador" class="pagination pagination-sm mb-0"></ul>
         </nav>
       </div>
@@ -232,13 +222,17 @@ $base = $this->config['app']['base_url'] ?? '';
     </div>
   </div>
 </div>
+<script>window.PROVEEDOR_API = '<?= htmlspecialchars($this->config['app']['base_url']) ?>/public/?r=admin_proveedores_api';</script>    
+<?php
+    $titulo = "Proveedores";
+    $esAdmin = true;
 
-<script>
-  // URLs para la API de Proveedores
-  window.PROVEEDOR_API = '<?= $base ?>/public/?r=admin_proveedores_api';
+    /* AQUÍ AGREGAMOS LOS CSS Y JS CORRECTAMENTE PARA EL USO DE LA PLANTILLA*/
+    $extra_css = [
+        'assets\css\AdminProveedores.css'
+    ];
 
-  // Por si quieres tenerlas separadas (son la misma ruta con distinto action)
-  window.PROVEEDOR_API_PRODUCTOS = window.PROVEEDOR_API; // productos_proveedor / productos_catalogo / productos_save
-</script>
-
-<script src="<?= $base ?>/assets/js/admin_proveedores.js?v=6" defer></script>
+    $extra_js = [
+        'assets\js\admin_proveedores.js?v=6'
+    ];
+?>

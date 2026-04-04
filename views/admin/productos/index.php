@@ -1,7 +1,6 @@
 <?php
 // views/admin/productos/index.php
-// MODULO PRODUCTOS / Juliana Lugo / vista de index de productos 
-$base = $this->config['app']['base_url'] ?? '';
+// MODULO PRODUCTOS / Juliana Lugo / Vista de index de productos 
 
 // === Rol / permisos (igual que clientes) ===
 if (session_status() !== PHP_SESSION_ACTIVE) {
@@ -27,15 +26,16 @@ $puedeGestionarProductos = ($rol === 'admin');
         </div>
 
         <!-- Buscador -->
-        <div class="input-group mb-3" style="max-width:520px;">
+        <div class="input-group input-group-sm mb-3" style="max-width:400px;">
             <span class="input-group-text"><i class="bi bi-search"></i></span>
             <input id="qProd" type="search" class="form-control"
-                   placeholder="Buscar por nombre, SKU, marca o categoría…">
+                placeholder="Buscar por Nombre, Categoria o Codigo">
             <button id="btnBuscarProd" class="btn btn-outline-success">Buscar</button>
         </div>
-
-        <!-- Tabla -->
-        <div class="table-responsive">
+    <!-- ===================================== -->
+    <!-- CONTENEDOR SCROLL PARA TABLA PRODUCTOS -->
+    <!-- ===================================== -->
+    <div class="contenedor-tabla-productos">
             <table id="tblProductos" class="table table-sm align-middle table-hover">
                 <thead class="table-light position-sticky" style="top:0; z-index:1;">
                 <tr>
@@ -63,7 +63,7 @@ $puedeGestionarProductos = ($rol === 'admin');
                 </thead>
                 <tbody></tbody>
             </table>
-
+    </div>                   
             <div class="d-flex align-items-center justify-content-between mt-3">
                 <div class="d-flex align-items-center gap-2">
                     <label class="text-muted small me-1">Mostrar</label>
@@ -105,7 +105,32 @@ $puedeGestionarProductos = ($rol === 'admin');
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Categoría</label>
-                            <input class="form-control" name="categoria" id="categoria" maxlength="100">
+                            <input list="listaCategorias" name="categoria" class="form-control" placeholder="Seleccione o escriba una categoría">
+                            <datalist id="listaCategorias">
+                                <option value="Aceites y Grasas Saludables">
+                                <option value="Aminoácidos">
+                                <option value="Antioxidantes">
+                                <option value="Bebidas Vegetales">
+                                <option value="Cápsulas de Plantas">
+                                <option value="Creatinas">
+                                <option value="Energizantes">
+                                <option value="Endulzantes Naturales">
+                                <option value="Extractos y Tinturas Madre">
+                                <option value="Fibras">
+                                <option value="Frutos Secos y Deshidratados">
+                                <option value="Gotas y Esencias">
+                                <option value="Granos, Semillas y Cereales">
+                                <option value="Harinas Especiales">
+                                <option value="Jarabes Naturales">
+                                <option value="Laxantes">
+                                <option value="Minerales">
+                                <option value="Multivitamínicos">
+                                <option value="Plantas Medicinales y Hierbas">
+                                <option value="Probióticos">
+                                <option value="Snacks Saludables">
+                                <option value="Tés e Infusiones">
+                                <option value="Vitaminas">
+                            </datalist>
                             <div class="invalid-feedback">Categoría requerida.</div>
                         </div>
                         <div class="col-md-4">
@@ -115,7 +140,18 @@ $puedeGestionarProductos = ($rol === 'admin');
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Presentación</label>
-                            <input class="form-control" name="presentacion" id="presentacion" maxlength="100">
+                            <input list="listaPresentacion" name="presentacion" class="form-control" placeholder="Seleccione o escriba una presentación">
+                            <datalist id="listaPresentacion">
+                                <option value="Atado">
+                                <option value="Bolsa">
+                                <option value="Caja">
+                                <option value="Capsulas">
+                                <option value="Frasco">
+                                <option value="Frasco vidrio">
+                                <option value="Gotero">
+                                <option value="Liquido">
+                                <option value="Sachet">
+                            </datalist>
                         </div>
 
                         <div class="col-md-4">
@@ -148,16 +184,25 @@ $puedeGestionarProductos = ($rol === 'admin');
                         </div>
 
                         <div class="col-md-3">
+                            <label class="form-label">IVA</label><br>
+
+                            <input type="radio" name="iva" value="1" id="iva_si" checked>
+                            <label for="iva_si">Con IVA</label>
+
+                            <input type="radio" name="iva" value="0" id="iva_no" style="margin-left:10px;">
+                            <label for="iva_no">Sin IVA</label>
+
+                            <small id="info_iva" style="display:block; margin-top:5px; color:#6c757d;">
+                                IVA (19%): 0 <br> Neto: 0
+                            </small>
+                        </div>
+                        
+                        <div class="col-md-3">
                             <label class="form-label">Precio Venta</label>
                             <input type="number" step="0.01" class="form-control" name="precio_venta"
                                    id="precio_venta" min="0.01" value="" required>
                             <div class="invalid-feedback">Precio Venta requerido.</div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label">IVA (%)</label>
-                            <input type="number" step="0.01" class="form-control" name="iva" id="iva"
-                                   min="0" value="0">
+                            <div id="mensajeGanancia" class="mensaje-ganancia"></div>
                         </div>
 
                         <div class="col-md-3">
@@ -233,85 +278,17 @@ $puedeGestionarProductos = ($rol === 'admin');
     </div>
 </div>
 
-<style>
-    /* Encabezado verde productos */
-    #tblProductos thead.table-light {
-        --bs-table-bg: #198754;
-        --bs-table-color: #fff;
-        --bs-table-border-color: rgba(255, 255, 255, .25);
-        background-color: #198754 !important;
-        color: #fff !important;
-    }
+<script>window.PRODUCTO_API = '<?= htmlspecialchars($this->config['app']['base_url']) ?>/public/?r=admin_productos_api';</script> 
+    <?php
+    $titulo = "Productos";
+    $esAdmin = true;
 
-    #tblProductos thead.table-light th {
-        background-color: #198754 !important;
-        color: #ffffff !important;
-        border-color: rgba(255,255,255,.25) !important;
-    }
+    /* AQUÍ AGREGAMOS LOS CSS Y JS CORRECTAMENTE PARA EL USO DE LA PLANTILLA*/
+    $extra_css = [
+        'assets/css/AdminProducto.css'
+    ];
 
-    /* Tabla amplia y legible */
-    #tblProductos {
-        width: 100%;
-        min-width: 1500px;
-    }
-
-    #tblProductos th,
-    #tblProductos td {
-        vertical-align: middle;
-        white-space: nowrap;
-    }
-
-    #tblProductos td.descripcion {
-        white-space: normal;
-        max-width: 250px;
-        overflow-wrap: break-word;
-        text-align: left;
-    }
-
-    /* Imagen miniatura */
-    .producto-img {
-        width: 55px;
-        height: 55px;
-        object-fit: cover;
-        border-radius: 8px;
-        border: 2px solid #e9ecef;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
-        transition: transform .2s, box-shadow .2s;
-    }
-
-    .producto-img:hover {
-        transform: scale(1.8);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, .2);
-        z-index: 10;
-        cursor: pointer;
-    }
-
-    .producto-img-placeholder {
-        width: 55px;
-        height: 55px;
-        border-radius: 8px;
-        background: linear-gradient(135deg, #f5f7fa, #e9ecef);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #adb5bd;
-        font-size: 24px;
-        border: 2px dashed #dee2e6;
-    }
-
-    /* Ocultar opción URL y su sección de input */
-    #tipoURL,
-    label[for="tipoURL"],
-    #seccionURL {
-        display: none !important;
-    }
-
-
-</style>
-
-<!-- Endpoint API; el JS lo usa -->
-<script>
-    window.PRODUCTO_API = '<?= $base ?>/?r=admin_productos_api';
-</script>
-
-<script src="<?= $base ?>/assets/js/admin_productos.js?v=5" defer></script>
+    $extra_js = [
+        'assets/js/admin_productos.js?v=6'
+    ];
+    ?>

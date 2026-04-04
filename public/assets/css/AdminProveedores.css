@@ -1,0 +1,8 @@
+  /* Encabezado amarillo */
+  #tblProveedor thead.table-light{
+    --bs-table-bg: #ffc107;
+    --bs-table-color:#fff;
+    --bs-table-border-color: rgba(255,255,255,.25);
+    background:#ffc107!important; color:#fff!important; background-image:none!important;
+  }
+  #tblProveedor thead.table-light th{ color:#fff!important; }

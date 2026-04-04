@@ -127,7 +127,7 @@ body.admin-login button[type="submit"]:active{
 
 /* mensajes */
 body.admin-login .error-msg{
-  background:#fff1f2; color:#991b1b; border:1px solid #fecaca;
+  background:#fff1f2; color:#ff0000; border:1px solid #fecaca;
   padding:10px 12px; border-radius:12px; font-size:14px; margin-bottom:12px; text-align:center;
 }
 

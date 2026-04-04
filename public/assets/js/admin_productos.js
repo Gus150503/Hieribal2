@@ -528,26 +528,29 @@
 
 
            tr.innerHTML = `
-<td>${p.id}</td>
-<td class="fw-semibold">${escapeHtml(p.nombre)}</td>
-<td>${escapeHtml(p.categoria ?? '')}</td>
-<td>${escapeHtml(p.marca ?? '')}</td>
-<td>${escapeHtml(p.presentacion ?? '')}</td>
-<td class="descripcion">${escapeHtml(p.descripcion ?? '')}</td>
-<td>${fmtNumber(p.stock_minimo)}</td>
-<td>${escapeHtml(p.lote ?? '')}</td>
-<td>${escapeHtml(p.f_vencimiento ?? p.fecha_vencimiento ?? '')}</td>
-<td>$${fmtMoney(p.precio_compra)}</td>
-<td>$${fmtMoney(p.precio_venta)}</td>
-<td>${fmtNumber(p.iva)}%</td>
-<td>${escapeHtml(p.codigo_sku ?? p.codigo_barras ?? '')}</td>
-<td>${escapeHtml(p.ubicacion ?? '')}</td>
-<td>${
-        activo
-            ? '<span class="badge bg-success-subtle text-success border">Activo</span>'
-            : '<span class="badge bg-secondary-subtle text-secondary border">Inactivo</span>'
-    }</td>
-<td class="text-center">${imagenHtml}</td>
+                <td>${p.id}</td>
+                <td class="fw-semibold">${escapeHtml(p.nombre)}</td>
+                <td>${escapeHtml(p.categoria ?? '')}</td>
+                <td>${escapeHtml(p.marca ?? '')}</td>
+                <td>${escapeHtml(p.presentacion ?? '')}</td>
+                <td class="descripcion">${escapeHtml(p.descripcion ?? '')}</td>
+                <td>${fmtNumber(p.stock_minimo)}</td>
+                <td>${escapeHtml(p.lote ?? '')}</td>
+                <td>${escapeHtml(p.f_vencimiento ?? p.fecha_vencimiento ?? '')}</td>
+                <td>$${fmtMoney(p.precio_compra)}</td>
+                <td>$${fmtMoney(p.precio_venta)}</td>
+                <td>${p.iva == 1
+                        ? '<span class="badge bg-primary">Con IVA</span>'
+                        : '<span class="badge bg-secondary">Sin IVA</span>'}
+                </td>
+                <td>${escapeHtml(p.codigo_sku ?? p.codigo_barras ?? '')}</td>
+                <td>${escapeHtml(p.ubicacion ?? '')}</td>
+                <td>${
+                        activo
+                            ? '<span class="badge bg-success-subtle text-success border">Activo</span>'
+                            : '<span class="badge bg-secondary-subtle text-secondary border">Inactivo</span>'
+                    }</td>
+                <td class="text-center">${imagenHtml}</td>
 ${accionesHtml}
 `;
 
@@ -1131,3 +1134,81 @@ tblBody?.addEventListener('click', async (e) => {
         if (e.persisted) boot();
     });
 })();
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const ivaSi = document.getElementById("iva_si");
+    const ivaNo = document.getElementById("iva_no");
+    const info = document.getElementById("info_iva");
+    const precioCompra = document.getElementById("precio_compra");
+
+    function formatear(num) {
+        return '$ ' + num.toLocaleString('es-CO', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        });
+    }
+    function calcularIVA() {
+        let precio = parseFloat(precioCompra.value) || 0;
+
+        if (ivaSi.checked) {
+            let neto = Math.round(precio / 1.19);
+            let iva = Math.round(precio - neto);
+
+            info.innerHTML = `
+                IVA (19%): ${formatear(iva)}<br>
+                Precio neto: ${formatear(neto)}
+            `;
+        } else {
+            info.innerHTML = `
+                Neto: ${formatear(precio)}
+            `;
+        }
+    }
+
+    // Eventos
+    ivaSi.addEventListener("change", calcularIVA);
+    ivaNo.addEventListener("change", calcularIVA);
+    precioCompra.addEventListener("input", calcularIVA);
+
+    calcularIVA();
+});
+// ===============================
+// CALCULO GANANCIA
+// ===============================
+const inputCompra = document.getElementById('precio_compra');
+const inputVenta = document.getElementById('precio_venta');
+const mensajeGanancia = document.getElementById('mensajeGanancia');
+
+function calcularGanancia() {
+    const compra = parseFloat(inputCompra.value);
+    const venta = parseFloat(inputVenta.value);
+
+    if (!compra || !venta) {
+        mensajeGanancia.innerHTML = '';
+        mensajeGanancia.className = 'mensaje-ganancia';
+        return;
+    }
+
+    const ganancia = ((venta - compra) / compra) * 100;
+    let texto = '';
+    let clase = '';
+
+    if (ganancia < 0) {
+        texto = `Perdida ${ganancia.toFixed(2)}%`;
+        clase = 'rojo';
+    } else if (ganancia <= 30) {
+        texto = `Ganancia baja: ${ganancia.toFixed(2)}%`;
+        clase = 'amarillo';
+    } else {
+        texto = `Buena ganancia: ${ganancia.toFixed(2)}%`;
+        clase = 'verde';
+    }
+
+    mensajeGanancia.innerHTML = texto;
+    mensajeGanancia.className = `mensaje-ganancia ${clase}`;
+}
+
+// Eventos
+inputCompra.addEventListener('input', calcularGanancia);
+inputVenta.addEventListener('input', calcularGanancia);
