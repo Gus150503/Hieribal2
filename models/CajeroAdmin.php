@@ -193,16 +193,14 @@ public function crearVenta(
 
         $idVenta = (int)$this->db->lastInsertId();
 
-        // ==========================
-        // 5) Insertar DETALLE en `reporte_venta`
-        // ==========================
-        $sqlDet = "INSERT INTO reporte_venta
-                   (numero_factura, producto_id, cantidad, precio, total,
-                    cliente_id, vendedor_id, metodo_pago, fecha, observaciones, created_at)
-                   VALUES
-                   (:nf, :pid, :cant, :precio, :sub,
-                    NULL, :vend, :metodo, NOW(), NULL, NOW())";
-        $stDet = $this->db->prepare($sqlDet);
+            // ==========================
+            // 5) Insertar DETALLE en `detalle_venta`
+            // ==========================
+            $sqlDet = "INSERT INTO detalle_venta
+                    (id_venta, id_producto, cantidad, precio, subtotal)
+                    VALUES
+                    (:idv, :pid, :cant, :precio, :sub)";
+            $stDet = $this->db->prepare($sqlDet);
 
         // ==========================
         // 6) Actualizar STOCK (stock_actual)
@@ -221,18 +219,16 @@ public function crearVenta(
 
             $subtotal = $precio * $cantidad;
 
-            // detalle
+            // ✅ guardar detalle
             $stDet->execute([
-                ':nf'     => $idVenta,
+                ':idv'    => $idVenta,
                 ':pid'    => $idProd,
                 ':cant'   => $cantidad,
                 ':precio' => $precio,
                 ':sub'    => $subtotal,
-                ':vend'   => $idUsuario,
-                ':metodo' => $metodoPago,
             ]);
 
-            // stock
+            // ✅ actualizar stock (esto ya lo tienes)
             $stStock->execute([
                 ':cant' => $cantidad,
                 ':idp'  => $idProd,
@@ -252,49 +248,41 @@ public function crearVenta(
 }
 
 
-
         public function historialPorUsuario(int $idUsuario, int $page, int $per): array
-    {
-        $off = ($page - 1) * $per;
+        {
+            $off = ($page - 1) * $per;
 
-        $sql = "SELECT
-                    v.id_venta,
-                    v.fecha_venta,
-                    v.total,
-                    TRIM(
-                      CONCAT(
-                        COALESCE(v.nombre_cliente, ''),
-                        ' ',
-                        COALESCE(v.apellido_cliente, '')
-                      )
-                    ) AS cliente
-                FROM ventas v
-                INNER JOIN (
-                    SELECT DISTINCT numero_factura
-                    FROM reporte_venta
-                    WHERE vendedor_id = :idu
-                ) rv ON rv.numero_factura = v.id_venta
-                ORDER BY v.fecha_venta DESC
-                LIMIT :off, :per";
+            $sql = "SELECT
+                        v.id_venta,
+                        v.fecha_venta,
+                        v.total,
+                        TRIM(
+                        CONCAT(
+                            COALESCE(v.nombre_cliente, ''),
+                            ' ',
+                            COALESCE(v.apellido_cliente, '')
+                        )
+                        ) AS cliente
+                    FROM ventas v
+                    ORDER BY v.fecha_venta DESC
+                    LIMIT :off, :per";
 
-        $st = $this->db->prepare($sql);
-        $st->bindValue(':idu', $idUsuario, PDO::PARAM_INT);
-        $st->bindValue(':off', (int)$off, PDO::PARAM_INT);
-        $st->bindValue(':per', (int)$per, PDO::PARAM_INT);
-        $st->execute();
-        $items = $st->fetchAll();
+            $st = $this->db->prepare($sql);
+            $st->bindValue(':off', (int)$off, PDO::PARAM_INT);
+            $st->bindValue(':per', (int)$per, PDO::PARAM_INT);
+            $st->execute();
+            $items = $st->fetchAll();
 
-        $sql2 = "SELECT COUNT(DISTINCT numero_factura)
-                 FROM reporte_venta
-                 WHERE vendedor_id = :idu";
-        $st2 = $this->db->prepare($sql2);
-        $st2->bindValue(':idu', $idUsuario, PDO::PARAM_INT);
-        $st2->execute();
-        $total = (int)$st2->fetchColumn();
+            $sql2 = "SELECT COUNT(*) FROM ventas";
+            $total = (int)$this->db->query($sql2)->fetchColumn();
 
-        return ['items' => $items, 'page' => $page, 'per' => $per, 'total' => $total];
-    }
-
+            return [
+                'items' => $items,
+                'page'  => $page,
+                'per'   => $per,
+                'total' => $total
+            ];
+        }
 
         public function obtenerVenta(int $idVenta): ?array
     {
@@ -316,21 +304,22 @@ public function crearVenta(
         return $row ?: null;
     }
 
-public function obtenerDetalleVenta(int $idVenta): array
-{
-    $sql = "SELECT
-                d.producto_id AS id_producto,
-                p.nombre      AS nombre_producto,
-                d.cantidad,
-                d.precio      AS precio_unitario,
-                d.total       AS subtotal
-            FROM reporte_venta d
-            INNER JOIN productos p ON p.id = d.producto_id
-            WHERE d.numero_factura = :id";
-    $st = $this->db->prepare($sql);
-    $st->execute([':id' => $idVenta]);
-    return $st->fetchAll();
-}
+        public function obtenerDetalleVenta(int $idVenta): array
+        {
+            $sql = "SELECT
+                        d.id_producto,
+                        p.nombre AS nombre_producto,
+                        d.cantidad,
+                        d.precio AS precio_unitario,
+                        d.subtotal
+                    FROM detalle_venta d
+                    INNER JOIN productos p ON p.id = d.id_producto
+                    WHERE d.id_venta = :id";
+
+            $st = $this->db->prepare($sql);
+            $st->execute([':id' => $idVenta]);
+            return $st->fetchAll();
+        }
 
 
 

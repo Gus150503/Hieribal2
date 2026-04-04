@@ -16,13 +16,11 @@ final class Carrito
         if (empty($config['db'])) {
             throw new RuntimeException('Configuración de BD no encontrada');
         }
-
-        // 👈 Igual que Cliente.php
         $this->pdo = Database::get($config['db']);
     }
 
     /**
-     * Guarda TODOS los items del carrito.
+     * Guarda el carrito y descuenta del inventario automáticamente
      */
     public function guardar(
         array $items,
@@ -34,55 +32,50 @@ final class Carrito
     ): bool {
         if (empty($items)) return false;
 
-        $sql = "INSERT INTO carrito (
-            id_producto,
-            nombre_producto,
-            cantidad,
-            precio,
-            subtotal,
-            id_cliente,
-            fecha_agregado,
-            telefono_envio,
-            direccion_envio,
-            metodo_pago,
-            notas
+        // SQL para registrar la compra
+        $sqlCarrito = "INSERT INTO carrito (
+            id_producto, nombre_producto, cantidad, precio, subtotal, 
+            id_cliente, fecha_agregado, telefono_envio, direccion_envio, 
+            metodo_pago, notas
         ) VALUES (
-            :id_producto,
-            :nombre_producto,
-            :cantidad,
-            :precio,
-            :subtotal,
-            :id_cliente,
-            NOW(),
-            :telefono_envio,
-            :direccion_envio,
-            :metodo_pago,
-            :notas
+            :id_producto, :nombre_producto, :cantidad, :precio, :subtotal, 
+            :id_cliente, NOW(), :telefono_envio, :direccion_envio, 
+            :metodo_pago, :notas
         )";
 
+        // SQL para descontar del inventario
+        $sqlStock = "UPDATE inventario SET stock = stock - :cantidad WHERE id_producto = :id_p";
 
         try {
             $this->pdo->beginTransaction();
-            $stmt = $this->pdo->prepare($sql);
+            
+            $stmtC = $this->pdo->prepare($sqlCarrito);
+            $stmtS = $this->pdo->prepare($sqlStock);
 
             foreach ($items as $item) {
-                $idProducto = (int)$item['id'];
-                $nombre     = (string)$item['nombre'];
-                $cantidad   = (int)$item['cantidad'];
-                $precio     = (float)$item['precio'];
-                $subtotal   = $precio * $cantidad;
+                $idProd   = (int)$item['id'];
+                $cant     = (int)$item['cantidad'];
+                $prec     = (float)$item['precio'];
+                $subtotal = $prec * $cant;
 
-                $stmt->execute([
-                    ':id_producto'     => $idProducto,
-                    ':nombre_producto' => $nombre,
-                    ':cantidad'        => $cantidad,
-                    ':precio'          => $precio,
+                // 1. Insertar en tabla carrito
+                $stmtC->execute([
+                    ':id_producto'     => $idProd,
+                    ':nombre_producto' => (string)$item['nombre'],
+                    ':cantidad'        => $cant,
+                    ':precio'          => $prec,
                     ':subtotal'        => $subtotal,
                     ':id_cliente'      => $clienteId,
                     ':telefono_envio'  => $telefono,
                     ':direccion_envio' => $direccion,
                     ':metodo_pago'     => $pago,
                     ':notas'           => $notas,
+                ]);
+
+                // 2. Descontar del inventario [Referencia image_c94b7f.png]
+                $stmtS->execute([
+                    ':cantidad' => $cant,
+                    ':id_p'     => $idProd
                 ]);
             }
 
@@ -96,21 +89,10 @@ final class Carrito
 
     public function listar(int $clienteId): array
     {
-        $sql = "SELECT 
-                    id_carrito,
-                    id_producto,
-                    nombre_producto,
-                    cantidad,
-                    precio,
-                    subtotal,
-                    fecha_agregado
-                FROM carrito
-                WHERE id_cliente = :cliente
-                ORDER BY fecha_agregado DESC";
-
+        $sql = "SELECT id_carrito, id_producto, nombre_producto, cantidad, precio, subtotal, fecha_agregado
+                FROM carrito WHERE id_cliente = :cliente ORDER BY fecha_agregado DESC";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':cliente' => $clienteId]);
-
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
