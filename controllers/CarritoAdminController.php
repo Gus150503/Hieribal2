@@ -17,36 +17,18 @@ class CarritoAdminController extends Controller
         }
 
         try {
-            // ============================
-            //  1) OBTENER ID DEL CLIENTE
-            // ============================
-            $clienteId = null;
-
-            // 👇 ESTA es la que vimos en DEBUG_SESSION
-            if (!empty($_SESSION['cliente']['id_cliente'])) {
-                $clienteId = (int)$_SESSION['cliente']['id_cliente'];
-
-                // Dejo estos como fallback por si más adelante usas otros
-            } elseif (!empty($_SESSION['cliente']['id'])) {
-                $clienteId = (int)$_SESSION['cliente']['id'];
-            } elseif (!empty($_SESSION['cliente_id'])) {
-                $clienteId = (int)$_SESSION['cliente_id'];
-            } elseif (!empty($_SESSION['usuario'])) {
-                $clienteId = (int)$_SESSION['usuario'];
-            }
+            // Obtener ID del cliente desde la sesión
+            $clienteId = $_SESSION['cliente']['id_cliente'] ?? $_SESSION['cliente']['id'] ?? $_SESSION['cliente_id'] ?? null;
 
             if (!$clienteId) {
                 echo json_encode(['success' => false, 'msg' => 'Debe iniciar sesión']);
                 return;
             }
 
-            // ============================
-            //  2) OBTENER CARRITO (JSON)
-            // ============================
+            // Obtener datos del JSON enviado por el JS
             $raw  = file_get_contents("php://input");
             $data = json_decode($raw, true);
 
-            // ahora el payload viene como { items: [], telefono, direccion, pago, notas }
             $items     = $data['items'] ?? [];
             $telefono  = trim($data['telefono']  ?? '');
             $direccion = trim($data['direccion'] ?? '');
@@ -59,65 +41,27 @@ class CarritoAdminController extends Controller
             }
 
             $carrito = new Carrito($this->config);
-            $ok      = $carrito->guardar($items, $clienteId, $telefono, $direccion, $pago, $notas);
+            // El modelo ahora descuenta stock automáticamente al guardar
+            $ok = $carrito->guardar($items, (int)$clienteId, $telefono, $direccion, $pago, $notas);
 
             echo json_encode(['success' => $ok]);
         } catch (Throwable $e) {
             echo json_encode([
                 'success' => false,
-                'msg'     => 'Error interno: ' . $e->getMessage()
+                'msg'     => 'Error al procesar la compra: ' . $e->getMessage()
             ]);
         }
     }
 
-    public function pagoInstrucciones(): void
-    {
-        $base   = rtrim((string)($this->config['app']['base_url'] ?? ''), '/');
-        $metodo = $_GET['metodo'] ?? '';
-        $total  = isset($_GET['total']) ? (float)$_GET['total'] : 0.0;
-
-        $this->render(
-            'home/pago_instrucciones',
-            [
-                'metodo'   => $metodo,
-                'total'    => $total,
-                'extra_css' => [$base . '/assets/css/pago_instrucciones.css'],
-            ],
-            'Detalles de pago'
-        );
-    }
-
-
-
-
     public function listar()
     {
         header('Content-Type: application/json; charset=utf-8');
+        if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            session_start();
-        }
-
-        $clienteId = null;
-
-        if (!empty($_SESSION['cliente']['id_cliente'])) {
-            $clienteId = (int)$_SESSION['cliente']['id_cliente'];
-        } elseif (!empty($_SESSION['cliente']['id'])) {
-            $clienteId = (int)$_SESSION['cliente']['id'];
-        } elseif (!empty($_SESSION['cliente_id'])) {
-            $clienteId = (int)$_SESSION['cliente_id'];
-        } elseif (!empty($_SESSION['usuario'])) {
-            $clienteId = (int)$_SESSION['usuario'];
-        }
-
-        if (!$clienteId) {
-            echo json_encode([]);
-            return;
-        }
+        $clienteId = $_SESSION['cliente']['id_cliente'] ?? $_SESSION['cliente']['id'] ?? null;
+        if (!$clienteId) { echo json_encode([]); return; }
 
         $carrito = new Carrito($this->config);
-        $items   = $carrito->listar($clienteId);
-
-        echo json_encode($items);
+        echo json_encode($carrito->listar((int)$clienteId));
     }
 }
