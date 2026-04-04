@@ -200,7 +200,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f0;color:#1a1a1
     <nav class="nav-section">
       <span class="nav-label">Mis compras</span>
       <a href="<?= $base ?>/?r=pedidos" class="nav-item <?= ($seccion ?? '') === 'pedidos' ? 'active' : '' ?>">
-        <span class="nav-icon">📦</span> Mis pedidos
       </a>
       <a href="<?= $base ?>/?r=carrito" class="nav-item <?= ($seccion ?? '') === 'carrito' ? 'active' : '' ?>">
         <span class="nav-icon">🛒</span> Mi carrito
