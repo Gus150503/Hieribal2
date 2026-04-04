@@ -56,7 +56,7 @@
             </div>
 
             <button class="btn-edit">
-                <i class="fas fa-edit"></i> Editar perfil
+                <i class="fas fa-edit"></i> Editar perfil 
             </button>
         </div>
     </div>
