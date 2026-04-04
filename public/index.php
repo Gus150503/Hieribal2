@@ -15,7 +15,7 @@ use Controllers\AdminDevolucionesController;
 use Controllers\CarritoAdminController;
 use Controllers\AdminCajeroController;
 use Controllers\AdminReportesController; 
-use Controllers\PerfilController;  // 👈 agrega esto
+use Controllers\PerfilController; 
 
 /* =============================
  *  ENTORNO Y AUTOLOAD
