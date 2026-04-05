@@ -23,6 +23,22 @@ if ($isAdmin) $bodyClasses[] = 'admin-layout';
 $bodyClassAttr = implode(' ', $bodyClasses);
 
 $ui_tema_fallback = $ui_tema ?? 'light';
+
+/* 3) Contador de pedidos nuevos para el Sidebar */
+$confFinal = $config ?? (isset($this->config) ? $this->config : null);
+$totalNuevos = 0; // Valor por defecto
+
+if ($confFinal) {
+    try {
+        $adminVenta = new \Models\AdminVenta($confFinal);
+        // Forzamos el conteo
+        $totalNuevos = (int)$adminVenta->contarPedidosNuevos();
+    } catch (\Throwable $e) {
+        // Si hay error, puedes descomentar la siguiente línea para ver qué pasa:
+        // echo "Error: " . $e->getMessage(); 
+        $totalNuevos = 0;
+    }
+}
 ?>
 <!doctype html>
 <html lang="es">
