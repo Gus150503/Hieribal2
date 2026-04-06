@@ -34,7 +34,8 @@ $ACL = [
     'configuracion',
     'devoluciones',
     'cajero',
-    'reportes' 
+    'reportes' ,
+    'pedidos_web'
   ],
 
   // 👇 Rol cajero: acceso directo a módulo Cajero + vistas limitadas
@@ -137,6 +138,19 @@ $can = function (string $perm) use ($rol, $ACL): bool {
         </a>
       </li>
     <?php endif; ?>
+
+  <?php if ($can('pedidos_web')): ?>
+  <li class="<?= $active('pedidos_web') ?>">
+    <a href="?r=admin_pedidos_web" class="d-flex align-items-center">
+      <i class="bi bi-cart-check"></i>
+      <span class="label">Pedidos Web</span>
+      
+      <?php if (isset($totalNuevos) && $totalNuevos > 0): ?>
+        <span style="height: 9px; width: 9px; background-color: #fd7e14; border-radius: 50%; display: inline-block; margin-left: 8px; box-shadow: 0 0 5px rgba(253, 126, 20, 0.6);"></span>
+      <?php endif; ?>
+    </a>
+  </li>
+<?php endif; ?>
 
     <?php if ($can('usuarios')): ?>
       <li class="<?= $active('usuarios') ?>">
