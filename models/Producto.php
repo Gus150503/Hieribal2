@@ -12,35 +12,31 @@ final class Producto {
         $this->pdo = Database::get($config['db']);
     }
 
-    /** Obtener todos los productos activos */
+    /** * Obtener productos activos con stock suficiente para la tienda se usa la condición que (Mínimo 10 en inventario)
+     * Esto evita que el cliente compre un producto con el cual no se cuenta en stock
+     */
     public function todos(): array {
         $sql = "SELECT 
-                    id,
-                    nombre,
-                    categoria,
-                    marca,
-                    presentacion,
-                    descripcion,
-                    stock_actual,
-                    stock_minimo,
-                    lote,
-                    f_vencimiento,
-                    precio_compra,
-                    precio_venta,
-                    iva,
-                    codigo_sku,
-                    ubicacion,
-                    estado,
-                    imagen
-                FROM productos
-                WHERE LOWER(estado) = 'activo'
-                ORDER BY nombre ASC";
+                    p.id, 
+                    p.nombre, 
+                    p.categoria, 
+                    p.imagen, 
+                    p.precio_venta,
+                    COALESCE(SUM(i.stock), 0) AS stock_total
+                FROM productos p
+                LEFT JOIN inventario i ON p.id = i.id_producto
+                WHERE LOWER(p.estado) = 'activo'
+                GROUP BY p.id
+                HAVING stock_total >= 10
+                ORDER BY p.nombre ASC";
 
         $st = $this->pdo->query($sql);
         return $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
-    /* ==== AQUÍ VAN LAS OTRAS FUNCIONES QUE YA TENÍAS ==== */
+    /* ==========================================================
+       OTRAS FUNCIONES EXISTENTES (SIN CAMBIOS)
+       ========================================================== */
 
     public function totalActivos(): int {
         $st = $this->pdo->query("SELECT COUNT(*) FROM productos WHERE LOWER(estado)='activo'");
