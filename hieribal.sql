@@ -322,43 +322,6 @@ INSERT INTO `proveedor_producto` (`id`, `proveedor_id`, `producto_id`, `precio_c
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `reporte_venta`
---
-
-CREATE TABLE `reporte_venta` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `numero_factura` varchar(50) NOT NULL,
-  `producto_id` int(11) NOT NULL,
-  `cantidad` int(11) NOT NULL,
-  `precio` decimal(10,2) NOT NULL,
-  `total` decimal(10,2) NOT NULL,
-  `cliente_id` int(11) DEFAULT NULL,
-  `vendedor_id` int(11) NOT NULL,
-  `metodo_pago` varchar(50) DEFAULT NULL,
-  `fecha` date NOT NULL,
-  `observaciones` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `reporte_venta`
---
-
-INSERT INTO `reporte_venta` (`id`, `numero_factura`, `producto_id`, `cantidad`, `precio`, `total`, `cliente_id`, `vendedor_id`, `metodo_pago`, `fecha`, `observaciones`, `created_at`) VALUES
-(1, '5009', 2, 1, 2000.00, 2000.00, NULL, 48, 'efectivo', '2025-12-05', NULL, '2025-12-05 16:53:34'),
-(3, '5005', 2, 1, 2000.00, 2000.00, NULL, 48, 'efectivo', '2025-12-04', NULL, '2025-12-04 15:46:08'),
-(4, '5006', 3, 3, 1200.00, 3600.00, NULL, 48, 'efectivo', '2025-12-04', NULL, '2025-12-04 15:49:12'),
-(5, '5007', 5, 1, 1500.00, 1500.00, NULL, 48, 'efectivo', '2025-12-04', NULL, '2025-12-04 16:02:58'),
-(6, '5008', 2, 3, 2000.00, 6000.00, NULL, 48, 'efectivo', '2025-12-04', NULL, '2025-12-04 16:30:28'),
-(10, '5016', 3, 1, 1200.00, 1200.00, NULL, 48, 'efectivo', '2025-12-05', NULL, '2025-12-05 17:05:36'),
-(11, '5017', 5, 1, 2000.00, 2000.00, NULL, 48, 'efectivo', '2025-12-05', NULL, '2025-12-05 17:06:42'),
-(12, '5018', 4, 1, 2000.00, 2000.00, NULL, 48, 'efectivo', '2025-12-05', NULL, '2025-12-05 23:42:44'),
-(13, '5018', 6, 1, 1500.00, 1500.00, NULL, 48, 'efectivo', '2025-12-05', NULL, '2025-12-05 23:42:44'),
-(14, '1415', 3, 2, 10000.00, 20000.00, 45, 41, 'efectivo', '2025-12-02', 'nada.', '2025-12-11 01:08:50');
-
--- --------------------------------------------------------
-
---
 -- Estructura de tabla para la tabla `usuarios`
 --
 
@@ -493,15 +456,6 @@ ALTER TABLE `proveedor_producto`
   ADD KEY `idx_pp_producto` (`producto_id`);
 
 --
--- Indices de la tabla `reporte_venta`
---
-ALTER TABLE `reporte_venta`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_reporte_producto` (`producto_id`),
-  ADD KEY `fk_reporte_cliente` (`cliente_id`),
-  ADD KEY `fk_reporte_vendedor` (`vendedor_id`);
-
---
 -- Indices de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
@@ -568,12 +522,6 @@ ALTER TABLE `proveedores`
 --
 ALTER TABLE `proveedor_producto`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
-
---
--- AUTO_INCREMENT de la tabla `reporte_venta`
---
-ALTER TABLE `reporte_venta`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `ventas`
