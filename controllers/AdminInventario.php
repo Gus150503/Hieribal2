@@ -330,8 +330,11 @@ final class AdminInventario extends Controller
             throw new \Exception('Los valores de stock y reorden no pueden ser negativos');
         }
         if ($stock_min > $stock_max) {
-            throw new \Exception('El stock mínimo no puede superar el máximo');
+            throw new \Exception('El stock mínimo no puede superar el máximo'); 
         }
+        if ($stock < $stock_min) {
+            throw new \Exception('El stock actual no puede ser menor que el stock mínimo');
+        }   
         if ($stock > $stock_max && $stock_max > 0) {
             throw new \Exception('El stock no puede superar el máximo');
         }

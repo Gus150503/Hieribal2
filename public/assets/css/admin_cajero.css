@@ -1,0 +1,49 @@
+/* ====== Cajero UI ====== */
+
+#tablaCarrito tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+#tablaCarrito input.cj-cant {
+  text-align: center;
+}
+
+#totalVenta {
+  font-weight: bold;
+  color: #198754;
+}
+
+/* Botón guardar */
+#btnGuardarVenta {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Inputs cliente */
+#cliNombre,
+#cliApellido,
+#cliCedula {
+  transition: all 0.2s ease;
+}
+
+#cliNombre:focus,
+#cliApellido:focus,
+#cliCedula:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.1);
+}
+
+/* Historial scroll */
+#tablaHistorial tbody tr:hover {
+  background-color: #f1f3f5;
+}
+
+/* Modal */
+#ventaModal .modal-content {
+  border-radius: 16px;
+}
+
+/* Toast host */
+.toast-host {
+  z-index: 9999;
+}
