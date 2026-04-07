@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 05-04-2026 a las 01:26:16
+-- Tiempo de generación: 07-04-2026 a las 04:34:58
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -163,7 +163,10 @@ CREATE TABLE `detalle_venta` (
 INSERT INTO `detalle_venta` (`id`, `id_venta`, `id_producto`, `cantidad`, `precio`, `subtotal`) VALUES
 (1, 5022, 4, 1, 2000.00, 2000.00),
 (2, 5023, 4, 1, 2000.00, 2000.00),
-(3, 5023, 3, 1, 1200.00, 1200.00);
+(3, 5023, 3, 1, 1200.00, 1200.00),
+(4, 5024, 6, 1, 1500.00, 1500.00),
+(5, 5025, 5, 1, 2000.00, 2000.00),
+(6, 5026, 24, 2, 18000.00, 36000.00);
 
 -- --------------------------------------------------------
 
@@ -191,7 +194,6 @@ CREATE TABLE `devoluciones` (
 --
 
 INSERT INTO `devoluciones` (`id`, `cliente_id`, `proveedor_id`, `producto_id`, `cantidad`, `numero_orden`, `motivo_devolucion`, `origen`, `fecha_compra`, `fecha_devolucion`, `estado`, `observaciones`) VALUES
-(1, 44, NULL, 6, 1, 'ni idea', 'ni idea', 'cliente', '2025-12-05', '2025-12-13', 'aprobada', 'no viene bien'),
 (6, NULL, 5, 13, 1, '78994', 'Tapa abierta', 'interno', '2025-12-04', '2025-12-04', 'pendiente', NULL),
 (7, NULL, 5, 14, 12, '75785', 'Fecha vencida', 'interno', '2025-12-06', '2025-12-07', 'aprobada', NULL),
 (8, NULL, 5, 23, 2, '1232', 'esta vencido', 'interno', '2026-04-05', '2026-04-11', 'aprobada', 'NA');
@@ -236,12 +238,12 @@ CREATE TABLE `inventario` (
 INSERT INTO `inventario` (`id`, `id_producto`, `codigo_interno`, `stock`, `stock_minimo`, `stock_maximo`, `punto_reorden`, `ubicacion`, `estado`) VALUES
 (17, 3, NULL, 12, 0, 0, 0, NULL, 'disponible'),
 (18, 4, 'INV-12-3951', 15, 0, 0, 0, '', 'disponible'),
-(19, 5, NULL, 10, 23, 0, 0, NULL, 'disponible'),
-(20, 6, '555789', 1, 3, 80, 10, 'Mueble 8', 'disponible'),
+(19, 5, NULL, 9, 23, 0, 0, NULL, 'disponible'),
+(20, 6, '555789', 0, 3, 80, 10, 'Mueble 8', 'disponible'),
 (34, 13, 'INV-16-4351', 15, 4, 20, 5, 'Vitrina 8', 'pendiente'),
 (36, 14, 'INV-2-2057', 0, 0, 0, 0, '', 'agotado'),
 (39, 16, 'INV-16-9478', 7, 10, 20, 3, 'Vitrina 1', 'disponible'),
-(43, 24, 'INV-24-1678', 10, 5, 15, 6, 'Vitrina 2', 'pendiente');
+(43, 24, 'INV-24-1678', 8, 5, 15, 6, 'Vitrina 2', 'pendiente');
 
 -- --------------------------------------------------------
 
@@ -278,8 +280,8 @@ INSERT INTO `productos` (`id`, `nombre`, `categoria`, `marca`, `presentacion`, `
 (2, 'Proteína', 'Proteínas', 'Whey', 'En tarro', 'Para ganar masa muscular', 100, 'N/A', '2025-12-11', 80.00, 100000.00, 0.00, '78789878', 'Vitrina 4', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_69330b07e8a319.39923359.png', '2025-08-27 23:37:31', 49),
 (3, 'Menta', 'Hierbas', 'Casera', 'Ramas x manojo', 'Frescura', 100, 'N/A', '2025-12-11', 1000.00, 1200.00, 0.00, NULL, 'Vitrina 1', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_69330a004d3f24.37455647.png', '2025-08-28 14:14:42', 45),
 (4, 'Toronjil', 'Hierbas', 'Casera', 'Ramas x manojo', 'Hierba aromática para nervios', 100, 'N/A', '2025-12-11', 1000.00, 2000.00, 0.00, NULL, 'Vitrina 1', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_6933085d325098.97524870.png', '2025-08-28 14:15:14', 47),
-(5, 'Manzanilla', 'Hierbas', 'Casera', 'Ramas x manojo', 'Aromática', 99, 'N/A', '2025-12-11', 1000.00, 2000.00, 0.00, NULL, 'Vitrina 1', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_693308e292ece7.64431140.png', '2025-08-28 14:15:56', 48),
-(6, 'Diente de leon', 'Hierbas', 'Casera', 'Ramas x manojo', 'Trastornos digestivos leves', 100, 'N/A', '2025-12-11', 500.00, 1500.00, 0.00, NULL, 'Vitrina 1', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_6933094692c640.26469423.png', '2025-08-28 14:15:56', 47),
+(5, 'Manzanilla', 'Hierbas', 'Casera', 'Ramas x manojo', 'Aromática', 99, 'N/A', '2025-12-11', 1000.00, 2000.00, 0.00, NULL, 'Vitrina 1', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_693308e292ece7.64431140.png', '2025-08-28 14:15:56', 47),
+(6, 'Diente de leon', 'Hierbas', 'Casera', 'Ramas x manojo', 'Trastornos digestivos leves', 100, 'N/A', '2025-12-11', 500.00, 1500.00, 0.00, NULL, 'Vitrina 1', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_6933094692c640.26469423.png', '2025-08-28 14:15:56', 46),
 (13, 'Vitamina C', 'Vitaminas', 'Healthy America Colombia SAS', 'Capsula 1000MG', 'ES UN SUPLEMENTO DIETARIO', 2, 'SD2015-0003704', '2025-12-10', 25000.00, 50000.00, 0.00, '565465', 'Mueble 8', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_693309c5a2f846.50062225.png', '2025-12-05 01:01:23', 50),
 (14, 'Oxido de magnesio', 'Minerales', 'Healthy America Colombia SAS', 'Capsula 100 MG', 'Para los huesos', 3, '121323', '2025-12-26', 20000.00, 60000.00, 0.00, '5667676', 'Vitrina 6', 'activo', 'https://hieribal.byethost3.com/public/assets/img/prod_6933099626aa07.24054122.png', '2025-12-05 01:30:20', 50),
 (16, 'Canela', 'Hierbas', 'Casera', 'Polvo X 8 G', 'Cólicos', 5, 'N/A', '2025-12-28', 700.00, 2100.00, 0.00, NULL, 'Mueble3', 'inactivo', 'https://hieribal.byethost3.com/public/assets/img/prod_6932f189aca661.39174005.png', '2025-12-05 14:51:53', 50),
@@ -386,7 +388,6 @@ INSERT INTO `usuarios` (`id_usuario`, `usuario`, `password`, `rol`, `nombres`, `
 
 CREATE TABLE `ventas` (
   `id_venta` int(11) UNSIGNED NOT NULL,
-  `id_carrito` int(11) DEFAULT NULL,
   `total` decimal(10,2) NOT NULL,
   `pago_con` decimal(10,2) DEFAULT NULL,
   `cambio` decimal(10,2) DEFAULT NULL,
@@ -401,21 +402,24 @@ CREATE TABLE `ventas` (
 -- Volcado de datos para la tabla `ventas`
 --
 
-INSERT INTO `ventas` (`id_venta`, `id_carrito`, `total`, `pago_con`, `cambio`, `fecha_venta`, `metodo_pago`, `nombre_cliente`, `apellido_cliente`, `cedula_cliente`) VALUES
-(5005, NULL, 2000.00, 50000.00, 48000.00, '2025-12-04 15:46:08', 'efectivo', 'gustavo', 'cuevas', '1000789324'),
-(5006, NULL, 3600.00, 50000.00, 46400.00, '2025-12-04 15:49:12', 'efectivo', 'gustavo', 'cuevas', '1000789324'),
-(5007, NULL, 1500.00, 60000.00, 58500.00, '2025-12-04 16:02:58', 'efectivo', 'gustavo', 'cuevas', '1000789324'),
-(5008, NULL, 6000.00, 50000.00, 44000.00, '2025-12-04 16:30:28', 'efectivo', 'gustavo', 'cuevas', '1000789324'),
-(5009, NULL, 2000.00, 5000.00, 3000.00, '2025-12-05 16:53:34', 'efectivo', 'gustavo', 'cuevas', '1000789324'),
-(5013, NULL, 2000.00, 2000.00, 0.00, '2025-12-05 16:59:47', 'efectivo', 'Omar', 'Camargo', '1134678626'),
-(5014, NULL, 1500.00, 3000.00, 1500.00, '2025-12-05 17:00:35', 'efectivo', 'Andres', 'González', '1134225746'),
-(5015, NULL, 1200.00, 4000.00, 2800.00, '2025-12-05 17:02:46', 'efectivo', 'cristian', 'cuevas', '1000789322'),
-(5016, NULL, 1200.00, 1200.00, 0.00, '2025-12-05 17:05:36', 'efectivo', 'Maria', 'Ecobar', '2354267777'),
-(5017, NULL, 2000.00, 4000.00, 2000.00, '2025-12-05 17:06:42', 'efectivo', 'Maria', 'Ecobar', '2354267777'),
-(5018, NULL, 3500.00, 50000.00, 46500.00, '2025-12-05 23:42:44', 'efectivo', 'Pepito', 'Perez', '1111111111'),
-(5019, NULL, 2400.00, 5000.00, 2600.00, '2026-04-03 01:48:30', 'efectivo', 'mivh', NULL, '789654123'),
-(5022, NULL, 2000.00, 5000.00, 3000.00, '2026-04-04 22:40:29', 'efectivo', 'Sra', 'dfdg', '2424324324'),
-(5023, NULL, 3200.00, 4000.00, 800.00, '2026-04-04 22:56:49', 'tarjeta', 'JJUan', 'dgregregre', '2345678');
+INSERT INTO `ventas` (`id_venta`, `total`, `pago_con`, `cambio`, `fecha_venta`, `metodo_pago`, `nombre_cliente`, `apellido_cliente`, `cedula_cliente`) VALUES
+(5005, 2000.00, 50000.00, 48000.00, '2025-12-04 15:46:08', 'efectivo', 'gustavo', 'cuevas', '1000789324'),
+(5006, 3600.00, 50000.00, 46400.00, '2025-12-04 15:49:12', 'efectivo', 'gustavo', 'cuevas', '1000789324'),
+(5007, 1500.00, 60000.00, 58500.00, '2025-12-04 16:02:58', 'efectivo', 'gustavo', 'cuevas', '1000789324'),
+(5008, 6000.00, 50000.00, 44000.00, '2025-12-04 16:30:28', 'efectivo', 'gustavo', 'cuevas', '1000789324'),
+(5009, 2000.00, 5000.00, 3000.00, '2025-12-05 16:53:34', 'efectivo', 'gustavo', 'cuevas', '1000789324'),
+(5013, 2000.00, 2000.00, 0.00, '2025-12-05 16:59:47', 'efectivo', 'Omar', 'Camargo', '1134678626'),
+(5014, 1500.00, 3000.00, 1500.00, '2025-12-05 17:00:35', 'efectivo', 'Andres', 'González', '1134225746'),
+(5015, 1200.00, 4000.00, 2800.00, '2025-12-05 17:02:46', 'efectivo', 'cristian', 'cuevas', '1000789322'),
+(5016, 1200.00, 1200.00, 0.00, '2025-12-05 17:05:36', 'efectivo', 'Maria', 'Ecobar', '2354267777'),
+(5017, 2000.00, 4000.00, 2000.00, '2025-12-05 17:06:42', 'efectivo', 'Maria', 'Ecobar', '2354267777'),
+(5018, 3500.00, 50000.00, 46500.00, '2025-12-05 23:42:44', 'efectivo', 'Pepito', 'Perez', '1111111111'),
+(5019, 2400.00, 5000.00, 2600.00, '2026-04-03 01:48:30', 'efectivo', 'mivh', NULL, '789654123'),
+(5022, 2000.00, 5000.00, 3000.00, '2026-04-04 22:40:29', 'efectivo', 'Sra', 'dfdg', '2424324324'),
+(5023, 3200.00, 4000.00, 800.00, '2026-04-04 22:56:49', 'tarjeta', 'JJUan', 'dgregregre', '2345678'),
+(5024, 1500.00, 9999.00, 8499.00, '2026-04-07 02:10:36', 'efectivo', 'gustavo', 'cuevas', '1000789324'),
+(5025, 2000.00, 10000.00, 8000.00, '2026-04-07 02:17:05', 'tarjeta', 'gustavo', 'cuevas', '1000789324'),
+(5026, 36000.00, 90000.00, 54000.00, '2026-04-07 02:17:45', 'tarjeta', 'gustavo', 'cuevas', '1000789324');
 
 --
 -- Índices para tablas volcadas
@@ -506,8 +510,7 @@ ALTER TABLE `usuarios`
 -- Indices de la tabla `ventas`
 --
 ALTER TABLE `ventas`
-  ADD PRIMARY KEY (`id_venta`),
-  ADD KEY `fk_carrito` (`id_carrito`);
+  ADD PRIMARY KEY (`id_venta`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -529,7 +532,7 @@ ALTER TABLE `clientes`
 -- AUTO_INCREMENT de la tabla `detalle_venta`
 --
 ALTER TABLE `detalle_venta`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `devoluciones`
@@ -571,7 +574,7 @@ ALTER TABLE `proveedor_producto`
 -- AUTO_INCREMENT de la tabla `ventas`
 --
 ALTER TABLE `ventas`
-  MODIFY `id_venta` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5024;
+  MODIFY `id_venta` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5027;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
