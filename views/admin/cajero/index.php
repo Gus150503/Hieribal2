@@ -214,5 +214,3 @@ $base = $this->config['app']['base_url'] ?? '';
 <!-- Toasts -->
 <div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
 
-<!-- JS específico de cajero -->
-<script src="<?= $base ?>/assets/js/admin_cajero.js?v=1" defer></script>

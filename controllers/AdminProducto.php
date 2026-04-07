@@ -115,7 +115,7 @@ final class AdminProducto extends Controller
         if ($e instanceof \PDOException && $e->getCode() === '23000') {
             $msg = $e->getMessage();
 
-            // 🔹 FK: producto usado en carrito / otros módulos
+            // FK: producto usado en carrito / otros módulos
             if (
                 stripos($msg, 'fk_carrito_productos') !== false ||
                 stripos($msg, 'foreign key constraint fails') !== false
@@ -125,12 +125,12 @@ final class AdminProducto extends Controller
                      . 'Si no deseas que se siga usando, cámbialo a INACTIVO.';
             }
 
-            // 🔹 SKU duplicado
+            //  SKU duplicado
             if (stripos($msg, 'codigo_sku') !== false) {
                 return 'Ese SKU ya existe. Por favor usa otro código.';
             }
 
-            // 🔹 Otros duplicados
+            // Otros duplicados
             if (stripos($msg, 'duplicate') !== false || stripos($msg, '1062') !== false) {
                 return 'Datos duplicados. Verifica que no estés repitiendo información única.';
             }
@@ -337,19 +337,19 @@ final class AdminProducto extends Controller
                         return;
                     }
 
-                    // 1️⃣ Si está ACTIVO → No permitir borrar
+                    // Si está ACTIVO → No permitir borrar
                     if (isset($row['estado']) && strcasecmp($row['estado'], 'activo') === 0) {
                         $this->fail('No puedes eliminar este producto mientras esté ACTIVO. Cámbialo a INACTIVO primero.');
                         return;
                     }
 
-                    // 2️⃣ Si está INACTIVO pero está en uso → mensaje diferente
+                    // Si está INACTIVO pero está en uso → mensaje diferente
                     if (method_exists($this->model, 'estaEnUso') && $this->model->estaEnUso($id)) {
                         $this->fail('Este producto está INACTIVO pero sigue siendo utilizado en otros registros, por lo que no puede eliminarse.');
                         return;
                     }
 
-                    // 3️⃣ Si está INACTIVO y NO está en uso → se elimina
+                    // Si está INACTIVO y NO está en uso → se elimina
                     $this->model->eliminar($id);
                     $this->ok(['msg' => 'Producto eliminado correctamente']);
                 } catch (\Throwable $ex) {

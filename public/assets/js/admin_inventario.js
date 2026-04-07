@@ -9,9 +9,13 @@
   // =========================
   // Endpoints (usa override del index)
   // =========================
+  // URL base para inventario (permite override desde index.php)
   const apiBase          = window.INVENTARIO_API   || (location.pathname.replace(/\/public\/?$/, '') + '/public/?r=admin_inventario_api');
+   // URL base para productos
   const apiProductosBase = window.PRODUCTO_API     || (location.pathname.replace(/\/public\/?$/, '') + '/public/?r=admin_productos_api');
+   // Función helper para armar URLs del API inventario
   const api          = (params='') => `${apiBase}&${params}`;
+    // Función helper para productos
   const apiProductos = (params='') => `${apiProductosBase}&${params}`;
 
   // =========================
@@ -25,84 +29,34 @@
   // =========================
   const $  = (s) => document.querySelector(s);
   const $$ = (s) => Array.from(document.querySelectorAll(s));
-
+  // Elementos de la tabla
   const tbl       = $('#tblInventario');
   const tblBody   = $('#tblInventario tbody');
+  // Buscador
   const qInput    = $('#qInventario');
   const btnBuscar = $('#btnBuscarInventario');
+  // Paginación
   const perSel    = $('#perPageInventario');
   const pager     = $('#paginadorInventario');
   const totalEl   = $('#totalInventario');
+  // Botón nuevo
   const btnNuevo  = $('#btnNuevoInventario');
-
+  // Modal
   const modal     = $('#modalInventario');
   const modalTit  = $('#modalTitleInventario');
   const frm       = $('#frmInventario');
+  // Select de productos
   const selProd   = $('#producto_id');
 
   // =========================
   // Estilos (toasts, inputs validados, tabla)
   // =========================
-  function ensureUIStyles() {
-    if (document.querySelector('#_nvtoast_css')) return; // evita duplicar
-    const css = document.createElement('style');
-    css.id = '_nvtoast_css';
-    css.textContent = `
-      /* ===== TOASTS ===== */
-      .nvtoast-host{ position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:10px; z-index:99999; pointer-events:none }
-      .nvtoast{ pointer-events:auto; min-width:280px; max-width:420px; padding:10px 12px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,.2); background:#111; color:#fff; display:flex; align-items:center; gap:10px; opacity:.98; transform:translateY(20px); animation:nvtoastSlideIn .2s ease-out forwards; border:1px solid transparent }
-      .nvtoast .nvtoast-close{ margin-left:auto; background:none; border:0; color:#fff; opacity:.85; cursor:pointer }
-      .nvtoast-success{ background:#198754; color:#eafff4; border-color:#198754 } /* crear (verde) */
-      .nvtoast-danger{  background:#dc3545; color:#fff0f1; border-color:#dc3545 }  /* eliminar (rojo) */
-      .nvtoast-warning{ background:#ffc107; color:#3a2f00; border-color:#ffc107 }  /* actualizar (amarillo) */
-      .nvtoast-info{    background:#0d6efd; color:#eaf2ff; border-color:#0d6efd }  /* editar/toggle (azul) */
-      .nvtoast .dot{ width:8px; height:8px; border-radius:50%; background:currentColor; opacity:.85 }
-      @keyframes nvtoastSlideIn{ to{ transform:translateY(0) } }
-      .flash-success{ animation:nvflashGreen .9s ease-in-out }  @keyframes nvflashGreen{ 0%,100%{background:transparent} 30%{background:#e8f8f0} }
-      .flash-danger{  animation:nvflashRed   .9s ease-in-out }  @keyframes nvflashRed  { 0%,100%{background:transparent} 30%{background:#fdecef} }
-
-      /* ===== VALIDACIÓN EN VIVO (como la imagen) ===== */
-      .form-control, .form-select { border-radius: .5rem; }
-      .is-valid.form-control, .is-valid.form-select{
-        border-color:#198754 !important; box-shadow:0 0 0 .2rem rgba(25,135,84,.15) !important;
-        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23198754' class='bi bi-check-lg' viewBox='0 0 16 16'%3E%3Cpath d='M13.485 1.89a.75.75 0 0 1 .025 1.06l-7.25 7.5a.75.75 0 0 1-1.08.02L2.5 8.72a.75.75 0 1 1 1.06-1.06l1.975 1.975 6.72-6.95a.75.75 0 0 1 1.06.205Z'/%3E%3C/svg%3E");
-        background-repeat:no-repeat; background-position:right .8rem center; background-size:16px;
-        padding-right:2.4rem;
-      }
-      .is-invalid.form-control, .is-invalid.form-select{
-        border-color:#dc3545 !important; box-shadow:0 0 0 .2rem rgba(220,53,69,.12) !important;
-        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23dc3545' class='bi bi-exclamation-circle' viewBox='0 0 16 16'%3E%3Cpath d='M7.001 11a1 1 0 1 0 2 0 1 1 0 0 0-2 0z'/%3E%3Cpath d='M7.002 4a.905.905 0 0 1 .998.917l-.35 3.5a.65.65 0 1 1-1.296 0l-.35-3.5A.905.905 0 0 1 7.002 4z'/%3E%3Cpath d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/%3E%3C/svg%3E");
-        background-repeat:no-repeat; background-position:right .8rem center; background-size:16px;
-        padding-right:2.4rem;
-      }
-
-      /* Feedback por defecto oculto */
-          .invalid-feedback{ display:none; }
-          .valid-feedback{ display:none; }
-
-          /* Mostrar SOLO cuando corresponda */
-          .is-invalid ~ .invalid-feedback{ display:block; color:#dc3545; }     /* rojo */
-          .is-valid   ~ .valid-feedback  { display:block; color:#198754; }     /* verde */
-
-          /* Si es válido, ocultar el texto rojo */
-          .is-valid ~ .invalid-feedback{ display:none; }
-
-          /* Si es inválido, ocultar el texto verde (por si lo hubiera) */
-          .is-invalid ~ .valid-feedback{ display:none; }
-
-      /* ===== TABLA moderna (bordes y esquinas) ===== */
-      .table-modern { border-collapse:separate; border-spacing:0; border:1px solid #e9ecef; border-radius: .75rem; overflow:hidden; }
-      .table-modern thead th{ background:#198754; color:#fff; border-bottom:1px solid rgba(255,255,255,.25); }
-      .table-modern tbody tr{ border-bottom:1px solid #eef2f5; }
-      .table-modern tbody tr:last-child{ border-bottom:0; }
-      .table-modern tbody tr:hover{ background:#f8fafb; }
-    `;
-    document.head.appendChild(css);
-
-    // añade clase de estilo a la tabla
-    if (tbl && !tbl.classList.contains('table-modern')) tbl.classList.add('table-modern');
+function ensureUIStyles() {
+  // Solo aseguramos que la tabla tenga la clase
+  if (tbl && !tbl.classList.contains('table-modern')) {
+    tbl.classList.add('table-modern');
   }
-
+}
   // TOAST helpers
   function ensureToastHost() {
     let host = document.querySelector('#nvtoastHost');
@@ -114,12 +68,16 @@
     }
     return host;
   }
+    // Mostrar mensaje tipo toast
   function uiToast(msg, variant='info', ms=3200) {
     try {
       ensureUIStyles();
       const host = ensureToastHost();
       const el = document.createElement('div');
+
+      // Clase según tipo (success, danger, etc.)
       el.className = `nvtoast nvtoast-${variant}`;
+      // Sanitiza texto (evita XSS)
       el.innerHTML = `
         <div class="dot"></div>
         <div class="nvtoast-msg">${(msg ?? '').toString()
@@ -129,13 +87,24 @@
       `;
       host.appendChild(el);
       const close = () => el.remove();
+      
+      // Botón cerrar
       el.querySelector('.nvtoast-close')?.addEventListener('click', close);
+
+      // Auto cierre
       const timer = setTimeout(close, ms);
+
+      // Si el mouse entra, no se cierra
       el.addEventListener('mouseenter', () => clearTimeout(timer), { once:true });
     } catch {
+       // fallback
       alert((variant.toUpperCase()) + ': ' + msg);
     }
   }
+
+  // =========================
+  // MODAL DE CONFIRMACIÓN
+  // =========================
 
   // Confirm modal (usa tu HTML si existe)
   function ensureConfirmModal(){
@@ -159,14 +128,19 @@
     </div>`;
     document.body.appendChild(wrap.firstElementChild);
   }
+    // Función para mostrar confirmación (Promise)
   function uiConfirm({title='Confirmar acción', body='¿Seguro?', confirmText='Sí, continuar', variant='success'} = {}) {
     const modalEl = $('#confirmModal');
+        // Si no hay bootstrap usa confirm normal
     if (!modalEl || !window.bootstrap) return Promise.resolve(confirm(body));
+
+        // Configura textos
     $('#confirmTitle').textContent = title;
     $('#confirmBody').innerHTML = (body ?? '').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;')
                                   .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')
                                   .replace(/\n/g,'<br>');
     const okBtn = $('#btnOkConfirm');
+        // Cambia color del botón según acción
     okBtn.className = 'btn ' + (variant === 'danger' ? 'btn-outline-danger'
                           : variant === 'warning' ? 'btn-outline-secondary'
                           : 'btn-success');
@@ -189,7 +163,9 @@
   // =========================
   // Utilidades
   // =========================
+    // Convierte objeto a FormData
   function formData(obj){ const fd = new FormData(); Object.entries(obj).forEach(([k,v])=>fd.append(k,v)); return fd; }
+    // Convierte respuesta a JSON de forma segura
   async function resToJsonSafe(res){
     try { return await res.json(); }
     catch { return { ok:false, msg:'Respuesta inválida del servidor' }; }
@@ -199,6 +175,8 @@
   // Cache productos
   // =========================
   const productosCache = new Map();
+    // Carga productos y los guarda en memoria
+
   async function precargarProductos() {
     try {
       const res = await fetch(apiProductos('action=list&per=1000'));
@@ -210,8 +188,10 @@
   }
 
   // =========================
-  // Listado + paginación
+  // LISTADO
   // =========================
+
+  // Muestra loading
   function setLoading(on) {
     if (!tblBody) return;
     if (on) {
@@ -258,7 +238,7 @@
   function updateTotal() {
     if (totalEl) totalEl.textContent = `${state.total} registro(s)`;
   }
-
+  // Función principal para listar inventario
   async function listar(page = state.page) {
     state.page = Math.max(1, page|0);
     const q = encodeURIComponent(state.q || '');
@@ -268,6 +248,8 @@
     try {
       const res = await fetch(api(`action=list&q=${q}&page=${state.page}&per=${state.per}`));
       const j   = await resToJsonSafe(res);
+
+      // Evita respuestas viejas
       if (seq !== __SEQ__) return;
 
       const items = j.items || j.data || [];
@@ -300,19 +282,44 @@
     return '<span class="badge bg-success-subtle text-success border">Disponible</span>';
   }
 
+  const alertados = new Set();
+
+  // =========================
+  // RENDER TABLA
+  // =========================
+
   function renderTabla(items) {
     if (!tblBody) return;
     tblBody.innerHTML = '';
     for (const i of items) {
-      const tr = document.createElement('tr');
-      tr.dataset.id = i.id;
 
       const prodId = String(i.producto_id ?? '');
       const prod = productosCache.get(prodId);
       const nombreProducto = prod?.nombre ? escapeHtml(prod.nombre) : `ID: ${escapeHtml(prodId)}`;
+      const stock = +i.stock || 0;
+      const punto = +i.punto_reorden || 0;
+      //REABASTECIMIENTO
+      if (stock <= punto && stock > 0 && !alertados.has(i.id)) {
+        alertados.add(i.id);
+        uiToast(`⚠ Producto "${nombreProducto}" está en punto de reorden`, 'warning', 5000);
+      }
+
+            // Crear fila
+      const tr = document.createElement('tr');
+      tr.dataset.id = i.id;
+      const stockMin = +i.stock_minimo || 0;
+
+
+      const stockMax = +i.stock_maximo || 0;
+      // 🎨 COLORES SEGÚN STOCK
+      if (stock === 0) {
+        tr.style.backgroundColor = '#fdecef'; // rojo suave
+      } else if (stock <= punto) {
+        tr.style.backgroundColor = '#fff3cd'; // amarillo
+      }
 
       const isAgotado = String(i.estado||'').toLowerCase().startsWith('agota');
-
+      // HTML de la fila
       tr.innerHTML = `
         <td>${i.id}</td>
         <td class="fw-semibold">${nombreProducto}</td>
@@ -364,12 +371,16 @@
     state.per = parseInt(e.target.value, 10) || 10;
     listar(1);
   });
+  // =========================
+  // EVENTOS
+  // =========================
 
+  // Buscar
   btnBuscar?.addEventListener('click', () => {
     state.q = qInput?.value.trim() || '';
     listar(1);
   });
-
+  // Enter buscar
   qInput?.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') { e.preventDefault(); state.q = e.target.value.trim(); listar(1); }
   });
@@ -377,14 +388,6 @@
   // =========================
   // Modal Crear/Editar
   // =========================
-  function ensureHidden() {
-    if (!modal) return;
-    modal.classList.remove('show');
-    modal.setAttribute('aria-hidden', 'true');
-    modal.style.display = 'none';
-    document.body.classList.remove('modal-open');
-    $$('.modal-backdrop').forEach(b => b.remove());
-  }
   if (modal && window.bootstrap) {
     ensureHidden();
     const bs = new bootstrap.Modal(modal, { backdrop: 'static' });
@@ -461,21 +464,29 @@
     fillForm(data);
     resetLiveValidation();
     if (modalTit) modalTit.textContent = title || 'Nuevo inventario';
-    ensureHidden();
     if (modal && window.bootstrap) {
-      modal.__getInstance?.().show();
-      setTimeout(() => frm?.querySelector('#producto_id')?.focus(), 120);
+      const bs = bootstrap.Modal.getOrCreateInstance(modal);
+      bs.show();
     } else if (modal) {
       modal.style.display = 'block';
     }
   }
-  function closeEditor(){ if (modal && window.bootstrap) modal.__getInstance?.().hide(); ensureHidden(); }
+  function closeEditor(){
+    if (modal && window.bootstrap) {
+      const bs = bootstrap.Modal.getOrCreateInstance(modal);
+      bs.hide();
+    }
+  }
 
   btnNuevo?.addEventListener('click', async () => {
     await cargarProductosEnSelect();
     openEditor({}, 'Nuevo inventario');
   });
 
+
+    modal.addEventListener('hidden.bs.modal', () => {
+  document.activeElement?.blur();
+});
   // =========================
   // Acciones de tabla
   // =========================
@@ -587,6 +598,10 @@
     });
   }
 
+  // =========================
+  // ENVÍO FORMULARIO
+  // =========================
+
   frm?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -599,7 +614,50 @@
       return;
     }
 
-    const fd   = new FormData(frm);
+      const fd = new FormData(frm);
+
+      // =========================
+      // VALIDACIONES PERSONALIZADAS FUERTES
+      // =========================
+      const stock        = Number(fd.get('stock'));
+      const stockMin     = Number(fd.get('stock_minimo'));
+      const stockMax     = Number(fd.get('stock_maximo'));
+      const puntoReorden = Number(fd.get('punto_reorden'));
+
+      // DEBUG (opcional, para ver si entra)
+      console.log({ stock, stockMin, stockMax });
+
+      // mínimo > máximo
+      if (stockMin > stockMax) {
+        uiToast('El stock mínimo no puede ser mayor que el stock máximo', 'danger');
+        return false;
+      }
+
+      // stock < mínimo
+      if (stock < stockMin) {
+        $('#stock')?.classList.add('is-invalid');
+        $('#stock_minimo')?.classList.add('is-invalid');
+
+        uiToast(`Stock (${stock}) no puede ser menor que mínimo (${stockMin})`, 'danger');
+        return false;
+      }
+
+      // stock > máximo
+      if (stock > stockMax) {
+        $('#stock')?.classList.add('is-invalid');
+        $('#stock_maximo')?.classList.add('is-invalid');
+
+        uiToast(`Stock (${stock}) no puede ser mayor que máximo (${stockMax})`, 'danger');
+        return false;
+      }
+
+      // punto de reorden inválido
+      if (puntoReorden > stockMax) {
+        uiToast('El punto de reorden no puede ser mayor que el stock máximo', 'warning');
+        return false;
+      }
+
+
     const id   = +fd.get('id');
     const isUpdate = !!id;
     const plain = Object.fromEntries(fd.entries());
@@ -650,6 +708,7 @@
     attachLiveValidation();
     precargarProductos().finally(() => listar(1));
   }
+    // Ejecutar al cargar
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
   window.addEventListener('pageshow', (e) => { if (e.persisted) boot(); });
 
