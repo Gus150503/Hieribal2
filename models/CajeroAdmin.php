@@ -50,17 +50,16 @@ class CajeroAdmin
     public function buscarProductos(string $q): array
     {
         $like = '%' . $q . '%';
-
-        // Ajusta columnas: id_producto, nombre_producto, precio_venta, stock, codigo, etc.
-            $sql = "SELECT id_producto,
-                        nombre AS nombre_producto,
-                        precio_venta,
-                        stock_actual AS stock,
-                        codigo
-                    FROM productos
-                    WHERE nombre LIKE :q OR codigo LIKE :q
-                    ORDER BY nombre ASC
-                    LIMIT 30";
+        $sql = "SELECT id_producto,
+                    nombre AS nombre_producto,
+                    precio_venta,
+                    stock_actual AS stock,
+                    codigo
+                FROM productos
+                WHERE (nombre LIKE :q OR codigo LIKE :q)
+                AND stock_actual > 0  /* <--- FILTRO DE STOCK */
+                ORDER BY nombre ASC
+                LIMIT 30";
         $st = $this->db->prepare($sql);
         $st->bindValue(':q', $like, PDO::PARAM_STR);
         $st->execute();
@@ -322,14 +321,15 @@ public function listarProductos(): array
     $sql = "SELECT 
                 id AS id_producto,
                 nombre AS nombre_producto,
-                precio_venta
+                precio_venta,
+                stock_actual /* Sugerencia: traerlo para validación en JS */
             FROM productos
-            WHERE estado = 'activo'
+            WHERE estado = 'activo' 
+              AND stock_actual > 0 /* <--- FILTRO DE STOCK */
             ORDER BY nombre ASC";
 
     $stmt = $this->db->prepare($sql);
     $stmt->execute();
-
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);
 }
 
