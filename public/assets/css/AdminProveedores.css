@@ -1,20 +1,37 @@
-  /* Encabezado amarillo */
-  #tblProveedor thead.table-light{
-    --bs-table-bg: #ffc107;
-    --bs-table-color:#fff;
-    --bs-table-border-color: rgba(255,255,255,.25);
-    background:#ffc107!important; color:#fff!important; background-image:none!important;
-  }
-  #tblProveedor thead.table-light th{ color:#fff!important; }
-
-    css.textContent {
-    .nvtoast-host{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:10px;z-index:1090;pointer-events:none}
-    .nvtoast{pointer-events:auto;min-width:280px;max-width:420px;padding:10px 12px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.18);display:flex;align-items:center;gap:10px;color:#fff;opacity:.98;transform:translateY(20px);animation:_tSlide .2s ease-out forwards;border:1px solid transparent}
-    .nvtoast .close{margin-left:auto;background:none;border:0;color:inherit;opacity:.9;cursor:pointer;font-size:16px;line-height:1}
-    .nvtoast .dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.9}
-    @keyframes _tSlide{to{transform:translateY(0)}}
-    .nv-success{background:#198754;border-color:#198754;color:#EAF6EF}
-    .nv-danger{background:#dc3545;border-color:#dc3545;color:#FFE5E8}
-    .nv-warning{background:#ffc107;border-color:#ffc107;color:#1f1f1f}
-    .nv-info{background:#0d6efd;border-color:#0d6efd;color:#E9F1FF}
+/* Encabezado amarillo */
+#tblProveedor thead.table-light{
+  --bs-table-bg: #ffc107;
+  --bs-table-color:#fff;
+  --bs-table-border-color: rgba(255,255,255,.25);
+  background:#ffc107!important;
+  color:#fff!important;
 }
+#tblProveedor thead.table-light th{
+  color:#fff!important;
+}
+
+/* TOASTS (CORRECTO) */
+.nvtoast-host{
+  position:fixed;
+  right:16px;
+  bottom:16px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  z-index:2000;
+}
+.nvtoast{
+  min-width:280px;
+  max-width:420px;
+  padding:10px 12px;
+  border-radius:12px;
+  box-shadow:0 6px 20px rgba(0,0,0,.18);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:#fff;
+}
+.nv-success{background:#198754;}
+.nv-danger{background:#dc3545;}
+.nv-warning{background:#ffc107; color:#000;}
+.nv-info{background:#0d6efd;}

@@ -229,10 +229,9 @@
 
     /* AQUÍ AGREGAMOS LOS CSS Y JS CORRECTAMENTE PARA EL USO DE LA PLANTILLA*/
     $extra_css = [
-        'assets\css\AdminProveedores.css'
+        'assets/css/AdminProveedores.css'
     ];
 
     $extra_js = [
-        'assets\js\admin_proveedores.js?v=6'
+        'assets/js/admin_proveedores.js?v=7'
     ];
-?>
