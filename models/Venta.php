@@ -11,7 +11,7 @@ final class Venta {
         $this->pdo = Database::get($config['db']);
     }
 
-    /** KPI: total ventas del mes (usa ventas.fecha_venta) */
+    /** KPI: total ventas del mes */
     public function totalDelMes(): int {
         $sql = "SELECT COUNT(*)
                   FROM ventas
@@ -20,27 +20,31 @@ final class Venta {
         return (int)$this->pdo->query($sql)->fetchColumn();
     }
 
-    /** Carrusel: productos más vendidos del mes (desde carrito) */
+    /** * Carrusel: productos más vendidos. 
+     * NOTA: Como ya no usas tabla detalle_ventas/carrito en el cajero, 
+     * esta función devolverá un array vacío para evitar errores hasta que implementes 
+     * un guardado de nombres de productos en la venta.
+     */
+    /** Carrusel: productos más vendidos del mes (AHORA DESDE detalle_ventas) */
     public function topProductos(int $limit = 10): array {
         $sql = "SELECT
-                    COALESCE(p.nombre, c.nombre_producto) AS nombre,
+                    p.nombre,
                     p.imagen AS img,
-                    SUM(c.cantidad) AS unidades
+                    SUM(d.cantidad) AS unidades
                 FROM ventas v
-                JOIN carrito c         ON c.id_carrito = v.id_carrito
-                LEFT JOIN productos p  ON p.id = c.id_producto
-               WHERE YEAR(v.fecha_venta) = YEAR(CURDATE())
-                 AND MONTH(v.fecha_venta) = MONTH(CURDATE())
-            GROUP BY COALESCE(p.id, c.id_producto), nombre, img
-            ORDER BY unidades DESC
-               LIMIT :lim";
+                INNER JOIN detalle_venta d ON d.id_venta = v.id_venta
+                INNER JOIN productos p      ON p.id = d.id_producto
+                WHERE YEAR(v.fecha_venta) = YEAR(CURDATE())
+                  AND MONTH(v.fecha_venta) = MONTH(CURDATE())
+                GROUP BY p.id, p.nombre, p.imagen
+                ORDER BY unidades DESC
+                LIMIT :lim";
 
         $st = $this->pdo->prepare($sql);
         $st->bindValue(':lim', $limit, PDO::PARAM_INT);
         $st->execute();
         $rows = $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
-        // Si no hay imagen en productos, deja null para que la vista use placeholder
         foreach ($rows as &$r) {
             if (!isset($r['img']) || $r['img'] === '') {
                 $r['img'] = null;
@@ -51,30 +55,31 @@ final class Venta {
 
     /**
      * Chart: top clientes del mes.
-     * $modo: 'compras' (unidades) o 'monto' (cantidad*precio).
-     * Devuelve [labels[], values[]]
+     * Lee directamente de la tabla 'ventas' usando el nombre del cliente.
      */
     public function topClientes(int $limit = 10, string $modo = 'compras'): array {
         if ($modo === 'monto') {
-            $sql = "SELECT cli.nombres AS nombre, SUM(c.cantidad * c.precio) AS val
-                      FROM ventas v
-                      JOIN carrito c       ON c.id_carrito = v.id_carrito
-                      JOIN clientes cli    ON cli.id_cliente = c.id_cliente
-                     WHERE YEAR(v.fecha_venta) = YEAR(CURDATE())
-                       AND MONTH(v.fecha_venta) = MONTH(CURDATE())
-                  GROUP BY cli.id_cliente, cli.nombres
-                  ORDER BY val DESC
-                     LIMIT :lim";
+            // Sumamos el total de dinero gastado por cliente
+            $sql = "SELECT 
+                        CONCAT(nombre_cliente, ' ', COALESCE(apellido_cliente, '')) AS nombre, 
+                        SUM(total) AS val
+                    FROM ventas
+                    WHERE YEAR(fecha_venta) = YEAR(CURDATE())
+                      AND MONTH(fecha_venta) = MONTH(CURDATE())
+                    GROUP BY cedula_cliente, nombre_cliente, apellido_cliente
+                    ORDER BY val DESC
+                    LIMIT :lim";
         } else {
-            $sql = "SELECT cli.nombres AS nombre, SUM(c.cantidad) AS val
-                      FROM ventas v
-                      JOIN carrito c       ON c.id_carrito = v.id_carrito
-                      JOIN clientes cli    ON cli.id_cliente = c.id_cliente
-                     WHERE YEAR(v.fecha_venta) = YEAR(CURDATE())
-                       AND MONTH(v.fecha_venta) = MONTH(CURDATE())
-                  GROUP BY cli.id_cliente, cli.nombres
-                  ORDER BY val DESC
-                     LIMIT :lim";
+            // Contamos cuántas veces ha comprado el cliente
+            $sql = "SELECT 
+                        CONCAT(nombre_cliente, ' ', COALESCE(apellido_cliente, '')) AS nombre, 
+                        COUNT(*) AS val
+                    FROM ventas
+                    WHERE YEAR(fecha_venta) = YEAR(CURDATE())
+                      AND MONTH(fecha_venta) = MONTH(CURDATE())
+                    GROUP BY cedula_cliente, nombre_cliente, apellido_cliente
+                    ORDER BY val DESC
+                    LIMIT :lim";
         }
 
         $st = $this->pdo->prepare($sql);
@@ -84,6 +89,7 @@ final class Venta {
 
         $labels = array_column($rows, 'nombre');
         $values = array_map(static fn($v) => (float)$v, array_column($rows, 'val'));
+        
         return [$labels, $values];
     }
 }

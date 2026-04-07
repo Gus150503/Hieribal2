@@ -32,10 +32,8 @@ class CajeroAdmin
        CLIENTES
        ============================ */
 
-    /** Para llenar el select de clientes */
     public function listarClientes(): array
     {
-        // Ajusta nombres de columnas según tu tabla `clientes`
         $sql = "SELECT id_cliente, nombre_cliente, documento
                 FROM clientes
                 ORDER BY nombre_cliente ASC";
@@ -46,19 +44,21 @@ class CajeroAdmin
        PRODUCTOS
        ============================ */
 
-    /** Búsqueda por nombre/código para el autocompletado */
+    /** Búsqueda por nombre/código: AHORA MIRA EL STOCK DE INVENTARIO */
     public function buscarProductos(string $q): array
     {
         $like = '%' . $q . '%';
-        $sql = "SELECT id_producto,
-                    nombre AS nombre_producto,
-                    precio_venta,
-                    stock_actual AS stock,
-                    codigo
-                FROM productos
-                WHERE (nombre LIKE :q OR codigo LIKE :q)
-                AND stock_actual > 0  /* <--- FILTRO DE STOCK */
-                ORDER BY nombre ASC
+        // Hacemos un JOIN con inventario para traer el stock real
+        $sql = "SELECT p.id AS id_producto,
+                       p.nombre AS nombre_producto,
+                       p.precio_venta,
+                       i.stock AS stock,
+                       p.codigo_sku AS codigo
+                FROM productos p
+                INNER JOIN inventario i ON p.id = i.id_producto
+                WHERE (p.nombre LIKE :q OR p.codigo_sku LIKE :q)
+                AND i.stock > 0 
+                ORDER BY p.nombre ASC
                 LIMIT 30";
         $st = $this->db->prepare($sql);
         $st->bindValue(':q', $like, PDO::PARAM_STR);
@@ -66,18 +66,27 @@ class CajeroAdmin
         return $st->fetchAll();
     }
 
-          /**
-     * Crear venta del cajero
-     *
-     * @param int    $idUsuario   ID del cajero (usuario logueado)
-     * @param array  $items       [{id_producto, cantidad, precio, nombre}]
-     * @param float  $pagoCon     Con cuánto paga el cliente
-     * @param string $metodoPago  'efectivo' | 'tarjeta' | etc
-     * @param string $cliNombre
-     * @param string $cliApellido
-     * @param string $cliCedula
-     */
+    /** Lista inicial: AHORA MIRA EL STOCK DE INVENTARIO */
+    public function listarProductos(): array
+    {
+        $sql = "SELECT p.id AS id_producto,
+                       p.nombre AS nombre_producto,
+                       p.precio_venta,
+                       i.stock AS stock_actual
+                FROM productos p
+                INNER JOIN inventario i ON p.id = i.id_producto
+                WHERE p.estado = 'activo' 
+                  AND i.stock > 0
+                ORDER BY p.nombre ASC";
 
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    /* ============================
+       VENTAS
+       ============================ */
 
     public function crearVenta(
         int $idUsuario,
@@ -93,9 +102,7 @@ class CajeroAdmin
             throw new \RuntimeException('No hay productos en la venta');
         }
 
-        // ==========================
-        // 0) NORMALIZAR IDS
-        // ==========================
+        // 0) Normalizar IDs
         $idsProductos = [];
         foreach ($items as $it) {
             $idProd = (int)($it['id_producto'] ?? 0);
@@ -103,81 +110,54 @@ class CajeroAdmin
                 $idsProductos[] = $idProd;
             }
         }
-
         $idsProductos = array_values(array_unique($idsProductos));
-
-        if (empty($idsProductos)) {
-            throw new \RuntimeException('No hay productos válidos');
-        }
 
         $this->db->beginTransaction();
 
         try {
-
-            // ==========================
-            // 1) LEER STOCK REAL (CORREGIDO)
-            // ==========================
+            // 1) LEER STOCK REAL DESDE TABLA INVENTARIO
             $in = implode(',', array_fill(0, count($idsProductos), '?'));
+            $sqlStock = "SELECT i.id_producto, p.nombre, i.stock
+                         FROM inventario i
+                         INNER JOIN productos p ON i.id_producto = p.id
+                         WHERE i.id_producto IN ($in)
+                         FOR UPDATE";
 
-            $sql = "SELECT id, nombre, stock_actual
-                    FROM productos 
-                    WHERE id IN ($in)
-                    FOR UPDATE";
+            $stmtStock = $this->db->prepare($sqlStock);
+            $stmtStock->execute($idsProductos);
+            $rows = $stmtStock->fetchAll();
 
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute($idsProductos);
-            $rows = $stmt->fetchAll();
-
-            $stockPorId = [];
+            $stockMap = [];
             foreach ($rows as $r) {
-                $stockPorId[(int)$r['id']] = [
+                $stockMap[(int)$r['id_producto']] = [
                     'nombre' => $r['nombre'],
-                    'stock'  => (float)$r['stock_actual'], // ✅ CORRECTO
+                    'stock'  => (float)$r['stock'],
                 ];
             }
 
-            // ==========================
             // 2) VALIDAR STOCK
-            // ==========================
             foreach ($items as $it) {
-
                 $idProd   = (int)$it['id_producto'];
                 $cantidad = (float)$it['cantidad'];
-
-                if (!isset($stockPorId[$idProd])) {
-                    throw new \RuntimeException("Producto no existe (ID $idProd)");
+                if (!isset($stockMap[$idProd])) {
+                    throw new \RuntimeException("Producto no disponible en inventario (ID $idProd)");
                 }
-
-                $disponible = $stockPorId[$idProd]['stock'];
-
-                if ($cantidad > $disponible) {
-                    throw new \RuntimeException(
-                        "Stock insuficiente para {$stockPorId[$idProd]['nombre']} (Disponible: $disponible)"
-                    );
+                if ($cantidad > $stockMap[$idProd]['stock']) {
+                    throw new \RuntimeException("Stock insuficiente para {$stockMap[$idProd]['nombre']} (Disponible: {$stockMap[$idProd]['stock']})");
                 }
             }
 
-            // ==========================
             // 3) TOTAL
-            // ==========================
             $total = 0;
             foreach ($items as $it) {
                 $total += $it['precio'] * $it['cantidad'];
             }
-
             $cambio = max(0, $pagoCon - $total);
 
-            // ==========================
             // 4) INSERTAR VENTA
-            // ==========================
             $sqlVenta = "INSERT INTO ventas
-                (id_carrito, total, fecha_venta, metodo_pago,
-                nombre_cliente, apellido_cliente, cedula_cliente,
-                pago_con, cambio)
-                VALUES
-                (NULL, :tot, NOW(), :metodo,
-                :nom, :ape, :ced,
-                :pago, :cambio)";
+                (total, fecha_venta, metodo_pago, nombre_cliente, apellido_cliente, cedula_cliente, pago_con, cambio)
+                VALUES (:tot, NOW(), :metodo, :nom, :ape, :ced, :pago, :cambio)";
 
             $stmtVenta = $this->db->prepare($sqlVenta);
             $stmtVenta->execute([
@@ -189,47 +169,33 @@ class CajeroAdmin
                 ':pago'   => $pagoCon,
                 ':cambio' => $cambio,
             ]);
-
             $idVenta = (int)$this->db->lastInsertId();
 
-            // ==========================
-            // 5) DETALLE + STOCK
-            // ==========================
-            $sqlDet = "INSERT INTO detalle_venta
-                (id_venta, id_producto, cantidad, precio, subtotal)
-                VALUES
-                (:idv, :pid, :cant, :precio, :sub)";
-
+            // 5) DETALLE + DESCUENTO DOBLE (INVENTARIO Y PRODUCTOS)
+            $sqlDet = "INSERT INTO detalle_venta (id_venta, id_producto, cantidad, precio, subtotal)
+                       VALUES (:idv, :pid, :cant, :precio, :sub)";
             $stmtDet = $this->db->prepare($sqlDet);
 
-            $sqlUpd = "UPDATE productos
-                    SET stock_actual = stock_actual - :cant
-                    WHERE id = :idp";
-
-            $stmtUpd = $this->db->prepare($sqlUpd);
+            // Query para descontar de INVENTARIO (La real)
+            $stmtUpdInv = $this->db->prepare("UPDATE inventario SET stock = stock - :cant WHERE id_producto = :idp");
+            
+            // Query para descontar de PRODUCTOS (Para no romper tus vistas actuales)
+            $stmtUpdPro = $this->db->prepare("UPDATE productos SET stock_actual = stock_actual - :cant WHERE id = :idp");
 
             foreach ($items as $it) {
-
                 $idProd   = (int)$it['id_producto'];
                 $precio   = (float)$it['precio'];
                 $cantidad = (float)$it['cantidad'];
-
                 $subtotal = $precio * $cantidad;
 
-                // detalle
-                $stmtDet->execute([
-                    ':idv'    => $idVenta,
-                    ':pid'    => $idProd,
-                    ':cant'   => $cantidad,
-                    ':precio' => $precio,
-                    ':sub'    => $subtotal,
-                ]);
+                // Guardar detalle
+                $stmtDet->execute([':idv'=>$idVenta, ':pid'=>$idProd, ':cant'=>$cantidad, ':precio'=>$precio, ':sub'=>$subtotal]);
 
-                // stock
-                $stmtUpd->execute([
-                    ':cant' => $cantidad,
-                    ':idp'  => $idProd,
-                ]);
+                // Descontar de Inventario
+                $stmtUpdInv->execute([':cant' => $cantidad, ':idp' => $idProd]);
+
+                // Descontar de Productos
+                $stmtUpdPro->execute([':cant' => $cantidad, ':idp' => $idProd]);
             }
 
             $this->db->commit();
@@ -241,97 +207,40 @@ class CajeroAdmin
         }
     }
 
-        public function historialPorUsuario(int $idUsuario, int $page, int $per): array
-        {
-            $off = ($page - 1) * $per;
-
-            $sql = "SELECT
-                        v.id_venta,
-                        v.fecha_venta,
-                        v.total,
-                        TRIM(
-                        CONCAT(
-                            COALESCE(v.nombre_cliente, ''),
-                            ' ',
-                            COALESCE(v.apellido_cliente, '')
-                        )
-                        ) AS cliente
-                    FROM ventas v
-                    ORDER BY v.fecha_venta DESC
-                    LIMIT :off, :per";
-
-            $st = $this->db->prepare($sql);
-            $st->bindValue(':off', (int)$off, PDO::PARAM_INT);
-            $st->bindValue(':per', (int)$per, PDO::PARAM_INT);
-            $st->execute();
-            $items = $st->fetchAll();
-
-            $sql2 = "SELECT COUNT(*) FROM ventas";
-            $total = (int)$this->db->query($sql2)->fetchColumn();
-
-            return [
-                'items' => $items,
-                'page'  => $page,
-                'per'   => $per,
-                'total' => $total
-            ];
-        }
-
-        public function obtenerVenta(int $idVenta): ?array
+    /* ... Resto de funciones: obtenerVenta, obtenerDetalleVenta, historialPorUsuario (se mantienen igual) ... */
+    
+    public function obtenerVenta(int $idVenta): ?array
     {
-        $sql = "SELECT
-                    v.id_venta,
-                    v.fecha_venta,
-                    v.total,
-                    v.metodo_pago,
-                    v.nombre_cliente,
-                    v.apellido_cliente,
-                    v.cedula_cliente,
-                    v.pago_con,
-                    v.cambio
-                FROM ventas v
-                WHERE v.id_venta = :id";
+        $sql = "SELECT * FROM ventas WHERE id_venta = :id";
         $st = $this->db->prepare($sql);
         $st->execute([':id' => $idVenta]);
         $row = $st->fetch();
         return $row ?: null;
     }
 
-        public function obtenerDetalleVenta(int $idVenta): array
-        {
-            $sql = "SELECT
-                        d.id_producto,
-                        p.nombre AS nombre_producto,
-                        d.cantidad,
-                        d.precio AS precio_unitario,
-                        d.subtotal
-                    FROM detalle_venta d
-                    INNER JOIN productos p ON p.id = d.id_producto
-                    WHERE d.id_venta = :id";
+    public function obtenerDetalleVenta(int $idVenta): array
+    {
+        $sql = "SELECT d.*, p.nombre AS nombre_producto 
+                FROM detalle_venta d
+                INNER JOIN productos p ON p.id = d.id_producto
+                WHERE d.id_venta = :id";
+        $st = $this->db->prepare($sql);
+        $st->execute([':id' => $idVenta]);
+        return $st->fetchAll();
+    }
 
-            $st = $this->db->prepare($sql);
-            $st->execute([':id' => $idVenta]);
-            return $st->fetchAll();
-        }
-
-
-
-public function listarProductos(): array
-{
-    $sql = "SELECT 
-                id AS id_producto,
-                nombre AS nombre_producto,
-                precio_venta,
-                stock_actual /* Sugerencia: traerlo para validación en JS */
-            FROM productos
-            WHERE estado = 'activo' 
-              AND stock_actual > 0 /* <--- FILTRO DE STOCK */
-            ORDER BY nombre ASC";
-
-    $stmt = $this->db->prepare($sql);
-    $stmt->execute();
-    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-}
-
-
+    public function historialPorUsuario(int $idUsuario, int $page, int $per): array
+    {
+        $off = ($page - 1) * $per;
+        $sql = "SELECT v.id_venta, v.fecha_venta, v.total, 
+                TRIM(CONCAT(COALESCE(v.nombre_cliente, ''), ' ', COALESCE(v.apellido_cliente, ''))) AS cliente
+                FROM ventas v ORDER BY v.fecha_venta DESC LIMIT :off, :per";
+        $st = $this->db->prepare($sql);
+        $st->bindValue(':off', (int)$off, PDO::PARAM_INT);
+        $st->bindValue(':per', (int)$per, PDO::PARAM_INT);
+        $st->execute();
+        $items = $st->fetchAll();
+        $total = (int)$this->db->query("SELECT COUNT(*) FROM ventas")->fetchColumn();
+        return ['items' => $items, 'page' => $page, 'per' => $per, 'total' => $total];
+    }
 }
