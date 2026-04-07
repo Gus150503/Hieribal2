@@ -106,15 +106,9 @@ function resolverImagen(?string $img, string $base): string
                             </div>
 
                             <!-- Botón Carrito -->
-                            <button onclick="addToCart(
-                            <?= $prod['id'] ?>,
-                            '<?= addslashes($prod['nombre']) ?>',
-                            <?= $prod['precio_venta'] ?>,
-                            '<?= $imgFinal ?>'
-                        )">
-                                🛒 Añadir al carrito
-                            </button>
-                        </div>
+     <button class="btn-comprar-verde" onclick="addToCart(<?= $prod['id'] ?>, '<?= addslashes($prod['nombre']) ?>', <?= $prod['precio_venta'] ?>, '<?= $imgFinal ?>')">
+    🛒 Añadir al carrito
+</button>
 
                     <?php endforeach; ?>
 
