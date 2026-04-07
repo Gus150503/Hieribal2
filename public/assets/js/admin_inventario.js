@@ -51,8 +51,64 @@
   // =========================
   // Estilos (toasts, inputs validados, tabla)
   // =========================
-function ensureUIStyles() {
-  // Solo aseguramos que la tabla tenga la clase
+  function ensureUIStyles() {
+    if (document.querySelector('#_nvtoast_css')) return; // evita duplicar
+    const css = document.createElement('style');
+    css.id = '_nvtoast_css';
+    css.textContent = `
+      /* ===== TOASTS ===== */
+      .nvtoast-host{ position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:10px; z-index:99999; pointer-events:none }
+      .nvtoast{ pointer-events:auto; min-width:280px; max-width:420px; padding:10px 12px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,.2); background:#111; color:#fff; display:flex; align-items:center; gap:10px; opacity:.98; transform:translateY(20px); animation:nvtoastSlideIn .2s ease-out forwards; border:1px solid transparent }
+      .nvtoast .nvtoast-close{ margin-left:auto; background:none; border:0; color:#fff; opacity:.85; cursor:pointer }
+      .nvtoast-success{ background:#198754; color:#eafff4; border-color:#198754 } /* crear (verde) */
+      .nvtoast-danger{  background:#dc3545; color:#fff0f1; border-color:#dc3545 }  /* eliminar (rojo) */
+      .nvtoast-warning{ background:#ffc107; color:#3a2f00; border-color:#ffc107 }  /* actualizar (amarillo) */
+      .nvtoast-info{    background:#0d6efd; color:#eaf2ff; border-color:#0d6efd }  /* editar/toggle (azul) */
+      .nvtoast .dot{ width:8px; height:8px; border-radius:50%; background:currentColor; opacity:.85 }
+      @keyframes nvtoastSlideIn{ to{ transform:translateY(0) } }
+      .flash-success{ animation:nvflashGreen .9s ease-in-out }  @keyframes nvflashGreen{ 0%,100%{background:transparent} 30%{background:#e8f8f0} }
+      .flash-danger{  animation:nvflashRed   .9s ease-in-out }  @keyframes nvflashRed  { 0%,100%{background:transparent} 30%{background:#fdecef} }
+
+      /* ===== VALIDACIÓN EN VIVO (como la imagen) ===== */
+      .form-control, .form-select { border-radius: .5rem; }
+      .is-valid.form-control, .is-valid.form-select{
+        border-color:#198754 !important; box-shadow:0 0 0 .2rem rgba(25,135,84,.15) !important;
+        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23198754' class='bi bi-check-lg' viewBox='0 0 16 16'%3E%3Cpath d='M13.485 1.89a.75.75 0 0 1 .025 1.06l-7.25 7.5a.75.75 0 0 1-1.08.02L2.5 8.72a.75.75 0 1 1 1.06-1.06l1.975 1.975 6.72-6.95a.75.75 0 0 1 1.06.205Z'/%3E%3C/svg%3E");
+        background-repeat:no-repeat; background-position:right .8rem center; background-size:16px;
+        padding-right:2.4rem;
+      }
+      .is-invalid.form-control, .is-invalid.form-select{
+        border-color:#dc3545 !important; box-shadow:0 0 0 .2rem rgba(220,53,69,.12) !important;
+        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23dc3545' class='bi bi-exclamation-circle' viewBox='0 0 16 16'%3E%3Cpath d='M7.001 11a1 1 0 1 0 2 0 1 1 0 0 0-2 0z'/%3E%3Cpath d='M7.002 4a.905.905 0 0 1 .998.917l-.35 3.5a.65.65 0 1 1-1.296 0l-.35-3.5A.905.905 0 0 1 7.002 4z'/%3E%3Cpath d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/%3E%3C/svg%3E");
+        background-repeat:no-repeat; background-position:right .8rem center; background-size:16px;
+        padding-right:2.4rem;
+      }
+
+      /* Feedback por defecto oculto */
+          .invalid-feedback{ display:none; }
+          .valid-feedback{ display:none; }
+
+          /* Mostrar SOLO cuando corresponda */
+          .is-invalid ~ .invalid-feedback{ display:block; color:#dc3545; }     /* rojo */
+          .is-valid   ~ .valid-feedback  { display:block; color:#198754; }     /* verde */
+
+          /* Si es válido, ocultar el texto rojo */
+          .is-valid ~ .invalid-feedback{ display:none; }
+
+          /* Si es inválido, ocultar el texto verde (por si lo hubiera) */
+          .is-invalid ~ .valid-feedback{ display:none; }
+
+      /* ===== TABLA moderna (bordes y esquinas) ===== */
+      .table-modern { border-collapse:separate; border-spacing:0; border:1px solid #e9ecef; border-radius: .75rem; overflow:hidden; }
+      .table-modern thead th{ background:#198754; color:#fff; border-bottom:1px solid rgba(255,255,255,.25); }
+      .table-modern tbody tr{ border-bottom:1px solid #eef2f5; }
+      .table-modern tbody tr:last-child{ border-bottom:0; }
+      .table-modern tbody tr:hover{ background:#f8fafb; }
+    `;
+    document.head.appendChild(css);
+
+    // añade clase de estilo a la tabla
+
   if (tbl && !tbl.classList.contains('table-modern')) {
     tbl.classList.add('table-modern');
   }
@@ -295,7 +351,7 @@ function ensureUIStyles() {
 
       const prodId = String(i.producto_id ?? '');
       const prod = productosCache.get(prodId);
-      const nombreProducto = prod?.nombre ? escapeHtml(prod.nombre) : `ID: ${escapeHtml(prodId)}`;
+      const nombreProducto = i.producto_nombre ? escapeHtml(i.producto_nombre) : `ID: ${escapeHtml(prodId)}`;
       const stock = +i.stock || 0;
       const punto = +i.punto_reorden || 0;
       //REABASTECIMIENTO
@@ -388,6 +444,14 @@ function ensureUIStyles() {
   // =========================
   // Modal Crear/Editar
   // =========================
+    function ensureHidden() {
+    if (!modal) return;
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden', 'true');
+    modal.style.display = 'none';
+    document.body.classList.remove('modal-open');
+    $$('.modal-backdrop').forEach(b => b.remove());
+  }
   if (modal && window.bootstrap) {
     const bs = new bootstrap.Modal(modal, { backdrop: 'static' });
     modal.addEventListener('hidden.bs.modal', () => {
@@ -463,7 +527,9 @@ function ensureUIStyles() {
     fillForm(data);
     resetLiveValidation();
     if (modalTit) modalTit.textContent = title || 'Nuevo inventario';
+     ensureHidden();
     if (modal && window.bootstrap) {
+      
       const bs = bootstrap.Modal.getOrCreateInstance(modal);
       bs.show();
     } else if (modal) {
@@ -629,7 +695,7 @@ function ensureUIStyles() {
       // mínimo > máximo
       if (stockMin > stockMax) {
         uiToast('El stock mínimo no puede ser mayor que el stock máximo', 'danger');
-        return false;
+        return ;
       }
 
       // stock < mínimo
@@ -638,7 +704,7 @@ function ensureUIStyles() {
         $('#stock_minimo')?.classList.add('is-invalid');
 
         uiToast(`Stock (${stock}) no puede ser menor que mínimo (${stockMin})`, 'danger');
-        return false;
+        return ;
       }
 
       // stock > máximo
@@ -647,13 +713,13 @@ function ensureUIStyles() {
         $('#stock_maximo')?.classList.add('is-invalid');
 
         uiToast(`Stock (${stock}) no puede ser mayor que máximo (${stockMax})`, 'danger');
-        return false;
+        return ;
       }
 
       // punto de reorden inválido
       if (puntoReorden > stockMax) {
         uiToast('El punto de reorden no puede ser mayor que el stock máximo', 'warning');
-        return false;
+        return ;
       }
 
 

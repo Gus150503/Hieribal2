@@ -77,18 +77,20 @@ final class UsuarioInventario
 
         // Alias id_producto -> producto_id para el frontend.
         $sql = "SELECT
-                    id,
-                    id_producto AS producto_id,
-                    codigo_interno,
-                    stock,
-                    stock_minimo,
-                    stock_maximo,
-                    punto_reorden,
-                    ubicacion,
-                    estado
-                FROM inventario
+                    i.id,
+                    i.id_producto AS producto_id,
+                    p.nombre AS producto_nombre,
+                    i.codigo_interno,
+                    i.stock,
+                    i.stock_minimo,
+                    i.stock_maximo,
+                    i.punto_reorden,
+                    i.ubicacion,
+                    i.estado
+                FROM inventario i
+                INNER JOIN productos p ON p.id = i.id_producto
                 {$where}
-                ORDER BY id DESC
+                ORDER BY i.id DESC
                 LIMIT ?, ?";
 
         $st = $this->db->prepare($sql);
@@ -137,17 +139,19 @@ final class UsuarioInventario
     {
         $st = $this->db->prepare(
             "SELECT
-                 id,
-                 id_producto AS producto_id,
-                 codigo_interno,
-                 stock,
-                 stock_minimo,
-                 stock_maximo,
-                 punto_reorden,
-                 ubicacion,
-                 estado
-             FROM inventario
-             WHERE id = :id"
+                i.id,
+                i.id_producto AS producto_id,
+                p.nombre AS producto_nombre,
+                i.codigo_interno,
+                i.stock,
+                i.stock_minimo,
+                i.stock_maximo,
+                i.punto_reorden,
+                i.ubicacion,
+                i.estado
+            FROM inventario i
+            INNER JOIN productos p ON p.id = i.id_producto
+            WHERE i.id = :id"
         );
 
         $st->execute([':id' => $id]);
