@@ -164,7 +164,7 @@ final class AdminCajeroController extends Controller
             }
 
             /* CREAR VENTA */
-if ($m === 'POST' && $action === 'crear_venta') {
+        if ($m === 'POST' && $action === 'crear_venta') {
     try {
         $idUsuario = $this->currentAdminId();
         if ($idUsuario <= 0) {
@@ -177,8 +177,8 @@ if ($m === 'POST' && $action === 'crear_venta') {
         $cliApellido = trim((string)($_POST['cli_apellido'] ?? ''));
         $cliCedula   = trim((string)($_POST['cli_cedula']   ?? ''));
 
-        if ($cliNombre === '' || $cliCedula === '') {
-            $this->fail('Nombre y cédula del cliente son obligatorios.');
+        if ($cliNombre === '' || $cliApellido === '' || $cliCedula === '') {
+            $this->fail('Nombre, apellido y cédula del cliente son obligatorios.');
             return;
         }
 
