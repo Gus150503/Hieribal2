@@ -849,3 +849,24 @@ textarea {
     display: block;
     margin-bottom: 4px;
 }
+/* Estilo infalible para el botón de añadir */
+.btn-comprar-verde {
+    background-color: #6FBC43 !important;
+    background: linear-gradient(135deg, #6FBC43 0%, #5da636 100%) !important;
+    color: white !important;
+    border: none !important;
+    padding: 10px 15px !important;
+    border-radius: 8px !important;
+    font-weight: bold !important;
+    width: 100% !important;
+    cursor: pointer !important;
+    display: block !important;
+    margin-top: 10px !important;
+    transition: all 0.3s ease !important;
+    text-align: center !important;
+}
+
+.btn-comprar-verde:hover {
+    background-color: #5da636 !important;
+    transform: scale(1.02) !important;
+}

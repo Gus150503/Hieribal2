@@ -16,9 +16,10 @@ use Controllers\CarritoAdminController;
 use Controllers\AdminCajeroController;
 use Controllers\AdminReportesController; 
 use Controllers\PerfilController; 
+use Controllers\PedidosWebController; // <--- Importación añadida
 
 /* =============================
- *  ENTORNO Y AUTOLOAD
+ * ENTORNO Y AUTOLOAD
  * ============================= */
 
 define('APP_ENV', 'local');
@@ -136,18 +137,18 @@ $adminA = new AdminAuthController($config);
 $adminD = new AdminDashboardController($config);
 
 /* =============================
- *           ROUTER
+ * ROUTER
  * ============================= */
 $r = $_GET['r'] ?? 'home';
 $r = trim(str_replace('/', '_', $r), '_');
 
 /* ==================================================
- *  BLOQUEO GLOBAL: PERFIL INCOMPLETO (POST GOOGLE)
+ * BLOQUEO GLOBAL: PERFIL INCOMPLETO (POST GOOGLE)
  * ================================================== */
 $publicRoutes = [
     'home',
     'dashboard',
-    'pago_instrucciones', // puedes dejar home libre para mostrar el modal
+    'pago_instrucciones', 
     'login',
     'do_login',
     'register',
@@ -226,7 +227,6 @@ switch ($r) {
         $auth->googleCallback();
         break;
 
-    // 🔒 PERFIL OBLIGATORIO POST GOOGLE (AJAX)
     case 'completar_perfil':
         $auth->completarPerfil();
         break;
@@ -374,6 +374,20 @@ switch ($r) {
         (new AdminReportesController($config))->devolucionesExcel();
         break;
 
+    /* ====== NUEVA RUTA: PEDIDOS WEB ====== */
+    case 'admin_pedidos_web':
+        (new PedidosWebController($config))->index();
+        break;
+
+        // Ejemplo de cómo suele estar en tu sistema:
+    case 'admin_pedidos_despachar_ajax':
+        (new \Controllers\PedidosWebController($config))->despacharAjax();
+        break;
+    // Dentro de tu switch($route) o lógica de rutas:
+    case 'admin_pedidos_despachar_ajax':
+        $controller = new \Controllers\PedidosWebController($config);
+        $controller->despacharAjax();
+        break;
     /* ====== 404 ====== */
     default:
         http_response_code(404);
