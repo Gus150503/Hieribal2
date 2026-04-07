@@ -10,8 +10,7 @@
   // ==============================
   // CONFIGURACIÓN BASE API
   // ==============================
-  const API_BASE = window.PROVEEDOR_API;
-    (location.pathname.replace(/\/public\/?$/, '') + '/public/?r=admin_proveedores_api');
+  const API_BASE = window.PROVEEDOR_API || (location.pathname.replace(/\/public\/?$/, '') + '/public/?r=admin_proveedores');
   const api = (params = '') => `${API_BASE}&${params}`;
 
   // ==============================
@@ -62,6 +61,20 @@
     }
     return host;
   }
+
+  function ensureToastCSS() {
+    if (document.getElementById('_prov_toast_css')) return;
+    const css = document.createElement('style');
+    css.id = '_prov_toast_css';
+    css.textContent = `
+      .nvtoast-host{ position:fixed; right:20px; bottom:20px; display:flex; flex-direction:column; gap:10px; z-index:2000; }
+      .nvtoast{ min-width:250px; background:#333; color:#fff; padding:12px 15px; border-radius:8px; display:flex; align-items:center; gap:10px; box-shadow:0 4px 12px rgba(0,0,0,.2); animation: _nvIn .3s ease; }
+      .nv-success{ background:#198754; } .nv-danger{ background:#bb2d3b; } .nv-warning{ background:#ffca2c; color:#000; } .nv-info{ background:#0dcaf0; color:#000; }
+      @keyframes _nvIn { from{ transform:translateX(100%); opacity:0; } to{ transform:translateX(0); opacity:1; } }
+    `;
+    document.head.appendChild(css);
+  }
+
   function uiToast(msg, variant = 'info', ms = 3200) {
     ensureToastCSS();
     const host = ensureToastHost();
@@ -633,11 +646,18 @@
   });
 
   // ========= INIT =========
-  function boot(){
+function boot(){
     ensureToastCSS();
     ensureConfirmModal();
     ensureFieldStyles();
     colorizeHeaderProveedores();
+    
+    // Inicialización del modal para evitar errores
+    const modalEl = document.getElementById('modalProveedor');
+    if (modalEl && window.bootstrap) {
+        bsModal = new bootstrap.Modal(modalEl, { backdrop: 'static' });
+    }
+
     listar(1);
   }
 

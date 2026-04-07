@@ -389,7 +389,6 @@ function ensureUIStyles() {
   // Modal Crear/Editar
   // =========================
   if (modal && window.bootstrap) {
-    ensureHidden();
     const bs = new bootstrap.Modal(modal, { backdrop: 'static' });
     modal.addEventListener('hidden.bs.modal', () => {
       fillForm({});
@@ -701,13 +700,17 @@ function ensureUIStyles() {
   // =========================
   // Init
   // =========================
-  function boot(){
-    ensureUIStyles();
-    ensureConfirmModal();
-    ensureHidden();
-    attachLiveValidation();
-    precargarProductos().finally(() => listar(1));
-  }
+    function boot(){
+      ensureUIStyles();
+      ensureConfirmModal();
+      attachLiveValidation();
+
+      // Cargar productos sin bloquear inventario
+      precargarProductos().catch(() => {});
+
+      // SIEMPRE cargar tabla
+      listar(1);
+    }
     // Ejecutar al cargar
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
   window.addEventListener('pageshow', (e) => { if (e.persisted) boot(); });
