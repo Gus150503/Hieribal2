@@ -88,33 +88,33 @@ final class Producto {
         return $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
-    public function porAcabarse(int $limit = 10, int $umbral = 5): array {
-        $sql = "
-            SELECT 
-                p.nombre,
-                COALESCE(SUM(i.stock), 0) AS stock
-            FROM productos p
-            LEFT JOIN inventario i 
-                ON i.id_producto = p.id 
-               AND (i.estado IS NULL OR i.estado = 'disponible')
-            WHERE LOWER(p.estado) = 'activo'
-            GROUP BY p.id, p.nombre
-            HAVING stock > 0 AND stock <= :u
-            ORDER BY stock ASC, p.nombre ASC
-            LIMIT :lim
-        ";
-        $st = $this->pdo->prepare($sql);
-        $st->bindValue(':u', $umbral, PDO::PARAM_INT);
-        $st->bindValue(':lim', $limit, PDO::PARAM_INT);
-        $st->execute();
+public function porAcabarse(int $limit = 10, int $umbral = 10): array {
+    $sql = "
+        SELECT 
+            p.nombre,
+            COALESCE(SUM(i.stock), 0) AS stock
+        FROM productos p
+        LEFT JOIN inventario i ON i.id_producto = p.id 
+        WHERE LOWER(p.estado) = 'activo'
+        GROUP BY p.id, p.nombre
+        -- CAMBIO AQUÍ: Permitimos que salgan los de stock 0 y subimos el rango
+        HAVING stock <= :u 
+        ORDER BY stock ASC, p.nombre ASC
+        LIMIT :lim
+    ";
+    
+    $st = $this->pdo->prepare($sql);
+    $st->bindValue(':u', $umbral, PDO::PARAM_INT);
+    $st->bindValue(':lim', $limit, PDO::PARAM_INT);
+    $st->execute();
 
-        $rows = $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $rows = $st->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
-        return [
-            array_column($rows, 'nombre'),
-            array_map('intval', array_column($rows, 'stock')),
-        ];
-    }
+    return [
+        array_column($rows, 'nombre'),
+        array_map('intval', array_column($rows, 'stock')),
+    ];
+}
 
     public function porPedir(int $limit = 10): array {
         $sql = "
