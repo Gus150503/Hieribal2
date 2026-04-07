@@ -1,182 +1,298 @@
-/* ===================================================
-   1. LIMPIEZA DE INTERFAZ (BORRAR BARRAS SOBRANTES)
-   =================================================== */
-header, 
-.navbar-top, 
-.site-header, 
-.navbar,
-button.navbar-toggler { 
+/* ELIMINAR NAVBAR SUPERIOR Y AJUSTE DE LAYOUT */
+header, .navbar, nav:not(.nav-group) { 
     display: none !important; 
-    height: 0 !important;
-    visibility: hidden !important;
 }
 
-/* ===================================================
-   2. ESTRUCTURA PRINCIPAL (SIDEBAR + CONTENIDO)
-   =================================================== */
-.hp-layout {
-    display: grid;
-    grid-template-columns: 260px 1fr; /* Espacio fijo para el menú lateral */
+.hp-layout { 
+    display: flex; 
     min-height: 100vh;
-    background: #f8faf9;
+    width: 100vw; /* Asegura que ocupe todo el ancho de pantalla */
+    margin: 0;
+    padding: 0;
 }
 
-/* SIDEBAR IZQUIERDO (EL MENÚ) */
-.sidebar {
-    background-color: #ffffff;
-    border-right: 1px solid #eee;
-    padding: 25px;
-    display: flex !important;
-    flex-direction: column;
-    gap: 10px;
+.perfil-dashboard { 
+    flex-grow: 1; 
+    padding: 30px; 
+    max-width: calc(100% - 280px); /* Evita que el contenido se desborde */
+    background: var(--bg-main);
 }
 
-/* CONTENEDOR DEL DASHBOARD */
-.perfil-dashboard {
-    flex: 1;
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    margin-top: 0 !important;
+/* ==========================================================
+   CONFIGURACIÓN Y VARIABLES
+   ========================================================== */
+:root {
+    --primary: #1D9E75;
+    --bg-main: #f8faf9;
+    --text-main: #1a1a1a;
+    --card-bg: #ffffff;
+    --border: rgba(0,0,0,0.08);
+    --shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-/* ===================================================
-   3. TARJETAS DE ESTADÍSTICAS (SUPERIORES)
-   =================================================== */
-.stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
+/* Modo Oscuro Activado */
+body.dark-mode {
+    --bg-main: #121212;
+    --text-main: #e0e0e0;
+    --card-bg: #1e1e1e;
+    --border: rgba(255,255,255,0.1);
 }
 
-.stat-card {
-    background: white;
-    padding: 20px;
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    transition: background 0.3s, color 0.3s; 
+}
+
+body { 
+    font-family: 'Segoe UI', sans-serif; 
+    background: var(--bg-main); 
+    color: var(--text-main); 
+    overflow-x: hidden; 
+}
+
+/* ==========================================================
+   SIDEBAR (CORREGIDO)
+   ========================================================== */
+.hp-layout { 
+    display: flex; 
+    min-height: 100vh;
+    width: 100%;
+}
+
+.sidebar { 
+    width: 280px;
+    background: var(--primary); 
+    color: white; 
+    padding: 40px 20px; 
+    display: flex; 
+    flex-direction: column; 
+    position: sticky; 
+    top: 0; 
+    height: 100vh; 
+    flex-shrink: 0; 
+    z-index: 100;
+}
+
+.sidebar-logo { 
+    background: white; 
+    padding: 10px; 
+    border-radius: 12px; 
+    margin-bottom: 30px; 
+    text-align: center; 
+}
+
+.sidebar-logo img {
+    max-width: 180px;
+    height: auto;
+}
+
+.profile-mini-side { 
+    margin-bottom: 30px; 
+    text-align: center; 
+}
+
+.profile-ava-big { 
+    width: 85px; 
+    height: 85px; 
+    border-radius: 50%; 
+    border: 3px solid white; 
+    margin: 0 auto 15px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 32px; 
+    font-weight: bold;
+    background: rgba(255,255,255,0.2); 
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+}
+
+.profile-ava-big img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+}
+
+.user-name-side {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    word-wrap: break-word;
+}
+
+.pro-badge {
+    font-size: 10px;
+    background: rgba(255,255,255,0.2);
+    padding: 2px 8px;
     border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.nav-group { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 10px; 
+}
+
+.nav-link-custom { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    padding: 12px 15px; 
+    color: rgba(255,255,255,0.85); 
+    text-decoration: none; 
+    border-radius: 10px; 
+    font-size: 15px;
+}
+
+.nav-link-custom:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.nav-link-custom.active { 
+    background: white; 
+    color: var(--primary); 
+    font-weight: bold; 
+}
+
+.logout-style { 
+    margin-top: auto; 
+    color: #ffb3b3; 
+    padding-top: 20px; 
+    border-top: 1px solid rgba(255,255,255,0.1); 
+}
+
+/* ==========================================================
+   DASHBOARD (CONTENIDO)
+   ========================================================== */
+.perfil-dashboard { 
+    flex-grow: 1; 
+    padding: 30px; 
+    max-width: calc(100% - 280px);
+}
+
+.page-title {
+    margin-bottom: 25px;
+    font-size: 22px;
+}
+
+.stats-row { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 20px; 
+    margin-bottom: 30px; 
+}
+
+.stat-card { 
+    background: var(--card-bg); 
+    padding: 20px; 
+    border-radius: 15px; 
+    box-shadow: var(--shadow); 
+    border: 1px solid var(--border); 
+    text-align: center;
 }
 
 .stat-label {
-    font-size: 12px;
-    color: #6b7c74;
+    font-size: 13px;
+    color: #666;
+    display: block;
     margin-bottom: 5px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
-.stat-num {
-    font-size: 24px;
-    font-weight: 700;
+body.dark-mode .stat-label { color: #aaa; }
+
+.stat-num { 
+    font-size: 24px; 
+    font-weight: 800; 
+    color: var(--text-main); 
 }
 
-.green { color: #1a6b3c; }
-.gold { color: #c8960c; }
+.gold { color: #BA7517 !important; }
 
-/* ===================================================
-   4. SECCIÓN MEDIA (GRÁFICA Y PERFIL)
-   =================================================== */
-.mid-row {
-    display: grid;
-    grid-template-columns: 1.6fr 1fr; /* Gráfica más ancha que el perfil */
-    gap: 20px;
+.mid-row { 
+    display: grid; 
+    grid-template-columns: 1.6fr 1.2fr; 
+    gap: 25px; 
+    margin-bottom: 30px; 
 }
 
-.card {
-    background: white;
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+.card { 
+    background: var(--card-bg); 
+    padding: 25px; 
+    border-radius: 15px; 
+    box-shadow: var(--shadow); 
+    border: 1px solid var(--border); 
 }
 
-/* Ajuste para que la gráfica no se vea pequeña */
-.chart-wrap {
-    height: 300px;
-    width: 100%;
-    position: relative;
-}
-
-/* ===================================================
-   5. PERFIL Y BOTONES
-   =================================================== */
-.profile-mini {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+.card-title {
     margin-bottom: 20px;
+    font-size: 16px;
 }
 
-/* Círculo de la foto */
-.profile-ava-big {
-    width: 65px;
-    height: 65px;
-    border-radius: 50%;
-    background: #2d9e5f;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 22px;
-    font-weight: bold;
-    cursor: pointer;
-    overflow: hidden;
-    border: 2px solid transparent;
-    transition: 0.3s;
+.chart-wrap { 
+    width: 100%; 
+    height: 300px; 
+    position: relative; 
 }
 
-.profile-ava-big:hover {
-    border-color: #1a6b3c;
-    filter: brightness(0.9);
-}
-
-.profile-name {
-    font-weight: 700;
-    font-size: 18px;
-    color: #333;
-}
-
-.profile-role {
-    font-size: 12px;
-    color: #2d9e5f;
-    font-weight: 600;
-}
-
+/* DATOS PERSONALES */
 .pf-row {
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid #f9f9f9;
-    font-size: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
 }
 
 .pf-label {
-    color: #888;
+    color: #666;
 }
 
-/* BOTÓN GUARDAR CAMBIOS */
-.btn-edit {
-    width: 100%;
-    margin-top: 20px;
-    padding: 12px;
-    border: none;
-    background: #1a6b3c;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
+body.dark-mode .pf-label { color: #aaa; }
+
+/* BOTONES */
+.btn-dark-mode { 
+    width: 100%; 
+    margin-top: 20px; 
+    padding: 12px; 
+    border: none; 
+    background: #333; 
+    color: white; 
+    border-radius: 10px; 
+    cursor: pointer; 
+    font-weight: bold; 
     font-size: 14px;
-    transition: background 0.3s;
 }
 
-.btn-edit:hover {
-    background: #14522d;
+.btn-dark-mode:hover {
+    background: #444;
 }
 
-/* ===================================================
-   6. RESPONSIVE (OPCIONAL)
-   =================================================== */
-@media (max-width: 992px) {
-    .hp-layout { grid-template-columns: 1fr; }
-    .sidebar { display: none !important; }
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+@media (max-width: 1100px) {
     .mid-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) {
+    .hp-layout { flex-direction: column; }
+    .sidebar { 
+        width: 100%; 
+        height: auto; 
+        position: sticky; 
+        top: 0; 
+        padding: 10px 20px; 
+        flex-direction: row; 
+        justify-content: space-between;
+        align-items: center;
+    }
+    .perfil-dashboard { 
+        max-width: 100%; 
+        padding: 20px;
+    }
+    .sidebar-logo, .profile-mini-side, .logout-style, .nav-text { display: none; }
+    .nav-group { flex-direction: row; gap: 20px; }
+    .stats-row { grid-template-columns: 1fr; }
 }

@@ -870,3 +870,63 @@ textarea {
     background-color: #5da636 !important;
     transform: scale(1.02) !important;
 }
+
+/* ============================================================
+   SOLO AJUSTES DE BOTONES (Sin tocar el resto del diseño)
+   ============================================================ */
+
+/* 1. Ajuste del contenedor de botones en el modal para que no se peguen */
+.modal-buttons {
+    display: flex;             /* Alineación en línea */
+    justify-content: center;    /* Centra los botones */
+    gap: 15px;                  /* Espacio de separación entre botones */
+    margin-top: 20px;           /* Espacio con respecto al formulario */
+}
+
+/* 2. Botón de Añadir y Confirmar (Verde) */
+.btn-comprar-verde {
+    background-color: #6FBC43 !important;
+    background: linear-gradient(135deg, #6FBC43 0%, #5da636 100%) !important;
+    color: white !important;
+    border: none !important;
+    padding: 10px 20px !important; /* Relleno equilibrado */
+    border-radius: 25px !important; /* Más redondeado y estético */
+    font-weight: bold !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    text-align: center !important;
+    flex: 1;                        /* Hace que midan lo mismo en el modal */
+    max-width: 200px;               /* Evita que se vea gigante/estirado */
+    width: auto !important;         /* Sobrescribe anchos automáticos */
+}
+
+/* 3. Botón de Cancelar (Gris) */
+.btn-cancelar-gris {
+    background-color: #6c757d;      /* Color gris neutro */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;            /* Redondeado igual al verde */
+    font-weight: bold;
+    cursor: pointer;
+    flex: 1;                        /* Simetría con el botón verde */
+    max-width: 200px;               /* Tamaño controlado */
+    transition: background 0.3s;
+}
+
+/* Efectos al pasar el mouse */
+.btn-comprar-verde:hover {
+    background-color: #5da636 !important;
+    transform: translateY(-2px);
+}
+
+.btn-cancelar-gris:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+
+/* Ajuste para que en los productos de la grilla el botón sí ocupe el ancho necesario */
+.product-card .btn-comprar-verde {
+    max-width: 100%;                /* En la tarjeta del producto sí puede ser ancho */
+    border-radius: 8px !important;  /* Un poco menos redondeado en la grilla para que cuadre mejor */
+}
