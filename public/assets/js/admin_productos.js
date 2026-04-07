@@ -76,6 +76,24 @@
         return host;
     }
 
+    function ensureToastCSS() {
+        if (document.getElementById('nv-toast-style')) return;
+        const style = document.createElement('style');
+        style.id = 'nv-toast-style';
+        style.textContent = `
+            .nvtoast-host { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+            .nvtoast { background: #333; color: #fff; padding: 12px 20px; border-radius: 12px; display: flex; align-items: center; gap: 10px; box-shadow: 0 6px 20px rgba(0,0,0,0.2); pointer-events: auto; animation: slideInProd 0.3s ease-out; border: 1px solid rgba(255,255,255,0.1); }
+            .nv-success { background: #0f5132; color: #d1f7e5; }
+            .nv-danger { background: #842029; color: #ffd7db; }
+            .nv-warning { background: #664d03; color: #fff3cd; }
+            .nv-info { background: #055160; color: #cff4fc; }
+            .nvtoast .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+            .nvtoast .close { background: none; border: none; color: currentColor; cursor: pointer; opacity: 0.5; margin-left: auto; }
+            @keyframes slideInProd { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        `;
+        document.head.appendChild(style);
+    }
+
     function uiToast(msg, variant = 'info', ms = 3200) {
    // Muestra mensaje tipo toast
         ensureToastCSS();
@@ -932,7 +950,6 @@ tblBody?.addEventListener('click', async (e) => {
     // =====================================
     frm?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        ensureFieldStyles();
         if (!frm) return;
 
         const fd = new FormData(frm);
@@ -1080,12 +1097,19 @@ tblBody?.addEventListener('click', async (e) => {
     // =====================================
     // Init
     // =====================================
-    function boot() {
-        ensureToastCSS();
+        function boot() {
+        // ensureToastCSS(); // Solo si usas la Opción 1
         ensureConfirmModal();
-        ensureFieldStyles();
+        // ensureFieldStyles(); // <--- BORRA ESTA LÍNEA, NO EXISTE
         ensureHidden();
         limitFechaVencimiento();
+        
+        // Inicializar el modal de bootstrap para que el botón "Nuevo" funcione
+        const modalEl = document.getElementById('modalProducto');
+        if (modalEl && window.bootstrap) {
+            bsModal = new bootstrap.Modal(modalEl, { backdrop: 'static' });
+        }
+
         listar(1);
     }
 
