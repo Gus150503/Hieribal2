@@ -445,21 +445,31 @@
   // Validar datos del cliente
   // ================================
   function validarCliente() {
-    if (!inpCliNombre || !inpCliCedula) return { ok: true };
+    if (!inpCliNombre || !inpCliCedula || !inpCliApellido) return { ok: true };
 
     const nombre   = (inpCliNombre.value || '').trim();
-    const apellido = (inpCliApellido?.value || '').trim();
+    const apellido = (inpCliApellido.value || '').trim(); // <--- Quitamos el opcional
     const cedula   = (inpCliCedula.value || '').trim();
 
+    // Limpiar estados de error previos
     inpCliNombre.classList.remove('is-invalid');
-    inpCliApellido?.classList.remove('is-invalid');
+    inpCliApellido.classList.remove('is-invalid');
     inpCliCedula.classList.remove('is-invalid');
 
+    // Validación de Nombre
     if (!nombre) {
       inpCliNombre.classList.add('is-invalid');
       uiToast('El nombre del cliente es obligatorio.', 'warning');
       return { ok: false };
     }
+
+    // VALIDACIÓN NUEVA: Apellido Obligatorio
+    if (!apellido) {
+      inpCliApellido.classList.add('is-invalid');
+      uiToast('El apellido del cliente es obligatorio.', 'warning');
+      return { ok: false };
+    }
+
     const reNombre = /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]+$/;
     if (!reNombre.test(nombre)) {
       inpCliNombre.classList.add('is-invalid');
@@ -467,12 +477,13 @@
       return { ok: false };
     }
 
-    if (apellido && !reNombre.test(apellido)) {
+    if (!reNombre.test(apellido)) {
       inpCliApellido.classList.add('is-invalid');
       uiToast('El apellido solo debe contener letras y espacios.', 'warning');
       return { ok: false };
     }
 
+    // Validación de Cédula
     if (!cedula) {
       inpCliCedula.classList.add('is-invalid');
       uiToast('La cédula es obligatoria.', 'warning');
@@ -487,7 +498,6 @@
 
     return { ok: true, nombre, apellido, cedula };
   }
-
   // =====================================================
   // Guardar venta (usando modal de pago)
   // =====================================================
@@ -565,6 +575,7 @@
       uiToast('Venta registrada correctamente.', 'success');
       carrito.splice(0, carrito.length);
       renderCarrito();
+      cargarProductos();
       setMsg(`Venta guardada con éxito. Cambio: ${money(cambio)}.`, true);
       cargarHistorial(1);
 

@@ -36,13 +36,13 @@ $base = $this->config['app']['base_url'] ?? '';
                        class="form-control form-control-sm"
                        placeholder="Ej: Juan">
               </div>
-              <div class="col-md-4">
-                <label class="form-label small">Apellido cliente</label>
-                <input type="text"
-                       id="cliApellido"
-                       class="form-control form-control-sm"
-                       placeholder="Ej: Pérez">
-              </div>
+          <div class="col-md-4">
+          <label class="form-label small">Apellido cliente <span class="text-danger">*</span></label>
+          <input type="text"
+                id="cliApellido"
+                class="form-control form-control-sm"
+                placeholder="Ej: Pérez"
+                required> </div>
               <div class="col-md-4">
                 <label class="form-label small">Cédula <span class="text-danger">*</span></label>
                 <input type="text"
