@@ -52,15 +52,15 @@ class CajeroAdmin
         $like = '%' . $q . '%';
 
         // Ajusta columnas: id_producto, nombre_producto, precio_venta, stock, codigo, etc.
-        $sql = "SELECT id_producto,
-                       nombre       AS nombre_producto,
-                       precio_venta,
-                       stock,
-                       codigo
-                FROM productos
-                WHERE nombre LIKE :q OR codigo LIKE :q
-                ORDER BY nombre ASC
-                LIMIT 30";
+            $sql = "SELECT id_producto,
+                        nombre AS nombre_producto,
+                        precio_venta,
+                        stock_actual AS stock,
+                        codigo
+                    FROM productos
+                    WHERE nombre LIKE :q OR codigo LIKE :q
+                    ORDER BY nombre ASC
+                    LIMIT 30";
         $st = $this->db->prepare($sql);
         $st->bindValue(':q', $like, PDO::PARAM_STR);
         $st->execute();
@@ -78,175 +78,169 @@ class CajeroAdmin
      * @param string $cliApellido
      * @param string $cliCedula
      */
-public function crearVenta(
-    int $idUsuario,
-    array $items,
-    float $pagoCon,
-    string $metodoPago,
-    string $cliNombre,
-    string $cliApellido,
-    string $cliCedula
-): int {
-    if (empty($items)) {
-        throw new \RuntimeException('No hay productos en la venta');
-    }
 
-    // ==========================
-    // 0) NORMALIZAR IDS
-    // ==========================
-    $idsProductos = [];
-    foreach ($items as $it) {
-        $idProd = (int)($it['id_producto'] ?? 0);
-        if ($idProd > 0) {
-            $idsProductos[] = $idProd;
-        }
-    }
-    $idsProductos = array_values(array_unique($idsProductos));
-    if (empty($idsProductos)) {
-        throw new \RuntimeException('No hay productos válidos en la venta');
-    }
 
-    $this->db->beginTransaction();
+    public function crearVenta(
+        int $idUsuario,
+        array $items,
+        float $pagoCon,
+        string $metodoPago,
+        string $cliNombre,
+        string $cliApellido,
+        string $cliCedula
+    ): int {
 
-    try {
-        // ==========================
-        // 1) LEER STOCK ACTUAL (FOR UPDATE)
-        // ==========================
-        $in = implode(',', array_fill(0, count($idsProductos), '?'));
-        $sqlStockSel = "
-            SELECT id, nombre, stock_actual
-            FROM productos
-            WHERE id IN ($in)
-            FOR UPDATE
-        ";
-        $stSel = $this->db->prepare($sqlStockSel);
-        $stSel->execute($idsProductos);
-        $rowsStock = $stSel->fetchAll();
-
-        // Indexar por id
-        $stockPorId = [];
-        foreach ($rowsStock as $r) {
-            $stockPorId[(int)$r['id']] = [
-                'nombre' => $r['nombre'],
-                'stock'  => (float)$r['stock_actual'],
-            ];
+        if (empty($items)) {
+            throw new \RuntimeException('No hay productos en la venta');
         }
 
         // ==========================
-        // 2) VALIDAR STOCK SUFICIENTE
+        // 0) NORMALIZAR IDS
         // ==========================
+        $idsProductos = [];
         foreach ($items as $it) {
-            $idProd   = (int)($it['id_producto'] ?? 0);
-            $cantidad = (float)($it['cantidad'] ?? 0);
-
-            if ($idProd <= 0 || $cantidad <= 0) {
-                throw new \RuntimeException('Producto o cantidad inválida.');
-            }
-
-            if (!isset($stockPorId[$idProd])) {
-                throw new \RuntimeException('El producto con ID ' . $idProd . ' no existe.');
-            }
-
-            $disp = $stockPorId[$idProd]['stock'];
-            if ($cantidad > $disp) {
-                $nombre = $stockPorId[$idProd]['nombre'];
-                throw new \RuntimeException(
-                    "Stock insuficiente para '{$nombre}'. ".
-                    "Disponible: {$disp}, solicitado: {$cantidad}."
-                );
+            $idProd = (int)($it['id_producto'] ?? 0);
+            if ($idProd > 0) {
+                $idsProductos[] = $idProd;
             }
         }
 
-        // ==========================
-        // 3) Calcular total
-        // ==========================
-        $total = 0.0;
-        foreach ($items as $it) {
-            $precio   = (float)($it['precio'] ?? 0);
-            $cantidad = (float)($it['cantidad'] ?? 0);
-            $total   += $precio * $cantidad;
+        $idsProductos = array_values(array_unique($idsProductos));
+
+        if (empty($idsProductos)) {
+            throw new \RuntimeException('No hay productos válidos');
         }
 
-        $cambio = max(0, $pagoCon - $total);
+        $this->db->beginTransaction();
 
-        // ==========================
-        // 4) Insertar CABECERA en `ventas`
-        // ==========================
-        $sqlVenta = "INSERT INTO ventas
-                     (id_carrito, total, fecha_venta, metodo_pago,
-                      nombre_cliente, apellido_cliente, cedula_cliente,
-                      pago_con, cambio)
-                     VALUES
-                     (NULL, :tot, NOW(), :metodo,
-                      :nom, :ape, :ced,
-                      :pago, :cambio)";
-        $stVenta = $this->db->prepare($sqlVenta);
-        $stVenta->execute([
-            ':tot'    => $total,
-            ':metodo' => $metodoPago,
-            ':nom'    => $cliNombre ?: null,
-            ':ape'    => $cliApellido ?: null,
-            ':ced'    => $cliCedula ?: null,
-            ':pago'   => $pagoCon,
-            ':cambio' => $cambio,
-        ]);
-
-        $idVenta = (int)$this->db->lastInsertId();
+        try {
 
             // ==========================
-            // 5) Insertar DETALLE en `detalle_venta`
+            // 1) LEER STOCK REAL (CORREGIDO)
+            // ==========================
+            $in = implode(',', array_fill(0, count($idsProductos), '?'));
+
+            $sql = "SELECT id, nombre, stock_actual
+                    FROM productos 
+                    WHERE id IN ($in)
+                    FOR UPDATE";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($idsProductos);
+            $rows = $stmt->fetchAll();
+
+            $stockPorId = [];
+            foreach ($rows as $r) {
+                $stockPorId[(int)$r['id']] = [
+                    'nombre' => $r['nombre'],
+                    'stock'  => (float)$r['stock_actual'], // ✅ CORRECTO
+                ];
+            }
+
+            // ==========================
+            // 2) VALIDAR STOCK
+            // ==========================
+            foreach ($items as $it) {
+
+                $idProd   = (int)$it['id_producto'];
+                $cantidad = (float)$it['cantidad'];
+
+                if (!isset($stockPorId[$idProd])) {
+                    throw new \RuntimeException("Producto no existe (ID $idProd)");
+                }
+
+                $disponible = $stockPorId[$idProd]['stock'];
+
+                if ($cantidad > $disponible) {
+                    throw new \RuntimeException(
+                        "Stock insuficiente para {$stockPorId[$idProd]['nombre']} (Disponible: $disponible)"
+                    );
+                }
+            }
+
+            // ==========================
+            // 3) TOTAL
+            // ==========================
+            $total = 0;
+            foreach ($items as $it) {
+                $total += $it['precio'] * $it['cantidad'];
+            }
+
+            $cambio = max(0, $pagoCon - $total);
+
+            // ==========================
+            // 4) INSERTAR VENTA
+            // ==========================
+            $sqlVenta = "INSERT INTO ventas
+                (id_carrito, total, fecha_venta, metodo_pago,
+                nombre_cliente, apellido_cliente, cedula_cliente,
+                pago_con, cambio)
+                VALUES
+                (NULL, :tot, NOW(), :metodo,
+                :nom, :ape, :ced,
+                :pago, :cambio)";
+
+            $stmtVenta = $this->db->prepare($sqlVenta);
+            $stmtVenta->execute([
+                ':tot'    => $total,
+                ':metodo' => $metodoPago,
+                ':nom'    => $cliNombre ?: null,
+                ':ape'    => $cliApellido ?: null,
+                ':ced'    => $cliCedula ?: null,
+                ':pago'   => $pagoCon,
+                ':cambio' => $cambio,
+            ]);
+
+            $idVenta = (int)$this->db->lastInsertId();
+
+            // ==========================
+            // 5) DETALLE + STOCK
             // ==========================
             $sqlDet = "INSERT INTO detalle_venta
-                    (id_venta, id_producto, cantidad, precio, subtotal)
-                    VALUES
-                    (:idv, :pid, :cant, :precio, :sub)";
-            $stDet = $this->db->prepare($sqlDet);
+                (id_venta, id_producto, cantidad, precio, subtotal)
+                VALUES
+                (:idv, :pid, :cant, :precio, :sub)";
 
-        // ==========================
-        // 6) Actualizar STOCK (stock_actual)
-        // ==========================
-        $sqlStockUpd = "
-            UPDATE productos
-            SET stock_actual = stock_actual - :cant
-            WHERE id = :idp
-        ";
-        $stStock = $this->db->prepare($sqlStockUpd);
+            $stmtDet = $this->db->prepare($sqlDet);
 
-        foreach ($items as $it) {
-            $idProd   = (int)($it['id_producto'] ?? 0);
-            $precio   = (float)($it['precio'] ?? 0);
-            $cantidad = (float)($it['cantidad'] ?? 0);
+            $sqlUpd = "UPDATE productos
+                    SET stock_actual = stock_actual - :cant
+                    WHERE id = :idp";
 
-            $subtotal = $precio * $cantidad;
+            $stmtUpd = $this->db->prepare($sqlUpd);
 
-            // ✅ guardar detalle
-            $stDet->execute([
-                ':idv'    => $idVenta,
-                ':pid'    => $idProd,
-                ':cant'   => $cantidad,
-                ':precio' => $precio,
-                ':sub'    => $subtotal,
-            ]);
+            foreach ($items as $it) {
 
-            // ✅ actualizar stock (esto ya lo tienes)
-            $stStock->execute([
-                ':cant' => $cantidad,
-                ':idp'  => $idProd,
-            ]);
+                $idProd   = (int)$it['id_producto'];
+                $precio   = (float)$it['precio'];
+                $cantidad = (float)$it['cantidad'];
+
+                $subtotal = $precio * $cantidad;
+
+                // detalle
+                $stmtDet->execute([
+                    ':idv'    => $idVenta,
+                    ':pid'    => $idProd,
+                    ':cant'   => $cantidad,
+                    ':precio' => $precio,
+                    ':sub'    => $subtotal,
+                ]);
+
+                // stock
+                $stmtUpd->execute([
+                    ':cant' => $cantidad,
+                    ':idp'  => $idProd,
+                ]);
+            }
+
+            $this->db->commit();
+            return $idVenta;
+
+        } catch (\Throwable $e) {
+            $this->db->rollBack();
+            throw $e;
         }
-
-        $this->db->commit();
-        return $idVenta;
-
-    } catch (PDOException $e) {
-        $this->db->rollBack();
-        throw $e;
-    } catch (\Throwable $e) {
-        $this->db->rollBack();
-        throw $e;
     }
-}
-
 
         public function historialPorUsuario(int $idUsuario, int $page, int $per): array
         {

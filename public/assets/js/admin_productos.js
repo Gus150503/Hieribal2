@@ -6,13 +6,16 @@
 
     'use strict';
 
-        // Permisos basados en lo que pintó PHP
+// Detecta si el usuario tiene permisos para gestionar productos
+// (esto depende de si PHP pintó la columna de acciones en la tabla)
         const PUEDE_GESTIONAR_PRODUCTOS =
       !!document.querySelector('#tblProductos thead th.text-end');
 
     // =====================================
     // Endpoints
     // =====================================
+// Construye la URL del API automáticamente
+// Permite que funcione en cualquier entorno sin cambiar rutas manualmente
     const API_BASE =
         window.PRODUCTO_API ||
         (location.pathname.replace(/\/public\/?$/, '') +
@@ -25,7 +28,7 @@
     // =====================================
     const state = { page: 1, per: 10, total: 0, q: '' };
     let __SEQ__ = 0;
-    let imagenBase64 = null; // si suben archivo (por si luego lo usas)
+    let imagenBase64 = null; // si suben archivo (por si luego lo usas) // guarda imagen convertida a base64
 
     // =====================================
     // Selectores
@@ -46,7 +49,7 @@
     const modalTit = $('#modalProdTitle');
     let bsModal = null;
 
-    // Imagen
+    // Manejo de Imagen
     const tipoURL = $('#tipoURL');
     const tipoArchivo = $('#tipoArchivo');
     const seccionURL = $('#seccionURL');
@@ -60,25 +63,9 @@
     // =====================================
     // TOASTS
     // =====================================
-    function ensureToastCSS() {
-        if ($('#_prod_toast_css')) return;
-        const css = document.createElement('style');
-        css.id = '_prod_toast_css';
-        css.textContent = `
-.nvtoast-host{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:10px;z-index:1090;pointer-events:none}
-.nvtoast{pointer-events:auto;min-width:280px;max-width:420px;padding:10px 12px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.18);display:flex;align-items:center;gap:10px;color:#fff;opacity:.98;transform:translateY(20px);animation:_tSlide .2s ease-out forwards;border:1px solid transparent}
-.nvtoast .close{margin-left:auto;background:none;border:0;color:inherit;opacity:.9;cursor:pointer;font-size:16px;line-height:1}
-.nvtoast .dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.9}
-@keyframes _tSlide{to{transform:translateY(0)}}
-.nv-success{background:#198754;border-color:#198754;color:#EAF6EF}
-.nv-danger{background:#dc3545;border-color:#dc3545;color:#FFE5E8}
-.nv-warning{background:#ffc107;border-color:#ffc107;color:#1f1f1f}
-.nv-info{background:#0d6efd;border-color:#0d6efd;color:#E9F1FF}
-`;
-        document.head.appendChild(css);
-    }
-
+    
     function ensureToastHost() {
+// Contenedor donde aparecen los mensajes
         let host = $('#nvtoastHost');
         if (!host) {
             host = document.createElement('div');
@@ -90,11 +77,14 @@
     }
 
     function uiToast(msg, variant = 'info', ms = 3200) {
+   // Muestra mensaje tipo toast
         ensureToastCSS();
         const host = ensureToastHost();
 
         const el = document.createElement('div');
         el.className = `nvtoast nv-${variant}`;
+        // Sanitiza texto para evitar XSS
+
         el.innerHTML = `
             <div class="dot"></div>
             <div class="msg">${(msg ?? '')
@@ -110,8 +100,10 @@
 
         const close = () => el.remove();
         el.querySelector('.close')?.addEventListener('click', close);
-
+        // Se cierra automáticamente
         const timer = setTimeout(close, ms);
+
+        // Si pasa el mouse, no se cierra
         el.addEventListener(
             'mouseenter',
             () => {
@@ -125,24 +117,26 @@
     // Confirm modal
     // =====================================
     function ensureConfirmModal() {
+
+        // Si no hay bootstrap usa confirm normal
         if ($('#confirmModal')) return;
         const wrap = document.createElement('div');
         wrap.innerHTML = `
-<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0 rounded-4 shadow">
-      <div class="modal-header border-0 pb-0">
-        <h5 class="modal-title" id="confirmTitle">Confirmar acción</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body pt-3" id="confirmBody">¿Seguro?</div>
-      <div class="modal-footer border-0 pt-0">
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-success" id="btnOkConfirm">Sí, continuar</button>
-      </div>
-    </div>
-  </div>
-</div>`;
+        <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="confirmTitle">Confirmar acción</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body pt-3" id="confirmBody">¿Seguro?</div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="btnOkConfirm">Sí, continuar</button>
+            </div>
+            </div>
+        </div>
+        </div>`;
         document.body.appendChild(wrap.firstElementChild);
     }
 
@@ -155,6 +149,7 @@
         const modal = $('#confirmModal');
         if (!modal || !window.bootstrap) return Promise.resolve(confirm(body));
 
+        // Configura contenido
         $('#confirmTitle').textContent = title;
         $('#confirmBody').innerHTML = (body ?? '')
             .toString()
@@ -174,7 +169,7 @@
                 ? 'btn-outline-secondary'
                 : 'btn-success');
         okBtn.textContent = confirmText;
-
+        // Devuelve promesa (true o false)
         return new Promise((resolve) => {
             const bs = new bootstrap.Modal(modal, { backdrop: 'static' });
 
@@ -202,38 +197,7 @@
     // =====================================
     // Validación visual
     // =====================================
-    function ensureFieldStyles() {
-        if ($('#_prod_field_css')) return;
-        const css = document.createElement('style');
-        css.id = '_prod_field_css';
-        css.textContent = `
-.form-control.is-valid,
-.form-select.is-valid{
-  border-color:#198754!important;
-  box-shadow:0 0 0 .2rem rgba(25,135,84,.15)!important;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23198754' class='bi bi-check' viewBox='0 0 16 16'%3E%3Cpath d='M10.97 4.97a.75.75 0 0 1 1.07 1.05l-4.0 4.99a.75.75 0 0 1-1.08.02L3.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 4.473-4.448z'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;
-  background-position:right .75rem center;
-  background-size:1rem;
-}
-.form-control.is-invalid,
-.form-select.is-invalid{
-  border-color:#dc3545!important;
-  box-shadow:0 0 0 .2rem rgba(220,53,69,.15)!important;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23dc3545' class='bi bi-exclamation-circle' viewBox='0 0 16 16'%3E%3Cpath d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0-12a.905.905 0 0 0-.9.995l.35 4.507a.55.55 0 0 0 1.1 0l.35-4.507A.905.905 0 0 0 8 3zm.002 8a1 1 0 1 0 0 2 1 1 0 0 0 0-2z'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;
-  background-position:right .75rem center;
-  background-size:1rem;
-}
-.valid-optional{
-  color:#198754;
-  font-size:.875rem;
-  margin-top:.25rem;
-}
-`;
-        document.head.appendChild(css);
-    }
-
+    // Marca campo válido o inválido visualmente
     function setValid(el, ok, msgIfOptional = '') {
         if (!el) return;
 
@@ -270,7 +234,7 @@
     }
 
     // =====================================
-    // Utils
+    // Utilidades
     // =====================================
     function escapeHtml(s) {
         return (s ?? '').toString().replace(/[&<>"']/g, (m) => {
@@ -1124,6 +1088,8 @@ tblBody?.addEventListener('click', async (e) => {
         limitFechaVencimiento();
         listar(1);
     }
+
+    // Ejecuta cuando carga la página
 
     if (document.readyState === 'loading')
         document.addEventListener('DOMContentLoaded', boot);

@@ -1,21 +1,34 @@
 // assets/js/admin_proveedores.js
 // MODULO INVENTARIOS / Juliana Lugo /
 (function () {
+
+  // Evita que el JS se cargue dos veces (bug común)
   if (window.__PROVEEDORES_JS_BOUND__) return;
   window.__PROVEEDORES_JS_BOUND__ = true;
 
   'use strict';
-
+  // ==============================
+  // CONFIGURACIÓN BASE API
+  // ==============================
   const API_BASE = window.PROVEEDOR_API;
     (location.pathname.replace(/\/public\/?$/, '') + '/public/?r=admin_proveedores_api');
   const api = (params = '') => `${API_BASE}&${params}`;
 
+  // ==============================
+  // ESTADO GLOBAL
+  // ==============================
   const state = { page: 1, per: 10, total: 0, q: '' };
-  let __SEQ__ = 0;
+  let __SEQ__ = 0; // control de peticiones (evita respuestas viejas)
+
+  // ==============================
+  // HELPERS DOM
+  // ==============================
 
   const $  = (s) => document.querySelector(s);
   const $$ = (s) => Array.from(document.querySelectorAll(s));
-
+  // ==============================
+  // ELEMENTOS PRINCIPALES
+  // ==============================
   const tblBody   = $('#tblProveedor tbody');
   const pager     = $('#paginador');
   const perSel    = $('#perPage');
@@ -28,7 +41,9 @@
   const frm       = $('#frmProveedor');
   const modalTit  = $('#modalTitleProveedor');
   let   bsModal   = null;
-
+  // ==============================
+  // LIMPIAR BACKDROPS (ERROR BOOTSTRAP)
+  // ==============================
   function cleanupBackdrops() {
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
     document.body.classList.remove('modal-open');
@@ -37,23 +52,6 @@
   }
 
   // ========= TOASTS =========
-  function ensureToastCSS() {
-    if ($('#_prov_toast_css')) return;
-    const css = document.createElement('style');
-    css.id = '_prov_toast_css';
-    css.textContent = `
-    .nvtoast-host{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:10px;z-index:1090;pointer-events:none}
-    .nvtoast{pointer-events:auto;min-width:280px;max-width:420px;padding:10px 12px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.18);display:flex;align-items:center;gap:10px;color:#fff;opacity:.98;transform:translateY(20px);animation:_tSlide .2s ease-out forwards;border:1px solid transparent}
-    .nvtoast .close{margin-left:auto;background:none;border:0;color:inherit;opacity:.9;cursor:pointer;font-size:16px;line-height:1}
-    .nvtoast .dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.9}
-    @keyframes _tSlide{to{transform:translateY(0)}}
-    .nv-success{background:#198754;border-color:#198754;color:#EAF6EF}
-    .nv-danger{background:#dc3545;border-color:#dc3545;color:#FFE5E8}
-    .nv-warning{background:#ffc107;border-color:#ffc107;color:#1f1f1f}
-    .nv-info{background:#0d6efd;border-color:#0d6efd;color:#E9F1FF}
-    `;
-    document.head.appendChild(css);
-  }
   function ensureToastHost() {
     let host = $('#nvtoastHost');
     if (!host) {
@@ -241,6 +239,9 @@
   }
   function updateTotal(){ if (totalEl) totalEl.textContent = `${state.total} registro(s)`; }
 
+  // ==============================
+  // LISTAR PROVEEDORES
+  // ==============================
   async function listar(page = 1) {
     state.page = page;
     const q = encodeURIComponent(state.q || '');
@@ -270,7 +271,9 @@
       uiToast('No se pudieron cargar proveedores.', 'danger');
     }
   }
-
+  // ==============================
+  // RENDER TABLA
+  // ==============================
   function renderTabla(items) {
     if (!tblBody) return;
     tblBody.innerHTML = '';
