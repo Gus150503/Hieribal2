@@ -1,70 +1,55 @@
-// Mantener tu lógica de la gráfica intacta
-const ctx = document.getElementById('chartPedidos');
-
-if(ctx){
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Sep','Oct','Nov','Dic','Ene','Feb','Mar'],
-            datasets: [
-                {
-                    label: 'Pedidos',
-                    data: [18, 22, 15, 31, 20, 28, 14],
-                    backgroundColor: 'rgba(45,158,95,0.2)',
-                    borderColor: '#2d9e5f',
-                    borderWidth: 2
-                },
-                {
-                    label: 'Total',
-                    data: [320, 410, 280, 580, 370, 520, 270],
-                    type: 'line',
-                    borderColor: '#c8960c',
-                    backgroundColor: 'rgba(200, 150, 12, 0.1)',
-                    tension: 0.4
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
-            }
-        }
-    });
-}
-
-/* ==========================================
-   NUEVAS FUNCIONALIDADES (FOTO Y TEMA)
-   ========================================== */
-
-// 1. Previsualización de Foto de Perfil
-function previewImage(event) {
-    const reader = new FileReader();
-    reader.onload = function() {
-        const output = document.getElementById('preview');
-        // Si el elemento es un IMG cambia el src, si es un DIV cambia el contenido
-        if (output.tagName === 'IMG') {
-            output.src = reader.result;
-        } else {
-            output.innerHTML = `<img src="${reader.result}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
-        }
-    };
-    if(event.target.files[0]) {
-        reader.readAsDataURL(event.target.files[0]);
-    }
-}
-
-// 2. Lógica de Modo Oscuro
-function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-}
-
-// 3. Aplicar tema guardado al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Cargar Tema
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
     }
+
+    // 2. Gráfica de Barras (Compras por mes)
+    const ctxPedidos = document.getElementById('chartPedidos');
+    if (ctxPedidos) {
+        new Chart(ctxPedidos, {
+            type: 'bar',
+            data: {
+                labels: window.statsGrafica.length ? window.statsGrafica.map(d => d.mes) : ['Ene', 'Feb', 'Mar'],
+                datasets: [{
+                    label: 'Pedidos',
+                    data: window.statsGrafica.length ? window.statsGrafica.map(d => d.total_pedidos) : [5, 8, 12],
+                    backgroundColor: 'rgba(29, 158, 117, 0.6)',
+                    borderColor: '#1D9E75',
+                    borderWidth: 1
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+
+    // 3. Gráfica de Dona (Productos)
+    const ctxTop = document.getElementById('chartTop');
+    if (ctxTop) {
+        new Chart(ctxTop, {
+            type: 'doughnut',
+            data: {
+                labels: window.productosTop.length ? window.productosTop.map(p => p.nombre_producto) : ['Producto A', 'Producto B'],
+                datasets: [{
+                    data: window.productosTop.length ? window.productosTop.map(p => p.total) : [60, 40],
+                    backgroundColor: ['#1D9E75', '#9FE1CB', '#BA7517', '#E24B4A']
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
+    }
 });
+
+function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = () => {
+        const output = document.getElementById('preview');
+        output.innerHTML = `<img src="${reader.result}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+}

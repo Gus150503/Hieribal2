@@ -1,182 +1,149 @@
-/* ===================================================
-   1. LIMPIEZA DE INTERFAZ (BORRAR BARRAS SOBRANTES)
-   =================================================== */
-header, 
-.navbar-top, 
-.site-header, 
-.navbar,
-button.navbar-toggler { 
-    display: none !important; 
-    height: 0 !important;
-    visibility: hidden !important;
+/* ==========================================================
+   1. VARIABLES Y ESTILOS BASE
+   ========================================================== */
+:root {
+    --primary: #1D9E75;          /* Verde Mi Hieribal */
+    --bg-main: #f8faf9;
+    --text-main: #1a1a1a;
+    --card-bg: #ffffff;
+    --border: rgba(0,0,0,0.08);
+    --shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-/* ===================================================
-   2. ESTRUCTURA PRINCIPAL (SIDEBAR + CONTENIDO)
-   =================================================== */
-.hp-layout {
-    display: grid;
-    grid-template-columns: 260px 1fr; /* Espacio fijo para el menú lateral */
-    min-height: 100vh;
-    background: #f8faf9;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { 
+    font-family: 'Segoe UI', sans-serif; 
+    background: var(--bg-main); 
+    color: var(--text-main); 
+    overflow-x: hidden; /* Evita el scroll lateral */
 }
 
-/* SIDEBAR IZQUIERDO (EL MENÚ) */
-.sidebar {
-    background-color: #ffffff;
-    border-right: 1px solid #eee;
-    padding: 25px;
-    display: flex !important;
-    flex-direction: column;
-    gap: 10px;
+/* ==========================================================
+   2. ESTRUCTURA PRINCIPAL (LAYOUT)
+   ========================================================== */
+.hp-layout { 
+    display: flex; 
+    min-height: 100vh; 
 }
 
-/* CONTENEDOR DEL DASHBOARD */
-.perfil-dashboard {
-    flex: 1;
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    margin-top: 0 !important;
+/* SIDEBAR: Se mantiene fijo a la izquierda en PC */
+.sidebar { 
+    width: 260px;
+    background: var(--primary); 
+    color: white; 
+    padding: 20px; 
+    display: flex; 
+    flex-direction: column; 
+    position: sticky; 
+    top: 0; 
+    height: 100vh; 
+    flex-shrink: 0; 
+    transition: all 0.3s;
 }
 
-/* ===================================================
-   3. TARJETAS DE ESTADÍSTICAS (SUPERIORES)
-   =================================================== */
-.stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
+.sidebar-logo { 
+    background: white; 
+    padding: 10px; 
+    border-radius: 8px; 
+    margin-bottom: 25px; 
+    text-align: center; 
 }
 
-.stat-card {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+.sidebar-logo img { max-width: 100%; height: auto; }
+
+.profile-ava-big { 
+    width: 65px; height: 65px; 
+    border-radius: 50%; 
+    border: 3px solid white; 
+    margin: 0 auto 10px; 
+    display: flex; align-items: center; justify-content: center; 
+    font-size: 24px; font-weight: bold;
+    background: rgba(255,255,255,0.2); 
 }
 
-.stat-label {
-    font-size: 12px;
-    color: #6b7c74;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+/* Navegación */
+.nav-group { display: flex; flex-direction: column; gap: 8px; }
+.nav-link-custom { 
+    display: flex; align-items: center; gap: 12px; 
+    padding: 12px 15px; color: rgba(255,255,255,0.8); 
+    text-decoration: none; border-radius: 8px; 
 }
+.nav-link-custom.active { background: white; color: var(--primary); font-weight: bold; }
+.logout-style { margin-top: auto; color: #ffb3b3; padding-top: 15px; }
 
-.stat-num {
-    font-size: 24px;
-    font-weight: 700;
-}
-
-.green { color: #1a6b3c; }
-.gold { color: #c8960c; }
-
-/* ===================================================
-   4. SECCIÓN MEDIA (GRÁFICA Y PERFIL)
-   =================================================== */
-.mid-row {
-    display: grid;
-    grid-template-columns: 1.6fr 1fr; /* Gráfica más ancha que el perfil */
-    gap: 20px;
-}
-
-.card {
-    background: white;
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-}
-
-/* Ajuste para que la gráfica no se vea pequeña */
-.chart-wrap {
-    height: 300px;
+/* ==========================================================
+   3. CONTENIDO (DASHBOARD)
+   ========================================================== */
+.perfil-dashboard { 
+    flex-grow: 1; 
+    padding: 30px; 
     width: 100%;
-    position: relative;
 }
 
-/* ===================================================
-   5. PERFIL Y BOTONES
-   =================================================== */
-.profile-mini {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
+/* Tarjetas de estadísticas */
+.stats-row { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 20px; 
+    margin-bottom: 30px; 
 }
 
-/* Círculo de la foto */
-.profile-ava-big {
-    width: 65px;
-    height: 65px;
-    border-radius: 50%;
-    background: #2d9e5f;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 22px;
-    font-weight: bold;
-    cursor: pointer;
-    overflow: hidden;
-    border: 2px solid transparent;
-    transition: 0.3s;
+.stat-card { 
+    background: var(--card-bg); 
+    padding: 20px; border-radius: 12px; 
+    box-shadow: var(--shadow); border: 1px solid var(--border); 
 }
 
-.profile-ava-big:hover {
-    border-color: #1a6b3c;
-    filter: brightness(0.9);
+.stat-num { font-size: 26px; font-weight: 800; }
+.gold { color: #BA7517; }
+
+/* Gráficas */
+.mid-row { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+    gap: 25px; 
+    margin-bottom: 25px; 
 }
 
-.profile-name {
-    font-weight: 700;
-    font-size: 18px;
-    color: #333;
+.card { 
+    background: var(--card-bg); 
+    padding: 25px; border-radius: 12px; 
+    box-shadow: var(--shadow); border: 1px solid var(--border); 
 }
 
-.profile-role {
-    font-size: 12px;
-    color: #2d9e5f;
-    font-weight: 600;
+.chart-wrap { width: 100%; height: 300px; position: relative; }
+
+/* Datos Personales */
+.pf-row { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid var(--border); }
+.btn-edit { 
+    width: 100%; margin-top: 20px; padding: 12px; 
+    border: none; background: var(--primary); color: white; 
+    border-radius: 8px; cursor: pointer; font-weight: bold;
 }
 
-.pf-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid #f9f9f9;
-    font-size: 14px;
-}
+/* ==========================================================
+   4. AJUSTES PARA MÓVILES (RESPONSIVE)
+   ========================================================== */
+@media (max-width: 850px) {
+    .hp-layout { flex-direction: column; }
+    
+    .sidebar { 
+        width: 100%; height: auto; 
+        position: sticky; top: 0; padding: 10px; 
+        flex-direction: row; justify-content: space-around;
+    }
 
-.pf-label {
-    color: #888;
-}
+    /* Ocultar elementos para limpiar la barra móvil */
+    .sidebar-logo, .profile-mini-side, .logout-style, .nav-text { display: none; }
 
-/* BOTÓN GUARDAR CAMBIOS */
-.btn-edit {
-    width: 100%;
-    margin-top: 20px;
-    padding: 12px;
-    border: none;
-    background: #1a6b3c;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 14px;
-    transition: background 0.3s;
-}
+    .nav-group { flex-direction: row; margin-top: 0; }
 
-.btn-edit:hover {
-    background: #14522d;
-}
+    .perfil-dashboard { padding: 15px; }
 
-/* ===================================================
-   6. RESPONSIVE (OPCIONAL)
-   =================================================== */
-@media (max-width: 992px) {
-    .hp-layout { grid-template-columns: 1fr; }
-    .sidebar { display: none !important; }
-    .mid-row { grid-template-columns: 1fr; }
+    .mid-row { grid-template-columns: 1fr; } /* Gráficas una sobre otra */
+    
+    .stats-row { grid-template-columns: 1fr; } /* Tarjetas una sobre otra */
+    
+    .pf-row { flex-direction: column; align-items: flex-start; gap: 5px; }
 }
