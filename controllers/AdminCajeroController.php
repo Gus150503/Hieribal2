@@ -157,6 +157,7 @@ final class AdminCajeroController extends Controller
                     $items = $this->Cajero->buscarProductos($q);
                     $this->json(['items' => $items]);
                 } catch (\Throwable $e) {
+                        error_log($e->getMessage()); // 👈 AGREGA ESTO
                     $this->fail($this->friendlyDbError($e), 500);
                 }
                 return;
