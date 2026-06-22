@@ -29,8 +29,9 @@
   const inpCliCedula   = $('#cliCedula');
   const selMetodoPago  = $('#metodoPago');
 
-  // Campos venta
-  const selProducto   = $('#productoSelect');
+  // Campos venta (Adaptados para datalist)
+  const inpProducto   = $('#productoSelect'); // El input del buscador
+  const listaData     = $('#listaProductos'); // El datalist
   const inpCantidad   = $('#cantidadProducto');
   const btnAgregar    = $('#btnAgregarProducto');
   const tbodyCarrito  = $('#tablaCarrito tbody');
@@ -143,7 +144,6 @@
     msgBox.className = ok ? 'text-success small' : 'text-danger small';
   }
 
-  // Impedir "-" y "e" en inputs numéricos (sólo 1 en adelante)
   function bloquearMinusYExponente(input){
     if (!input) return;
     input.addEventListener('keydown', (e) => {
@@ -158,7 +158,6 @@
     });
   }
 
-  // Solo letras y espacios (para nombre / apellido)
   function soloLetras(input){
     if (!input) return;
     input.addEventListener('input', (e) => {
@@ -168,7 +167,6 @@
     });
   }
 
-  // Solo números, máximo 10 dígitos (para cédula)
   function configurarCedula(input){
     if (!input) return;
     input.addEventListener('keydown', (e) => {
@@ -189,7 +187,6 @@
   function pedirPagoEnModal(total, resumenTexto) {
     const modalEl   = document.getElementById('ventaModal');
     if (!modalEl || !window.bootstrap) {
-      // Fallback por si falta el modal alguna vez
       let pagoStr = prompt(
         `Total a pagar: ${money(total)}\n\n` +
         '¿Con cuánto paga el cliente? (solo números, sin puntos ni comas)'
@@ -244,7 +241,7 @@
 
       const onHidden = () => {
         cleanup();
-        resolve(null); // canceló
+        resolve(null);
       };
 
       const cleanup = () => {
@@ -265,51 +262,37 @@
   }
 
   // =====================================================
-  // Productos -> dropdown
+  // Productos -> Datalist
   // =====================================================
   async function cargarProductos() {
-    if (!selProducto) return;
-
-    selProducto.innerHTML = '<option value="">Cargando productos…</option>';
+    if (!listaData) return;
+    listaData.innerHTML = '';
 
     try {
       const res = await fetch(api('action=productos'));
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
       const j = await resToJsonSafe(res);
-
-      if (j.ok === false) {
-        throw new Error(j.msg || 'Error de API al cargar productos');
-      }
 
       const items = j.items || j.productos || j.data || [];
       if (!Array.isArray(items) || !items.length) {
-        selProducto.innerHTML = '<option value="">No hay productos activos</option>';
         return;
       }
-
-      selProducto.innerHTML = '<option value="">Seleccione un producto…</option>';
 
       for (const p of items) {
         const id = p.id ?? p.id_producto ?? p.ID ?? null;
         const nombre = p.nombre ?? p.nombre_producto ?? p.descripcion ?? 'Producto sin nombre';
-        const precio = Number(
-          (p.precio_venta ?? p.precio ?? p.precio_unitario ?? 0)
-        );
+        const precio = Number(p.precio_venta ?? p.precio ?? 0);
 
         if (!id || !precio) continue;
 
         const opt = document.createElement('option');
-        opt.value = id;
-        opt.textContent = `${nombre} - ${money(precio)}`;
-        opt.dataset.nombre = nombre;
+        opt.value = nombre; // Lo que el usuario escribe
+        opt.dataset.id = id;
         opt.dataset.precio = String(precio);
-        selProducto.appendChild(opt);
+        opt.textContent = `Precio: ${money(precio)}`;
+        listaData.appendChild(opt);
       }
     } catch (e) {
       console.error('Error cargando productos:', e);
-      selProducto.innerHTML = '<option value="">Error cargando productos</option>';
       uiToast('No se pudieron cargar los productos.', 'danger');
     }
   }
@@ -360,34 +343,28 @@
       `;
       tbodyCarrito.appendChild(tr);
     }
-
-    // bloquear "-" y "e" en cantidades del carrito
     tbodyCarrito.querySelectorAll('.cj-cant').forEach(bloquearMinusYExponente);
-
     actualizarTotal();
   }
 
   function agregarAlCarrito() {
-    if (!selProducto || !inpCantidad) return;
-
-    const id = parseInt(selProducto.value, 10);
+    const nombreEscrito = inpProducto.value.trim();
     const cantidad = parseFloat(inpCantidad.value || '1');
 
-    if (!id || isNaN(id)) {
-      uiToast('Selecciona un producto.', 'warning');
+    // Buscar en el datalist
+    const opcion = Array.from(listaData.options).find(opt => opt.value === nombreEscrito);
+
+    if (!opcion) {
+      uiToast('Seleccione un producto válido de la lista.', 'warning');
       return;
     }
-    if (!cantidad || cantidad <= 0) {
+
+    const id = parseInt(opcion.dataset.id, 10);
+    const precio = parseFloat(opcion.dataset.precio || '0');
+    const nombre = opcion.value;
+
+    if (cantidad <= 0) {
       uiToast('Cantidad inválida.', 'warning');
-      return;
-    }
-
-    const opt = selProducto.options[selProducto.selectedIndex];
-    const nombre = opt.dataset.nombre || opt.textContent || '';
-    const precio = parseFloat(opt.dataset.precio || '0');
-
-    if (!precio || precio <= 0) {
-      uiToast('El producto no tiene precio válido.', 'danger');
       return;
     }
 
@@ -395,26 +372,22 @@
     if (existing) {
       existing.cantidad += cantidad;
     } else {
-      carrito.push({
-        id_producto: id,
-        nombre,
-        precio,
-        cantidad
-      });
+      carrito.push({ id_producto: id, nombre, precio, cantidad });
     }
 
     renderCarrito();
+    inpProducto.value = '';
+    inpCantidad.value = '1';
+    inpProducto.focus();
     setMsg('Producto agregado al carrito.', true);
   }
 
   function onCarritoClick(e) {
-    const btnDel    = e.target.closest('.cj-del');
-    const inputCant = e.target.closest('.cj-cant');
+    const btnDel     = e.target.closest('.cj-del');
+    const inputCant  = e.target.closest('.cj-cant');
 
-    // Eliminar
     if (btnDel) {
       const tr = btnDel.closest('tr');
-      if (!tr) return;
       const id = parseInt(tr.dataset.idProducto || '0', 10);
       const idx = carrito.findIndex(it => it.id_producto === id);
       if (idx >= 0) {
@@ -424,20 +397,16 @@
       return;
     }
 
-    // Cambiar cantidad
     if (inputCant && inputCant instanceof HTMLInputElement) {
       const tr = inputCant.closest('tr');
-      if (!tr) return;
       const id = parseInt(tr.dataset.idProducto || '0', 10);
       const it = encontrarItem(id);
       if (!it) return;
 
       let nueva = parseFloat(inputCant.value || '1');
       if (!nueva || nueva <= 0) nueva = 1;
-      inputCant.value = String(nueva);
       it.cantidad = nueva;
       renderCarrito();
-      return;
     }
   }
 
@@ -448,22 +417,18 @@
     if (!inpCliNombre || !inpCliCedula || !inpCliApellido) return { ok: true };
 
     const nombre   = (inpCliNombre.value || '').trim();
-    const apellido = (inpCliApellido.value || '').trim(); // <--- Quitamos el opcional
+    const apellido = (inpCliApellido.value || '').trim();
     const cedula   = (inpCliCedula.value || '').trim();
 
-    // Limpiar estados de error previos
     inpCliNombre.classList.remove('is-invalid');
     inpCliApellido.classList.remove('is-invalid');
     inpCliCedula.classList.remove('is-invalid');
 
-    // Validación de Nombre
     if (!nombre) {
       inpCliNombre.classList.add('is-invalid');
       uiToast('El nombre del cliente es obligatorio.', 'warning');
       return { ok: false };
     }
-
-    // VALIDACIÓN NUEVA: Apellido Obligatorio
     if (!apellido) {
       inpCliApellido.classList.add('is-invalid');
       uiToast('El apellido del cliente es obligatorio.', 'warning');
@@ -473,33 +438,21 @@
     const reNombre = /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]+$/;
     if (!reNombre.test(nombre)) {
       inpCliNombre.classList.add('is-invalid');
-      uiToast('El nombre solo debe contener letras y espacios.', 'warning');
+      uiToast('Nombre inválido.', 'warning');
       return { ok: false };
     }
 
-    if (!reNombre.test(apellido)) {
-      inpCliApellido.classList.add('is-invalid');
-      uiToast('El apellido solo debe contener letras y espacios.', 'warning');
-      return { ok: false };
-    }
-
-    // Validación de Cédula
     if (!cedula) {
       inpCliCedula.classList.add('is-invalid');
       uiToast('La cédula es obligatoria.', 'warning');
       return { ok: false };
     }
-    const reCedula = /^\d{1,10}$/;
-    if (!reCedula.test(cedula)) {
-      inpCliCedula.classList.add('is-invalid');
-      uiToast('La cédula debe tener solo números (máx. 10).', 'warning');
-      return { ok: false };
-    }
 
     return { ok: true, nombre, apellido, cedula };
   }
+
   // =====================================================
-  // Guardar venta (usando modal de pago)
+  // Guardar venta
   // =====================================================
   async function guardarVenta() {
     if (!carrito.length) {
@@ -507,193 +460,99 @@
       return;
     }
 
-    // Validar datos de cliente
     const valCli = validarCliente();
     if (!valCli.ok) return;
 
-    const nombre   = valCli.nombre;
-    const apellido = valCli.apellido || '';
-    const cedula   = valCli.cedula;
-
-    const metodoPago = selMetodoPago?.value || 'efectivo';
-
     const total = carrito.reduce((acc, it) => acc + it.cantidad * it.precio, 0);
+    const resumen = carrito.map(it => `• ${it.nombre} x ${it.cantidad} = ${money(it.cantidad * it.precio)}`).join('\n');
 
-    const resumen = carrito
-      .map(it => `• ${it.nombre} x ${it.cantidad} = ${money(it.cantidad * it.precio)}`)
-      .join('\n');
-
-    // Modal para pedir con cuánto paga
     const pagoInfo = await pedirPagoEnModal(total, resumen);
-    if (!pagoInfo) {
-      return;
-    }
+    if (!pagoInfo) return;
 
     const { pago, cambio } = pagoInfo;
-
     const fd = new FormData();
     fd.append('items', JSON.stringify(carrito));
     fd.append('pago_efectivo', String(pago));
-    fd.append('cli_nombre', nombre);
-    fd.append('cli_apellido', apellido);
-    fd.append('cli_cedula', cedula);
-    fd.append('metodo_pago', metodoPago);
+    fd.append('cli_nombre', valCli.nombre);
+    fd.append('cli_apellido', valCli.apellido);
+    fd.append('cli_cedula', valCli.cedula);
+    fd.append('metodo_pago', selMetodoPago?.value || 'efectivo');
 
     try {
-      if (btnGuardar) {
-        btnGuardar.disabled = true;
-        btnGuardar.innerHTML =
-          '<span class="spinner-border spinner-border-sm me-1"></span>Guardando…';
-      }
+      btnGuardar.disabled = true;
+      btnGuardar.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Guardando…';
 
-      const res = await fetch(api('action=crear_venta'), {
-        method: 'POST',
-        body: fd
-      });
-
+      const res = await fetch(api('action=crear_venta'), { method: 'POST', body: fd });
       const j = await resToJsonSafe(res);
 
-      // Caso error (HTTP != 200/201 o JSON con ok === false)
       if (!res.ok || j.ok === false) {
-        // Caso específico: stock insuficiente
-        if (
-          j.error_code === 'OUT_OF_STOCK' ||
-          (j.msg && j.msg.toLowerCase().includes('stock insuficiente'))
-        ) {
-          uiToast(j.msg || 'Stock insuficiente para completar la venta.', 'warning');
-          setMsg(j.msg || 'Stock insuficiente para uno o más productos.', false);
-          return; // No seguimos, pero el finally igual re-habilita el botón
-        }
-
-        const msg = j.msg || j.error || `HTTP ${res.status}`;
-        throw new Error(msg);
+        throw new Error(j.msg || `Error ${res.status}`);
       }
 
-
-      const idVenta = j.id_venta ?? j.id ?? null;
-
-      uiToast('Venta registrada correctamente.', 'success');
+      uiToast('Venta registrada.', 'success');
       carrito.splice(0, carrito.length);
       renderCarrito();
       cargarProductos();
-      setMsg(`Venta guardada con éxito. Cambio: ${money(cambio)}.`, true);
+      setMsg(`Venta éxito. Cambio: ${money(cambio)}.`, true);
       cargarHistorial(1);
 
-      // 🔹 Abrir factura en PDF en nueva pestaña
-      if (idVenta) {
-        const urlFactura = `${base}/?r=admin_cajero_factura&id_venta=${encodeURIComponent(idVenta)}`;
-        window.open(urlFactura, '_blank');
+      if (j.id_venta) {
+        window.open(`${base}/?r=admin_cajero_factura&id_venta=${j.id_venta}`, '_blank');
       }
-
     } catch (err) {
-      console.error('Error guardar venta:', err);
-      uiToast(err.message || 'Error al guardar venta', 'danger');
-      setMsg('Error al guardar la venta.', false);
+      uiToast(err.message, 'danger');
     } finally {
-      if (btnGuardar) {
-        btnGuardar.disabled = false;
-        btnGuardar.innerHTML = '<i class="bi bi-check2-circle me-1"></i> Guardar venta';
-      }
+      btnGuardar.disabled = false;
+      btnGuardar.innerHTML = '<i class="bi bi-check2-circle me-1"></i> Guardar venta';
     }
   }
 
   // =====================================================
-  // Historial del cajero
+  // Historial
   // =====================================================
   async function cargarHistorial(page = 1) {
     if (!tbodyHist) return;
-    histState.page = page < 1 ? 1 : page;
-
-    tbodyHist.innerHTML = `
-      <tr>
-        <td colspan="4" class="py-3 text-center">
-          <div class="spinner-border spinner-border-sm me-2"></div> Cargando…
-        </td>
-      </tr>
-    `;
+    tbodyHist.innerHTML = '<tr><td colspan="4" class="text-center"><div class="spinner-border spinner-border-sm"></div></td></tr>';
 
     try {
-      const res = await fetch(api(`action=historial&page=${histState.page}&per=${histState.per}`));
+      const res = await fetch(api(`action=historial&page=${page}&per=${histState.per}`));
       const j = await resToJsonSafe(res);
       const items = j.items || [];
-      histState.total = parseInt(j.total ?? items.length, 10);
-
+      
       if (!items.length) {
-        tbodyHist.innerHTML = `
-          <tr>
-            <td colspan="4" class="py-3 text-center text-muted">
-              Aún no tienes ventas registradas.
-            </td>
-          </tr>
-        `;
+        tbodyHist.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Sin ventas.</td></tr>';
         return;
       }
 
       tbodyHist.innerHTML = '';
-      for (const v of items) {
+      items.forEach(v => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${v.id_venta}</td>
-          <td>${escapeHtml(v.fecha_venta || '')}</td>
-          <td>${escapeHtml(v.cliente || 'N/A')}</td>
-          <td>${money(v.total || 0)}</td>
-        `;
+        tr.innerHTML = `<td>${v.id_venta}</td><td>${v.fecha_venta}</td><td>${v.cliente}</td><td>${money(v.total)}</td>`;
         tbodyHist.appendChild(tr);
-      }
+      });
     } catch (err) {
-      console.error('Error cargar historial:', err);
-      tbodyHist.innerHTML = `
-        <tr>
-          <td colspan="4" class="py-3 text-center text-danger">
-            Error al cargar el historial.
-          </td>
-        </tr>
-      `;
+      tbodyHist.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Error.</td></tr>';
     }
   }
 
-  // =====================================================
-  // Init
-  // =====================================================
   function boot() {
     ensureToastCSS();
-
-    // Validaciones de campos cliente
     soloLetras(inpCliNombre);
     soloLetras(inpCliApellido);
     configurarCedula(inpCliCedula);
+    cargarProductos();
+    bloquearMinusYExponente(inpCantidad);
+    renderCarrito();
+    
+    tbodyCarrito?.addEventListener('click', onCarritoClick);
+    btnAgregar?.addEventListener('click', agregarAlCarrito);
+    btnGuardar?.addEventListener('click', guardarVenta);
+    cargarHistorial(1);
 
-    if (selProducto) {
-      cargarProductos();
-    }
-    if (inpCantidad) {
-      bloquearMinusYExponente(inpCantidad);
-    }
-    if (tbodyCarrito) {
-      renderCarrito();
-      tbodyCarrito.addEventListener('click', onCarritoClick);
-      tbodyCarrito.addEventListener('input', onCarritoClick);
-    }
-    if (btnAgregar) {
-      btnAgregar.addEventListener('click', agregarAlCarrito);
-    }
-    if (btnGuardar) {
-      btnGuardar.addEventListener('click', guardarVenta);
-    }
-    if (tbodyHist) {
-      cargarHistorial(1);
-    }
-
-    // bloquear "-" y "e" en el input del modal de pago
     const inpModalPago = document.getElementById('vmPagaCon');
-    if (inpModalPago) {
-      bloquearMinusYExponente(inpModalPago);
-    }
+    if (inpModalPago) bloquearMinusYExponente(inpModalPago);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
-  } else {
-    boot();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
 })();

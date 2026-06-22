@@ -47,7 +47,6 @@ final class Reportes
     {
         $sql = "SELECT 
                     v.id_venta,
-                    v.id_carrito,
                     v.total,
                     v.pago_con,
                     v.cambio,
